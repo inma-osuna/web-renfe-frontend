@@ -180,7 +180,6 @@ function renderizarGrafica() {
         zAcciones.push(fila);
     }
 
-    // Escala de colores para fondo claro (tonos esmeralda / ámbar, sin azul)
     let heatmapColors = [
         [0, '#ecfdf5'], 
         [0.25, '#99f6e4'], 
@@ -224,6 +223,6 @@ window.onload = function() {
     }
     
     setLang('es');
-    actualizarValores(15, 45);
+    actualizarValores(15, 50); // <--- Inicializado a 50 asientos
     renderizarGrafica();
 };
