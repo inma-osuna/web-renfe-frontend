@@ -10,94 +10,46 @@ const multiplicadores = [
 ];
 
 const translations = {
-
     es: {
-        header_subtitle: 'Motor de precios dinámicos',
-        online: 'Modelo activo',
-        export_btn: 'Exportar',
-
-        input: 'Entrada',
-        env_params: 'Parámetros del entorno',
-
+        nav_dashboard: 'Dashboard',
+        subtitle: 'Deep Reinforcement Learning',
+        title: 'Motor de Precios Dinámicos',
+        export_btn: 'Exportar Reporte',
+        env_params: 'Parámetros del Entorno',
         days_label: 'Días para la salida',
-        seats_label: 'Plazas disponibles',
-
-        state: 'Estado',
-        ready: 'Listo',
-
-        decision: 'Decisión',
-        inf_title: 'Inferencia del agente PPO',
-
+        seats_label: 'Asientos disponibles',
+        inf_title: 'Inferencia del Agente PPO',
         multiplier: 'Multiplicador',
-        discrete_action: 'Acción',
-
-        diagnosis: 'Diagnóstico',
-        algorithm: 'Algoritmo',
-
-        visualization: 'Visualización',
-        heatmap_title: 'Espacio de política',
-
-        current: 'Estado actual',
-
-        low: 'Descuento',
-        neutral: 'Tarifa base',
-        high: 'Incremento',
-
-        days_axis: 'Días hasta salida',
-        seats_axis: 'Plazas disponibles',
-        action: 'Acción'
+        discrete_action: 'Acción Discreta',
+        heatmap_title: 'Espacio de Política',
+        leg_1_title: 'Acciones 0–2 · 0.6x–0.8x',
+        leg_1_desc: 'Descuentos agresivos para estimular la demanda.',
+        leg_2_title: 'Acciones 3–5 · 0.9x–1.1x',
+        leg_2_desc: 'Tarifa base neutra de equilibrio.',
+        leg_3_title: 'Acciones 6–8 · 1.2x–1.4x',
+        leg_3_desc: 'Yield management alcista por escasez.'
     },
 
-
     en: {
-        header_subtitle: 'Dynamic pricing engine',
-        online: 'Model active',
-        export_btn: 'Export',
-
-        input: 'Input',
-        env_params: 'Environment parameters',
-
+        nav_dashboard: 'Dashboard',
+        subtitle: 'Deep Reinforcement Learning',
+        title: 'Dynamic Pricing Engine',
+        export_btn: 'Export Report',
+        env_params: 'Environment Parameters',
         days_label: 'Days to departure',
         seats_label: 'Available seats',
-
-        state: 'Status',
-        ready: 'Ready',
-
-        decision: 'Decision',
-        inf_title: 'PPO agent inference',
-
+        inf_title: 'PPO Agent Inference',
         multiplier: 'Multiplier',
-        discrete_action: 'Action',
-
-        diagnosis: 'Diagnosis',
-        algorithm: 'Algorithm',
-
-        visualization: 'Visualization',
-        heatmap_title: 'Policy space',
-
-        current: 'Current state',
-
-        low: 'Discount',
-        neutral: 'Base fare',
-        high: 'Increase',
-
-        days_axis: 'Days to departure',
-        seats_axis: 'Available seats',
-        action: 'Action'
+        discrete_action: 'Discrete Action',
+        heatmap_title: 'Policy Space',
+        leg_1_title: 'Actions 0–2 · 0.6x–0.8x',
+        leg_1_desc: 'Aggressive discounts to stimulate demand.',
+        leg_2_title: 'Actions 3–5 · 0.9x–1.1x',
+        leg_2_desc: 'Neutral equilibrium base fare.',
+        leg_3_title: 'Actions 6–8 · 1.2x–1.4x',
+        leg_3_desc: 'Bullish yield management due to scarcity.'
     }
-
 };
-
-
-/* =========================================================
-   TRANSLATION HELPER
-========================================================= */
-
-function t(key) {
-
-    return translations[currentLang][key] || key;
-
-}
 
 
 /* =========================================================
@@ -105,186 +57,102 @@ function t(key) {
 ========================================================= */
 
 function setLang(lang) {
-
     currentLang = lang;
 
     const btnES = document.getElementById('btnES');
     const btnEN = document.getElementById('btnEN');
 
-    const active =
-        'px-2.5 py-1 rounded-md text-[9px] font-bold bg-white shadow-sm';
+    const activeClass =
+        'bg-white text-slate-900 px-3 py-1.5 rounded-lg text-[10px] font-bold shadow-sm transition-all';
 
-    const inactive =
-        'px-2.5 py-1 rounded-md text-[9px] font-bold text-slate-400';
-
+    const inactiveClass =
+        'text-slate-400 hover:text-slate-900 px-3 py-1.5 rounded-lg text-[10px] font-bold transition-all';
 
     if (btnES) {
-
-        btnES.className =
-            lang === 'es'
-                ? active
-                : inactive;
-
+        btnES.className = lang === 'es'
+            ? activeClass
+            : inactiveClass;
     }
-
 
     if (btnEN) {
-
-        btnEN.className =
-            lang === 'en'
-                ? active
-                : inactive;
-
+        btnEN.className = lang === 'en'
+            ? activeClass
+            : inactiveClass;
     }
 
+    document.querySelectorAll('[data-i18n]').forEach(element => {
+        const key = element.getAttribute('data-i18n');
 
-    document.documentElement.lang = lang;
-
-
-    document
-        .querySelectorAll('[data-i18n]')
-        .forEach(element => {
-
-            const key =
-                element.dataset.i18n;
-
-            if (
-                translations[lang] &&
-                translations[lang][key]
-            ) {
-
-                element.textContent =
-                    translations[lang][key];
-
-            }
-
-        });
-
-
-    actualizarEtiquetas();
+        if (
+            translations[lang] &&
+            translations[lang][key]
+        ) {
+            element.innerText = translations[lang][key];
+        }
+    });
 
     ejecutarModeloIA();
-
     renderizarGrafica();
-
 }
 
 
 /* =========================================================
-   VALUES
-========================================================= */
-
-function actualizarEtiquetas() {
-
-    const txtD =
-        document.getElementById('txtDias');
-
-    const txtA =
-        document.getElementById('txtAsientos');
-
-
-    if (txtD) {
-
-        txtD.textContent =
-            `${valorDias} d`;
-
-    }
-
-
-    if (txtA) {
-
-        txtA.textContent =
-            `${valorAsientos} ${
-                currentLang === 'es'
-                    ? 'pl'
-                    : 'seats'
-            }`;
-
-    }
-
-}
-
-
-/* =========================================================
-   ENVIRONMENT
+   ENVIRONMENT VALUES
 ========================================================= */
 
 function actualizarValores(dias, asientos) {
 
-    valorDias =
-        parseInt(dias, 10);
+    valorDias = parseInt(dias, 10);
+    valorAsientos = parseInt(asientos, 10);
 
-    valorAsientos =
-        parseInt(asientos, 10);
+    const sliderD = document.getElementById('sliderDias');
+    const txtD = document.getElementById('txtDias');
 
-
-    const sliderD =
-        document.getElementById(
-            'sliderDias'
-        );
-
-    const sliderA =
-        document.getElementById(
-            'sliderAsientos'
-        );
-
+    const sliderA = document.getElementById('sliderAsientos');
+    const txtA = document.getElementById('txtAsientos');
 
     if (sliderD) {
-
-        sliderD.value =
-            valorDias;
-
+        sliderD.value = valorDias;
     }
 
+    if (txtD) {
+        txtD.innerText =
+            `${valorDias}${currentLang === 'es' ? ' d' : ' d'}`;
+    }
 
     if (sliderA) {
-
-        sliderA.value =
-            valorAsientos;
-
+        sliderA.value = valorAsientos;
     }
 
-
-    actualizarEtiquetas();
+    if (txtA) {
+        txtA.innerText =
+            `${valorAsientos}${currentLang === 'es' ? ' pl' : ' seats'}`;
+    }
 
     ejecutarModeloIA();
-
     renderizarGrafica();
-
 }
 
 
 /* =========================================================
-   PPO
+   PPO MODEL
 ========================================================= */
 
-function obtenerAccionPPO(
-    dias,
-    asientos
-) {
+function obtenerAccionPPO(dias, asientos) {
 
-    const clave =
-        `${dias}_${asientos}`;
-
+    const clave = `${dias}_${asientos}`;
 
     if (
         typeof CEREBRO_IA !== 'undefined' &&
         CEREBRO_IA[clave] !== undefined
     ) {
-
         return CEREBRO_IA[clave];
-
     }
 
-
+    // Fallback: neutral action
     return 4;
-
 }
 
-
-/* =========================================================
-   MULTIPLIER
-========================================================= */
 
 function obtenerMultiplicador(accion) {
 
@@ -292,65 +160,15 @@ function obtenerMultiplicador(accion) {
         accion >= 0 &&
         accion < multiplicadores.length
     ) {
-
         return multiplicadores[accion];
-
     }
-
 
     return 1.0;
-
 }
 
 
 /* =========================================================
-   DIAGNOSIS
-========================================================= */
-
-function obtenerDiagnostico(accion) {
-
-    if (currentLang === 'es') {
-
-        if (accion <= 2) {
-
-            return 'Descuento estratégico por alta antelación y baja ocupación.';
-
-        }
-
-
-        if (accion <= 5) {
-
-            return 'Tarifa base estable en zona de equilibrio del mercado.';
-
-        }
-
-
-        return 'Incremento de tarifa por escasez de plazas.';
-
-    }
-
-
-    if (accion <= 2) {
-
-        return 'Strategic discount due to early departure and low occupancy.';
-
-    }
-
-
-    if (accion <= 5) {
-
-        return 'Stable base fare in the market equilibrium zone.';
-
-    }
-
-
-    return 'Fare increase driven by seat scarcity.';
-
-}
-
-
-/* =========================================================
-   AGENT
+   AGENT INFERENCE
 ========================================================= */
 
 function ejecutarModeloIA() {
@@ -361,91 +179,96 @@ function ejecutarModeloIA() {
             valorAsientos
         );
 
-
     const multi =
-        obtenerMultiplicador(
-            accion
-        );
-
+        obtenerMultiplicador(accion);
 
     const pct =
-        Math.round(
-            (multi - 1) * 100
-        );
-
+        Math.round((multi - 1) * 100);
 
     const elMulti =
-        document.getElementById(
-            'precioMultiplicador'
-        );
+        document.getElementById('precioMultiplicador');
 
     const elAccion =
-        document.getElementById(
-            'accionAgente'
-        );
+        document.getElementById('accionAgente');
 
     const elPct =
-        document.getElementById(
-            'ajustePorcentaje'
-        );
+        document.getElementById('ajustePorcentaje');
 
     const elDesc =
-        document.getElementById(
-            'textoExplicativoAccion'
-        );
+        document.getElementById('textoExplicativoAccion');
 
 
     if (elMulti) {
-
-        elMulti.textContent =
+        elMulti.innerText =
             `${multi.toFixed(1)}x`;
-
     }
-
 
     if (elAccion) {
-
-        elAccion.textContent =
+        elAccion.innerText =
             accion;
-
     }
-
-
-    if (elDesc) {
-
-        elDesc.textContent =
-            obtenerDiagnostico(
-                accion
-            );
-
-    }
-
 
     if (elPct) {
 
-        elPct.textContent =
+        elPct.innerText =
             `${pct > 0 ? '+' : ''}${pct}%`;
 
-
+        // Color semantic
         if (pct > 0) {
-
             elPct.className =
-                'mono text-[10px] font-bold px-2 py-1 rounded-md bg-amber-500/10 text-amber-500';
-
+                'px-2.5 py-1.5 rounded-lg bg-amber-500/10 border border-amber-400/20 text-amber-300 text-[10px] font-bold font-mono';
         } else if (pct < 0) {
-
             elPct.className =
-                'mono text-[10px] font-bold px-2 py-1 rounded-md bg-blue-500/10 text-blue-400';
+                'px-2.5 py-1.5 rounded-lg bg-blue-500/10 border border-blue-400/20 text-blue-300 text-[10px] font-bold font-mono';
+        } else {
+            elPct.className =
+                'px-2.5 py-1.5 rounded-lg bg-white/5 border border-white/10 text-slate-300 text-[10px] font-bold font-mono';
+        }
+    }
+
+
+    let desc = '';
+
+    if (currentLang === 'es') {
+
+        if (accion <= 2) {
+
+            desc =
+                'Descuento estratégico activado por alta antelación y baja ocupación.';
+
+        } else if (accion <= 5) {
+
+            desc =
+                'Tarifa base estable en zona de equilibrio del mercado.';
 
         } else {
 
-            elPct.className =
-                'mono text-[10px] font-bold px-2 py-1 rounded-md bg-white/5 text-slate-300';
-
+            desc =
+                'Yield management alcista por escasez crítica de plazas.';
         }
 
+    } else {
+
+        if (accion <= 2) {
+
+            desc =
+                'Strategic discount activated due to early horizon and low occupancy.';
+
+        } else if (accion <= 5) {
+
+            desc =
+                'Stable base fare in market equilibrium zone.';
+
+        } else {
+
+            desc =
+                'Bullish yield management due to critical seat scarcity.';
+        }
     }
 
+    if (elDesc) {
+        elDesc.innerText = desc;
+    }
 }
 
 
@@ -461,91 +284,122 @@ function descargarReporte() {
             valorAsientos
         );
 
-
     const multi =
-        obtenerMultiplicador(
-            accion
-        );
-
+        obtenerMultiplicador(accion);
 
     const pct =
-        Math.round(
-            (multi - 1) * 100
-        );
-
+        Math.round((multi - 1) * 100);
 
     const fecha =
         new Date().toLocaleString();
 
+    const descElem =
+        document.getElementById(
+            'textoExplicativoAccion'
+        );
 
-    let contenido;
+    const descText =
+        descElem
+            ? descElem.innerText
+            : '';
+
+
+    let contenido = '';
 
 
     if (currentLang === 'es') {
 
-        contenido = [
+        contenido +=
+            '============================================================\n';
 
-            'INFORME DE INFERENCIA — RENFE TFM',
+        contenido +=
+            '          INFORME DE INFERENCIA — RENFE TFM\n';
 
-            '-----------------------------------',
+        contenido +=
+            '============================================================\n\n';
 
-            `Fecha: ${fecha}`,
+        contenido +=
+            `Fecha de generación: ${fecha}\n`;
 
-            'Modelo: Deep Reinforcement Learning (PPO)',
+        contenido +=
+            'Modelo: Deep Reinforcement Learning (PPO)\n\n';
 
-            '',
+        contenido +=
+            'PARÁMETROS DEL ENTORNO\n';
 
-            'PARÁMETROS',
+        contenido +=
+            '------------------------------------------------------------\n';
 
-            `Días para la salida: ${valorDias}`,
+        contenido +=
+            `Días para la salida: ${valorDias} días\n`;
 
-            `Plazas disponibles: ${valorAsientos}`,
+        contenido +=
+            `Asientos disponibles: ${valorAsientos} plazas\n\n`;
 
-            '',
+        contenido +=
+            'RESULTADO DEL AGENTE\n';
 
-            'RESULTADO',
+        contenido +=
+            '------------------------------------------------------------\n';
 
-            `Acción PPO: ${accion}`,
+        contenido +=
+            `Acción Discreta PPO: ${accion}\n`;
 
-            `Multiplicador: ${multi.toFixed(1)}x (${pct > 0 ? '+' : ''}${pct}%)`,
+        contenido +=
+            `Multiplicador de Tarifa: ${multi.toFixed(1)}x (${pct > 0 ? '+' : ''}${pct}%)\n`;
 
-            `Diagnóstico: ${obtenerDiagnostico(accion)}`
+        contenido +=
+            `Diagnóstico: ${descText}\n\n`;
 
-        ].join('\n');
-
+        contenido +=
+            '============================================================\n';
 
     } else {
 
-        contenido = [
+        contenido +=
+            '============================================================\n';
 
-            'PPO INFERENCE REPORT — RENFE TFM',
+        contenido +=
+            '             PPO INFERENCE REPORT — RENFE TFM\n';
 
-            '--------------------------------',
+        contenido +=
+            '============================================================\n\n';
 
-            `Date: ${fecha}`,
+        contenido +=
+            `Generation Date: ${fecha}\n`;
 
-            'Model: Deep Reinforcement Learning (PPO)',
+        contenido +=
+            'Model: Deep Reinforcement Learning (PPO)\n\n';
 
-            '',
+        contenido +=
+            'ENVIRONMENT PARAMETERS\n';
 
-            'PARAMETERS',
+        contenido +=
+            '------------------------------------------------------------\n';
 
-            `Days to departure: ${valorDias}`,
+        contenido +=
+            `Days to departure: ${valorDias} days\n`;
 
-            `Available seats: ${valorAsientos}`,
+        contenido +=
+            `Available seats: ${valorAsientos} seats\n\n`;
 
-            '',
+        contenido +=
+            'AGENT OUTPUT\n';
 
-            'RESULT',
+        contenido +=
+            '------------------------------------------------------------\n';
 
-            `PPO action: ${accion}`,
+        contenido +=
+            `PPO Discrete Action: ${accion}\n`;
 
-            `Multiplier: ${multi.toFixed(1)}x (${pct > 0 ? '+' : ''}${pct}%)`,
+        contenido +=
+            `Fare Multiplier: ${multi.toFixed(1)}x (${pct > 0 ? '+' : ''}${pct}%)\n`;
 
-            `Diagnosis: ${obtenerDiagnostico(accion)}`
+        contenido +=
+            `Diagnostic: ${descText}\n\n`;
 
-        ].join('\n');
-
+        contenido +=
+            '============================================================\n';
     }
 
 
@@ -557,59 +411,42 @@ function descargarReporte() {
             }
         );
 
-
     const url =
-        URL.createObjectURL(
-            blob
-        );
-
+        URL.createObjectURL(blob);
 
     const a =
-        document.createElement(
-            'a'
-        );
-
+        document.createElement('a');
 
     a.href = url;
 
-
     a.download =
-        `Renfe_PPO_${valorDias}d_${valorAsientos}pl.txt`;
-
+        `Informe_Renfe_PPO_${valorDias}d_${valorAsientos}s.txt`;
 
     document.body.appendChild(a);
 
     a.click();
 
-    a.remove();
+    document.body.removeChild(a);
 
     URL.revokeObjectURL(url);
-
 }
 
 
 /* =========================================================
-   HEATMAP
+   POLICY HEATMAP
 ========================================================= */
 
 function renderizarGrafica() {
 
     const contenedor =
-        document.getElementById(
-            'graficaIA'
-        );
+        document.getElementById('graficaIA');
 
-
-    if (
-        !contenedor ||
-        typeof Plotly === 'undefined'
-    ) {
-
+    if (!contenedor) {
         return;
-
     }
 
 
+    /* X axis: days */
     const xDias =
         Array.from(
             { length: 31 },
@@ -617,6 +454,7 @@ function renderizarGrafica() {
         );
 
 
+    /* Y axis: seats */
     const yAsientos =
         Array.from(
             { length: 101 },
@@ -624,20 +462,43 @@ function renderizarGrafica() {
         );
 
 
+    /* Policy matrix */
     const zAcciones =
-        yAsientos.map(
-            asientos =>
+        yAsientos.map(asientos => {
 
-                xDias.map(
-                    dias =>
+            return xDias.map(dias => {
 
-                        obtenerAccionPPO(
-                            dias,
-                            asientos
-                        )
+                return obtenerAccionPPO(
+                    dias,
+                    asientos
+                );
 
-                )
-        );
+            });
+
+        });
+
+
+    /*
+        Tech light palette:
+
+        0–2  → blue
+        3–5  → neutral
+        6–8  → amber
+    */
+
+    const heatmapColors = [
+        [0.00, '#dbeafe'],
+        [0.125, '#bfdbfe'],
+        [0.25, '#93c5fd'],
+        [0.375, '#60a5fa'],
+
+        [0.50, '#cbd5e1'],
+
+        [0.625, '#fcd34d'],
+        [0.75, '#fbbf24'],
+        [0.875, '#f59e0b'],
+        [1.00, '#d97706']
+    ];
 
 
     const data = [
@@ -655,34 +516,54 @@ function renderizarGrafica() {
 
             zmax: 8,
 
-            colorscale: [
+            colorscale: heatmapColors,
 
-                [0.00, '#dbeafe'],
+            showscale: true,
 
-                [0.25, '#60a5fa'],
-
-                [0.50, '#e2e8f0'],
-
-                [0.75, '#fbbf24'],
-
-                [1.00, '#d97706']
-
-            ],
-
-            showscale: false,
+            hoverongaps: false,
 
             hovertemplate:
+                `<b>${currentLang === 'es' ? 'Días' : 'Days'}:</b> %{x}` +
+                `<br><b>${currentLang === 'es' ? 'Plazas' : 'Seats'}:</b> %{y}` +
+                `<br><b>Action:</b> %{z}` +
+                '<extra></extra>',
 
-                `<b>${t('days_axis')}:</b> %{x}` +
+            colorbar: {
+                thickness: 8,
+                len: 0.82,
 
-                `<br><b>${t('seats_axis')}:</b> %{y}` +
+                outlinewidth: 0,
 
-                `<br><b>${t('action')}:</b> %{z}` +
+                tickmode: 'array',
 
-                '<extra></extra>'
+                tickvals: [
+                    0, 1, 2,
+                    3, 4, 5,
+                    6, 7, 8
+                ],
+
+                ticktext: [
+                    '0',
+                    '1',
+                    '2',
+                    '3',
+                    '4',
+                    '5',
+                    '6',
+                    '7',
+                    '8'
+                ],
+
+                tickfont: {
+                    family: 'Inter',
+                    size: 9,
+                    color: '#94a3b8'
+                }
+            }
         },
 
 
+        /* Current state marker */
         {
             x: [valorDias],
 
@@ -692,30 +573,25 @@ function renderizarGrafica() {
 
             type: 'scatter',
 
-            marker: {
+            name: 'Current State',
 
+            marker: {
                 color: '#0f172a',
 
-                size: 11,
+                size: 13,
+
+                symbol: 'circle',
 
                 line: {
-
                     color: '#ffffff',
-
-                    width: 2.5
-
+                    width: 3
                 }
-
             },
 
             hovertemplate:
-
-                `<b>${t('current')}</b>` +
-
-                `<br>${t('days_axis')}: ${valorDias}` +
-
-                `<br>${t('seats_axis')}: ${valorAsientos}` +
-
+                `<b>${currentLang === 'es' ? 'Estado actual' : 'Current state'}</b>` +
+                `<br>${currentLang === 'es' ? 'Días' : 'Days'}: ${valorDias}` +
+                `<br>${currentLang === 'es' ? 'Plazas' : 'Seats'}: ${valorAsientos}` +
                 '<extra></extra>'
         }
 
@@ -727,15 +603,68 @@ function renderizarGrafica() {
         autosize: true,
 
         margin: {
+            t: 10,
+            l: 52,
+            r: 60,
+            b: 48
+        },
 
-            t: 12,
 
-            r: 12,
+        xaxis: {
 
-            b: 48,
+            title: {
+                text:
+                    currentLang === 'es'
+                        ? 'Días hasta salida'
+                        : 'Days to departure',
 
-            l: 55
+                font: {
+                    family: 'Inter',
+                    size: 10,
+                    color: '#64748b'
+                }
+            },
 
+            tickfont: {
+                family: 'JetBrains Mono',
+                size: 9,
+                color: '#94a3b8'
+            },
+
+            gridcolor: 'rgba(148, 163, 184, 0.10)',
+
+            zeroline: false,
+
+            fixedrange: true
+        },
+
+
+        yaxis: {
+
+            title: {
+                text:
+                    currentLang === 'es'
+                        ? 'Plazas disponibles'
+                        : 'Available seats',
+
+                font: {
+                    family: 'Inter',
+                    size: 10,
+                    color: '#64748b'
+                }
+            },
+
+            tickfont: {
+                family: 'JetBrains Mono',
+                size: 9,
+                color: '#94a3b8'
+            },
+
+            gridcolor: 'rgba(148, 163, 184, 0.10)',
+
+            zeroline: false,
+
+            fixedrange: true
         },
 
 
@@ -745,135 +674,43 @@ function renderizarGrafica() {
         plot_bgcolor:
             'rgba(0,0,0,0)',
 
-
-        xaxis: {
-
-            title: {
-
-                text:
-                    t('days_axis'),
-
-                font: {
-
-                    family: 'Inter',
-
-                    size: 9,
-
-                    color: '#64748b'
-
-                }
-
-            },
-
-            tickfont: {
-
-                family: 'JetBrains Mono',
-
-                size: 8,
-
-                color: '#94a3b8'
-
-            },
-
-            gridcolor:
-                'rgba(148,163,184,.10)',
-
-            zeroline:
-                false,
-
-            fixedrange:
-                true
-
-        },
-
-
-        yaxis: {
-
-            title: {
-
-                text:
-                    t('seats_axis'),
-
-                font: {
-
-                    family: 'Inter',
-
-                    size: 9,
-
-                    color: '#64748b'
-
-                }
-
-            },
-
-            tickfont: {
-
-                family: 'JetBrains Mono',
-
-                size: 8,
-
-                color: '#94a3b8'
-
-            },
-
-            gridcolor:
-                'rgba(148,163,184,.10)',
-
-            zeroline:
-                false,
-
-            fixedrange:
-                true
-
-        },
+        showlegend:
+            false,
 
 
         hoverlabel: {
 
-            bgcolor:
-                '#0f172a',
+            bgcolor: '#0f172a',
 
-            bordercolor:
-                '#0f172a',
+            bordercolor: '#1e293b',
 
             font: {
-
-                family:
-                    'Inter',
-
-                size:
-                    9,
-
-                color:
-                    '#ffffff'
-
+                family: 'Inter',
+                size: 10,
+                color: '#ffffff'
             }
-
         }
+    };
 
+
+    const config = {
+
+        responsive: true,
+
+        displayModeBar: false,
+
+        scrollZoom: false,
+
+        doubleClick: false
     };
 
 
     Plotly.react(
-
         contenedor,
-
         data,
-
         layout,
-
-        {
-
-            responsive: true,
-
-            displayModeBar: false,
-
-            scrollZoom: false
-
-        }
-
+        config
     );
-
 }
 
 
@@ -881,70 +718,57 @@ function renderizarGrafica() {
    INITIALIZATION
 ========================================================= */
 
-window.addEventListener(
-    'load',
-    () => {
+window.onload = function () {
 
-        const sliderD =
-            document.getElementById(
-                'sliderDias'
-            );
-
-
-        const sliderA =
-            document.getElementById(
-                'sliderAsientos'
-            );
-
-
-        if (sliderD) {
-
-            sliderD.addEventListener(
-                'input',
-                event => {
-
-                    actualizarValores(
-
-                        event.target.value,
-
-                        valorAsientos
-
-                    );
-
-                }
-            );
-
-        }
-
-
-        if (sliderA) {
-
-            sliderA.addEventListener(
-                'input',
-                event => {
-
-                    actualizarValores(
-
-                        valorDias,
-
-                        event.target.value
-
-                    );
-
-                }
-            );
-
-        }
-
-
-        setLang('es');
-
-
-        actualizarValores(
-            15,
-            50
+    const sliderD =
+        document.getElementById(
+            'sliderDias'
         );
 
+    const sliderA =
+        document.getElementById(
+            'sliderAsientos'
+        );
+
+
+    if (sliderD) {
+
+        sliderD.addEventListener(
+            'input',
+            event => {
+
+                actualizarValores(
+                    event.target.value,
+                    valorAsientos
+                );
+
+            }
+        );
     }
-);
-```
+
+
+    if (sliderA) {
+
+        sliderA.addEventListener(
+            'input',
+            event => {
+
+                actualizarValores(
+                    valorDias,
+                    event.target.value
+                );
+
+            }
+        );
+    }
+
+
+    setLang('es');
+
+    actualizarValores(
+        15,
+        45
+    );
+
+    renderizarGrafica();
+};
