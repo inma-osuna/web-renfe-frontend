@@ -1,6 +1,6 @@
-// main.js - Inferencia directa y pura desde cerebro.js
+// main.js - Inferencia directa desde cerebro.js sin modificaciones visuales
 let valorDias = 15;
-let valorAsientos = 50;
+let valorAsientos = 45;
 let currentLang = 'es';
 
 const translations = {
@@ -84,7 +84,7 @@ function obtenerAccionPPO(dias, asientos) {
     if (typeof CEREBRO_IA !== 'undefined' && CEREBRO_IA[clave] !== undefined) {
         return CEREBRO_IA[clave];
     }
-    return 4; // Valor por defecto si no existe la clave
+    return 4;
 }
 
 function ejecutarModeloIA() {
