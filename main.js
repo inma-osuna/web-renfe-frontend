@@ -4,40 +4,34 @@ let currentLang = 'es';
 
 const translations = {
     'es': {
-        'subtitle': 'SYS.ML_ENGINE_v1.0',
-        'title': 'Motor de Precios Dinámicos',
-        'export_btn': '[EXPORT_REPORT]',
-        'env_params': '// ENV_PARAMETERS',
-        'days_label': 'Días (Lead Time)',
-        'seats_label': 'Asientos Libres',
-        'inf_title': '>> INFERENCE_OUTPUT',
-        'multiplier': 'Multiplicador',
-        'discrete_action': 'Acción Discreta',
-        'heatmap_title': '// POLICY_SPACE_MATRIX',
-        'leg_1_title': 'ACT: 0–2 (0.6x - 0.8x)',
-        'leg_1_desc': 'Descuentos agresivos para estimular la demanda.',
-        'leg_2_title': 'ACT: 3–5 (0.9x - 1.1x)',
-        'leg_2_desc': 'Tarifa base neutra de equilibrio.',
-        'leg_3_title': 'ACT: 6–8 (1.2x - 1.4x)',
-        'leg_3_desc': 'Yield management alcista por escasez.'
+        'subtitle': 'Dynamic Yield Engine',
+        'title': 'Price Optimization',
+        'export_btn': 'Exportar Reporte',
+        'env_params': 'Parámetros del Entorno',
+        'days_label': 'Días al despegue (Lead Time)',
+        'seats_label': 'Inventario',
+        'inf_title': 'Recomendación del Modelo',
+        'multiplier': 'Multiplicador de Precio',
+        'discrete_action': 'Acción:',
+        'heatmap_title': 'Mapa de Política: Random Forest',
+        'leg_1_title': 'Estrategia de Descuento (Acción 0-2)',
+        'leg_2_title': 'Tarifa Neutra (Acción 3-5)',
+        'leg_3_title': 'Yield Alcista (Acción 6-8)'
     },
     'en': {
-        'subtitle': 'SYS.ML_ENGINE_v1.0',
-        'title': 'Dynamic Pricing Engine',
-        'export_btn': '[EXPORT_REPORT]',
-        'env_params': '// ENV_PARAMETERS',
-        'days_label': 'Days (Lead Time)',
-        'seats_label': 'Available Seats',
-        'inf_title': '>> INFERENCE_OUTPUT',
-        'multiplier': 'Multiplier',
-        'discrete_action': 'Discrete Action',
-        'heatmap_title': '// POLICY_SPACE_MATRIX',
-        'leg_1_title': 'ACT: 0–2 (0.6x - 0.8x)',
-        'leg_1_desc': 'Aggressive discounts to stimulate demand.',
-        'leg_2_title': 'ACT: 3–5 (0.9x - 1.1x)',
-        'leg_2_desc': 'Neutral equilibrium base fare.',
-        'leg_3_title': 'ACT: 6–8 (1.2x - 1.4x)',
-        'leg_3_desc': 'Bullish yield management for scarcity.'
+        'subtitle': 'Dynamic Yield Engine',
+        'title': 'Price Optimization',
+        'export_btn': 'Export Report',
+        'env_params': 'Environment Parameters',
+        'days_label': 'Lead Time (Days)',
+        'seats_label': 'Available Inventory',
+        'inf_title': 'Model Recommendation',
+        'multiplier': 'Price Multiplier',
+        'discrete_action': 'Action:',
+        'heatmap_title': 'Policy Map: Random Forest',
+        'leg_1_title': 'Discount Strategy (Action 0-2)',
+        'leg_2_title': 'Neutral Fare (Action 3-5)',
+        'leg_3_title': 'Bullish Yield (Action 6-8)'
     }
 };
 
@@ -45,8 +39,8 @@ function setLang(lang) {
     currentLang = lang;
     const btnES = document.getElementById('btnES');
     const btnEN = document.getElementById('btnEN');
-    if (btnES) btnES.className = lang === 'es' ? 'bg-white border border-stone-300 shadow-sm text-stone-900 px-3 py-1 rounded text-[11px] font-bold' : 'text-stone-500 hover:text-stone-900 px-3 py-1 rounded text-[11px] font-bold';
-    if (btnEN) btnEN.className = lang === 'en' ? 'bg-white border border-stone-300 shadow-sm text-stone-900 px-3 py-1 rounded text-[11px] font-bold' : 'text-stone-500 hover:text-stone-900 px-3 py-1 rounded text-[11px] font-bold';
+    if (btnES) btnES.className = lang === 'es' ? 'bg-white shadow-sm text-gray-900 px-3 py-1 rounded-md text-xs font-semibold transition-all' : 'text-gray-500 hover:text-gray-900 px-3 py-1 rounded-md text-xs font-semibold transition-colors';
+    if (btnEN) btnEN.className = lang === 'en' ? 'bg-white shadow-sm text-gray-900 px-3 py-1 rounded-md text-xs font-semibold transition-all' : 'text-gray-500 hover:text-gray-900 px-3 py-1 rounded-md text-xs font-semibold transition-colors';
     
     document.querySelectorAll('[data-i18n]').forEach(el => {
         const key = el.getAttribute('data-i18n');
@@ -56,6 +50,7 @@ function setLang(lang) {
     });
 
     ejecutarModeloIA();
+    renderizarGrafica();
 }
 
 function actualizarValores(d, a) {
@@ -81,7 +76,7 @@ function obtenerAccionModelo(dias, asientos) {
     if (typeof CEREBRO_IA !== 'undefined' && CEREBRO_IA[clave] !== undefined) {
         return CEREBRO_IA[clave];
     }
-    return 4; // Valor fallback
+    return 4;
 }
 
 function ejecutarModeloIA() {
@@ -97,17 +92,28 @@ function ejecutarModeloIA() {
 
     if (elMulti) elMulti.innerText = multi.toFixed(1) + "x";
     if (elAccion) elAccion.innerText = accion;
-    if (elPct) elPct.innerText = (pct > 0 ? "+" : "") + pct + "%";
+    
+    if (elPct) {
+        elPct.innerText = (pct > 0 ? "+" : "") + pct + "%";
+        // Estilo dinámico del badge según descuento o aumento
+        if (pct < 0) {
+            elPct.className = "absolute top-4 right-4 text-xs font-bold text-red-700 bg-red-50 px-2 py-0.5 rounded-full border border-red-100";
+        } else if (pct > 0) {
+            elPct.className = "absolute top-4 right-4 text-xs font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-100";
+        } else {
+            elPct.className = "absolute top-4 right-4 text-xs font-bold text-gray-600 bg-gray-100 px-2 py-0.5 rounded-full border border-gray-200";
+        }
+    }
 
     let desc = "";
     if (currentLang === 'es') {
-        if (accion <= 2) desc = "Descuento estratégico activado por alta antelación y baja ocupación.";
-        else if (accion <= 5) desc = "Tarifa base estable en zona de equilibrio del mercado.";
-        else desc = "Yield management alcista por escasez crítica de plazas.";
+        if (accion <= 2) desc = "Se recomienda aplicar un descuento estratégico debido a la alta antelación y la baja ocupación proyectada.";
+        else if (accion <= 5) desc = "El sistema sugiere mantener la tarifa en la zona de equilibrio actual del mercado.";
+        else desc = "Recomendación de Yield Management alcista por alta demanda y escasez crítica de inventario.";
     } else {
-        if (accion <= 2) desc = "Strategic discount activated due to early horizon and low occupancy.";
-        else if (accion <= 5) desc = "Stable base fare in market equilibrium zone.";
-        else desc = "Bullish yield management due to critical seat scarcity.";
+        if (accion <= 2) desc = "Strategic discount recommended due to early lead time and low projected occupancy.";
+        else if (accion <= 5) desc = "The system suggests maintaining the fare within the current market equilibrium zone.";
+        else desc = "Bullish Yield Management recommended due to high demand and critical inventory scarcity.";
     }
     if (elDesc) elDesc.innerText = desc;
 }
@@ -121,42 +127,25 @@ function descargarReporte() {
     const descElem = document.getElementById('textoExplicativoAccion');
     const descText = descElem ? descElem.innerText : "";
 
-    let contenido = "";
-    if (currentLang === 'es') {
-        contenido = `==================================================\n`;
-        contenido += `        INFORME DE INFERENCIA - TFM RENFE         \n`;
-        contenido += `==================================================\n`;
-        contenido += `Fecha: ${fecha}\n`;
-        contenido += `Modelo: Machine Learning (Random Forest)\n\n`;
-        contenido += `[PARAMETROS]\n`;
-        contenido += ` > Días Lead Time: ${valorDias}\n`;
-        contenido += ` > Asientos Libres: ${valorAsientos}\n\n`;
-        contenido += `[INFERENCIA]\n`;
-        contenido += ` > Acción Óptima: ${accion}\n`;
-        contenido += ` > Multiplicador: ${multi.toFixed(1)}x (${pct > 0 ? "+" : ""}${pct}%)\n`;
-        contenido += ` > Diagnóstico: ${descText}\n`;
-        contenido += `==================================================\n`;
-    } else {
-        contenido = `==================================================\n`;
-        contenido += `        INFERENCE REPORT - RENFE TFM              \n`;
-        contenido += `==================================================\n`;
-        contenido += `Date: ${fecha}\n`;
-        contenido += `Model: Machine Learning (Random Forest)\n\n`;
-        contenido += `[PARAMETERS]\n`;
-        contenido += ` > Lead Time Days: ${valorDias}\n`;
-        contenido += ` > Available Seats: ${valorAsientos}\n\n`;
-        contenido += `[INFERENCE]\n`;
-        contenido += ` > Optimal Action: ${accion}\n`;
-        contenido += ` > Multiplier: ${multi.toFixed(1)}x (${pct > 0 ? "+" : ""}${pct}%)\n`;
-        contenido += ` > Diagnostic: ${descText}\n`;
-        contenido += `==================================================\n`;
-    }
+    let contenido = `==================================================\n`;
+    contenido += `      PIVOTICS - PRICING OPTIMIZATION REPORT      \n`;
+    contenido += `==================================================\n`;
+    contenido += `Fecha / Date: ${fecha}\n`;
+    contenido += `Modelo / Model: Random Forest Optimization\n\n`;
+    contenido += `[ESTADO DEL INVENTARIO / INVENTORY STATUS]\n`;
+    contenido += ` > Días (Lead Time): ${valorDias}\n`;
+    contenido += ` > Plazas Libres (Seats): ${valorAsientos}\n\n`;
+    contenido += `[DECISIÓN ALGORÍTMICA / ALGORITHMIC DECISION]\n`;
+    contenido += ` > Acción Discreta (Action): ${accion}\n`;
+    contenido += ` > Ajuste de Precio (Price Adj): ${multi.toFixed(1)}x (${pct > 0 ? "+" : ""}${pct}%)\n`;
+    contenido += ` > Diagnóstico: ${descText}\n`;
+    contenido += `==================================================\n`;
 
     const blob = new Blob([contenido], { type: 'text/plain;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `Reporte_Pricing_RF_${valorDias}d_${valorAsientos}s.txt`;
+    a.download = `Pivotics_Report_${valorDias}d_${valorAsientos}s.txt`;
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
@@ -180,33 +169,41 @@ function renderizarGrafica() {
         zAcciones.push(fila);
     }
 
-    // Escala analítica clara (Esmeralda/Ambar, sin azul)
+    // Colores SaaS Corporativos: De verde bosque a amarillo/ámbar
     let heatmapColors = [
-        [0, '#f5f5f4'], 
-        [0.25, '#d1fae5'], 
-        [0.5, '#10b981'], 
-        [0.75, '#f59e0b'], 
-        [1, '#ea580c']
+        [0, '#115e59'],   // teal-800
+        [0.25, '#14b8a6'],// teal-500
+        [0.5, '#fef08a'], // yellow-200
+        [0.75, '#fbbf24'],// amber-400
+        [1, '#d97706']    // amber-600
     ];
 
     let data = [
         {
             z: zAcciones, x: xDias, y: yAsientos, type: 'heatmap', zmin: 0, zmax: 8, colorscale: heatmapColors,
-            colorbar: { thickness: 12, len: 0.9, tickfont: { family: 'JetBrains Mono', size: 10, color: '#57534e' } },
+            colorbar: { thickness: 12, len: 0.8, tickfont: { family: 'Inter', size: 11, color: '#4b5563' } },
             hoverongaps: false
         },
         {
             x: [valorDias], y: [valorAsientos], mode: 'markers', type: 'scatter',
-            marker: { color: '#1c1917', size: 10, symbol: 'square', line: { color: '#ffffff', width: 1.5 } },
-            name: 'Selección'
+            marker: { color: '#ffffff', size: 14, symbol: 'circle', line: { color: '#0f766e', width: 3 } },
+            name: 'Punto de Inferencia'
         }
     ];
 
     Plotly.react('graficaIA', data, {
         autosize: true,
-        margin: { t: 10, l: 40, r: 10, b: 35 },
-        xaxis: { title: { text: currentLang === 'es' ? 'Días' : 'Days', font: { family: 'JetBrains Mono', size: 11, color: '#78716c' } }, tickfont: { family: 'JetBrains Mono', color: '#78716c' }, gridcolor: '#e7e5e4' },
-        yaxis: { title: { text: currentLang === 'es' ? 'Plazas' : 'Seats', font: { family: 'JetBrains Mono', size: 11, color: '#78716c' } }, tickfont: { family: 'JetBrains Mono', color: '#78716c' }, gridcolor: '#e7e5e4' },
+        margin: { t: 20, l: 50, r: 20, b: 40 },
+        xaxis: { 
+            title: { text: currentLang === 'es' ? 'Lead Time (Días)' : 'Lead Time (Days)', font: { family: 'Inter', size: 12, color: '#6b7280' } }, 
+            tickfont: { family: 'Inter', color: '#6b7280' }, 
+            gridcolor: '#f3f4f6' 
+        },
+        yaxis: { 
+            title: { text: currentLang === 'es' ? 'Asientos Disponibles' : 'Available Seats', font: { family: 'Inter', size: 12, color: '#6b7280' } }, 
+            tickfont: { family: 'Inter', color: '#6b7280' }, 
+            gridcolor: '#f3f4f6' 
+        },
         paper_bgcolor: 'rgba(0,0,0,0)', plot_bgcolor: 'rgba(0,0,0,0)',
         showlegend: false
     }, { responsive: true, displayModeBar: false });
@@ -224,6 +221,5 @@ window.onload = function() {
     }
     
     setLang('es');
-    actualizarValores(15, 50); // <--- Inicializado a 50 plazas por defecto
-    renderizarGrafica();
+    actualizarValores(15, 50); // Empieza en 50 asientos
 };
