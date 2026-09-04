@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pricing Optimization | TFM</title>
-    <!-- FAVICON (Tu logo SVG directo en la pestaña) -->
+    <!-- FAVICON (Logo SVG en la pestaña) -->
     <link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 19L9 11L13 15L21 5" stroke="%23f43f5e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/><circle cx="3" cy="19" r="2.5" fill="%23f43f5e"/><circle cx="9" cy="11" r="2.5" fill="%23f43f5e"/><circle cx="13" cy="15" r="2.5" fill="%23fb923c"/><circle cx="21" cy="5" r="2.5" fill="%23fb923c"/></svg>' type="image/svg+xml">
     
     <script src="https://cdn.tailwindcss.com"></script>
@@ -12,7 +12,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Inter', sans-serif; }
-        /* Sliders corporativos a juego con tu logo */
         input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; }
         input[type=range]::-webkit-slider-thumb {
             -webkit-appearance: none; height: 18px; width: 18px; border-radius: 50%;
@@ -32,7 +31,6 @@
     <nav class="bg-white border-b border-gray-200 w-full z-10 sticky top-0">
         <div class="max-w-[1600px] mx-auto px-6 h-16 flex items-center justify-between">
             <div class="flex items-center gap-6">
-                <!-- Tu Logo SVG -->
                 <div class="flex items-center gap-3">
                     <svg class="w-8 h-8" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                         <path d="M3 19L9 11L13 15L21 5" stroke="#f43f5e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
@@ -47,10 +45,9 @@
                     </div>
                 </div>
 
-                <!-- Pestañas de Navegación -->
                 <div class="hidden md:flex ml-8 h-16">
                     <button onclick="switchTab('dashboard')" id="nav-dashboard" class="px-4 h-full tab-active transition-colors text-sm" data-i18n="nav_dashboard">Dashboard</button>
-                    <button onclick="switchTab('docs')" id="nav-docs" class="px-4 h-full tab-inactive transition-colors text-sm" data-i18n="nav_docs">Documentación</button>
+                    <button onclick="switchTab('docs')" id="nav-docs" class="px-4 h-full tab-inactive transition-colors text-sm" data-i18n="nav_docs">Documentación Técnica</button>
                 </div>
             </div>
             
@@ -61,7 +58,7 @@
                 </div>
                 <div class="w-px h-6 bg-gray-200"></div>
                 <button onclick="descargarReporte()" class="bg-white hover:bg-gray-50 border border-gray-300 text-gray-700 shadow-sm px-4 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-2" data-i18n="export_btn">
-                    Exportar
+                    Exportar Reporte
                 </button>
             </div>
         </div>
@@ -118,8 +115,6 @@
                 <div class="flex-1 p-2">
                     <div id="graficaIA" class="w-full h-full"></div>
                 </div>
-                
-                <!-- Leyenda -->
                 <div class="px-6 py-4 border-t border-gray-100 bg-gray-50 flex flex-wrap gap-x-8 gap-y-3 items-center">
                     <div class="flex items-center gap-3">
                         <div class="w-4 h-4 bg-[#ffe4e6] border border-[#fda4af] rounded-sm shadow-sm"></div>
@@ -148,29 +143,83 @@
     </main>
 
     <!-- VISTA 2: DOCUMENTACIÓN -->
-    <main id="view-docs" class="hidden flex-1 w-full max-w-4xl mx-auto p-8 animate-fade-in bg-white border-x border-gray-200 min-h-screen">
-        <h2 class="text-2xl font-bold text-gray-900 mb-2" data-i18n="doc_title">Documentación del Proyecto</h2>
-        <p class="text-gray-500 mb-8 pb-4 border-b border-gray-200" data-i18n="doc_subtitle">Explicación de la metodología y parámetros del algoritmo.</p>
+    <main id="view-docs" class="hidden flex-1 w-full max-w-5xl mx-auto p-8 lg:p-12 animate-fade-in bg-white border-x border-gray-200 min-h-screen">
+        <header class="mb-10 pb-6 border-b border-gray-200">
+            <h2 class="text-3xl font-extrabold text-gray-900 tracking-tight mb-3" data-i18n="doc_title">Fundamentos y Arquitectura del Modelo</h2>
+            <p class="text-gray-500 text-lg" data-i18n="doc_subtitle">Análisis metodológico del motor de Revenue Management Dinámico.</p>
+        </header>
         
-        <div class="space-y-8 text-sm text-gray-700 leading-relaxed">
-            <section>
-                <h3 class="text-lg font-bold text-rose-500 mb-3" data-i18n="doc_sec1_title">1. El Problema de Revenue Management</h3>
-                <p data-i18n="doc_sec1_desc">El objetivo de esta herramienta es optimizar los ingresos de un tren de Alta Velocidad ajustando dinámicamente el precio del billete basándose en dos factores clave: los días restantes para la salida del tren y el número de asientos que aún quedan libres.</p>
-            </section>
+        <div class="space-y-12 text-gray-700 leading-relaxed">
             
+            <!-- 1. El Problema -->
             <section>
-                <h3 class="text-lg font-bold text-rose-500 mb-3" data-i18n="doc_sec2_title">2. Variables del Entorno</h3>
-                <ul class="list-disc pl-5 space-y-2">
-                    <li><strong class="text-gray-900" data-i18n="doc_var1_name">Lead Time (Días):</strong> <span data-i18n="doc_var1_desc">Horizonte temporal. A menor tiempo, menor elasticidad del pasajero (dispuesto a pagar más).</span></li>
-                    <li><strong class="text-gray-900" data-i18n="doc_var2_name">Inventario (Plazas):</strong> <span data-i18n="doc_var2_desc">La capacidad del tren. La escasez es el principal motor para aplicar políticas alcistas.</span></li>
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-8 h-8 rounded bg-rose-100 text-rose-600 flex items-center justify-center font-bold">1</div>
+                    <h3 class="text-xl font-bold text-gray-900" data-i18n="doc_sec1_title">Formulación del Problema (Revenue Management)</h3>
+                </div>
+                <p class="mb-4" data-i18n="doc_sec1_p1">La optimización de precios en el sector ferroviario de Alta Velocidad requiere un equilibrio continuo entre la maximización del factor de ocupación y el incremento del ingreso marginal por asiento. El objetivo del sistema desarrollado es maximizar el <em>Yield</em> total de un tren ajustando la política de precios de forma dinámica.</p>
+                <p data-i18n="doc_sec1_p2">Para lograrlo, el entorno se ha modelado como un Proceso de Decisión de Markov (MDP), donde el agente de inteligencia artificial observa un estado en el tiempo <em>t</em> y ejecuta una acción de fijación de precio para maximizar la recompensa futura esperada.</p>
+            </section>
+
+            <!-- 2. MDP -->
+            <section>
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-8 h-8 rounded bg-rose-100 text-rose-600 flex items-center justify-center font-bold">2</div>
+                    <h3 class="text-xl font-bold text-gray-900" data-i18n="doc_sec2_title">Espacio de Estados y Acciones (MDP)</h3>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+                    <div class="bg-gray-50 border border-gray-200 p-5 rounded-xl">
+                        <h4 class="font-bold text-gray-900 mb-2 border-b border-gray-200 pb-2" data-i18n="doc_sec2_state">Espacio de Estados (S)</h4>
+                        <ul class="list-disc pl-5 space-y-2 text-sm mt-3">
+                            <li><strong data-i18n="doc_sec2_s1_title">Lead Time:</strong> <span data-i18n="doc_sec2_s1_desc">Días restantes hasta la salida (0 a 30). Captura la evolución de la curva de demanda y la inelasticidad del pasajero de última hora.</span></li>
+                            <li><strong data-i18n="doc_sec2_s2_title">Inventario Disponible:</strong> <span data-i18n="doc_sec2_s2_desc">Asientos libres restantes. A menor capacidad, mayor es el coste de oportunidad de vender barato.</span></li>
+                        </ul>
+                    </div>
+                    <div class="bg-gray-50 border border-gray-200 p-5 rounded-xl">
+                        <h4 class="font-bold text-gray-900 mb-2 border-b border-gray-200 pb-2" data-i18n="doc_sec2_action">Espacio de Acciones (A)</h4>
+                        <p class="text-sm mt-3 mb-2" data-i18n="doc_sec2_a_desc">El sistema acciona una variable discreta escalar entre 0 y 8, que se traduce algorítmicamente en un multiplicador sobre la tarifa base:</p>
+                        <ul class="list-disc pl-5 space-y-1 text-sm text-gray-600">
+                            <li><strong class="text-rose-500">0 - 2:</strong> Descuentos (0.6x - 0.8x)</li>
+                            <li><strong class="text-gray-700">3 - 5:</strong> Tarifas Neutras (0.9x - 1.1x)</li>
+                            <li><strong class="text-orange-500">6 - 8:</strong> Yield Alcista (1.2x - 1.4x)</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 3. DRL vs RF -->
+            <section class="bg-rose-50 border border-rose-100 rounded-2xl p-8 relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-32 h-32 bg-rose-200 rounded-full blur-3xl opacity-50 -mr-10 -mt-10"></div>
+                <div class="flex items-center gap-3 mb-6 relative z-10">
+                    <div class="w-8 h-8 rounded bg-rose-600 text-white flex items-center justify-center font-bold">3</div>
+                    <h3 class="text-xl font-bold text-gray-900" data-i18n="doc_sec3_title">Evolución Algorítmica: De PPO a Random Forest</h3>
+                </div>
+                
+                <div class="space-y-4 relative z-10 text-gray-800">
+                    <p data-i18n="doc_sec3_p1">En la fase experimental inicial, se entrenó un agente mediante <strong>Proximal Policy Optimization (PPO)</strong> dentro de un entorno Gymnasium. Sin embargo, la complejidad en el diseño de la <em>Reward Function</em> (penalizaciones por asientos vacíos frente a recompensas por ingresos altos) provocó un <strong>Policy Collapse</strong>: el agente aprendió a converger en un mínimo local, aplicando sistemáticamente la tarifa máxima para mitigar riesgos, perdiendo la sensibilidad a la demanda real.</p>
+                    
+                    <p data-i18n="doc_sec3_p2">Para resolver este sesgo, se implementó una simulación mediante el método de <strong>Monte Carlo</strong> que generó un dataset masivo de transacciones óptimas simuladas. Sobre estos datos, se entrenó un <strong>Random Forest Regressor</strong>. Este algoritmo de ensamble demostró una capacidad muy superior para modelar las interacciones no lineales entre el tiempo y la escasez sin sufrir colapsos de política.</p>
+                    
+                    <div class="bg-white/80 p-4 rounded-lg border border-rose-200 mt-4 flex items-center gap-4">
+                        <div class="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center text-orange-600 font-bold text-xl">+17%</div>
+                        <p class="text-sm font-medium" data-i18n="doc_sec3_p3">La matriz de decisiones inferida por el modelo de Random Forest logró un incremento en el ingreso global simulado del 17% frente a la política de precios fijos.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 4. Interpretación -->
+            <section>
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-8 h-8 rounded bg-rose-100 text-rose-600 flex items-center justify-center font-bold">4</div>
+                    <h3 class="text-xl font-bold text-gray-900" data-i18n="doc_sec4_title">Guía de Interpretación del Dashboard</h3>
+                </div>
+                <p class="mb-4" data-i18n="doc_sec4_p1">El <strong>Mapa de Política</strong> de la interfaz expone visualmente el espacio de decisión completo del modelo Random Forest. Permite al analista de negocio evaluar la estrategia global de un solo vistazo:</p>
+                <ul class="list-disc pl-5 space-y-3">
+                    <li data-i18n="doc_sec4_li1"><strong>Zonas Claras (Rosa pálido):</strong> Aparecen principalmente en la parte superior derecha de la gráfica (muchos días de antelación, muchas plazas libres). Indican acciones de descuento para estimular compras tempranas y asegurar el <em>Load Factor</em> base del tren.</li>
+                    <li data-i18n="doc_sec4_li2"><strong>Zonas Cálidas (Naranja fuego):</strong> Se concentran en el origen de los ejes (pocos días, pocas plazas). Representan la activación del Yield Management restrictivo para capitalizar la disposición a pagar de los clientes corporativos o de urgencia.</li>
                 </ul>
             </section>
 
-            <section class="bg-rose-50 border border-rose-100 rounded-xl p-5">
-                <h3 class="text-lg font-bold text-rose-600 mb-3" data-i18n="doc_sec3_title">3. Arquitectura del Modelo: Random Forest</h3>
-                <p class="mb-3" data-i18n="doc_sec3_desc1">Para resolver la optimización de precios, se ha implementado un modelo de Machine Learning basado en Random Forest Regressor. Este algoritmo de ensamble es ideal para capturar las complejas relaciones no lineales entre la escasez de plazas y la urgencia temporal del pasajero.</p>
-                <p data-i18n="doc_sec3_desc2">El modelo evalúa el estado actual del entorno y determina la acción discreta óptima (escala del 0 al 8). Esta política de precios permite maximizar el Revenue total (Uplift) al equilibrar eficientemente el riesgo de asientos vacíos con la oportunidad de capturar la máxima disposición a pagar por parte de los viajeros.</p>
-            </section>
         </div>
     </main>
 

@@ -7,8 +7,8 @@ const translations = {
         'title': 'Revenue Management',
         'subtitle': 'Dynamic Pricing',
         'nav_dashboard': 'Dashboard',
-        'nav_docs': 'Documentación',
-        'export_btn': 'Exportar',
+        'nav_docs': 'Documentación Técnica',
+        'export_btn': 'Exportar Reporte',
         'env_params': 'Parámetros del Entorno',
         'days_label': 'Días al despegue',
         'seats_label': 'Inventario',
@@ -16,6 +16,7 @@ const translations = {
         'multiplier': 'Multiplicador de Precio',
         'discrete_action': 'Acción Discreta:',
         'heatmap_title': 'Mapa de Política: Random Forest',
+        
         'leg_1_title': 'Acciones 0–2 (0.6x - 0.8x)',
         'leg_1_desc': 'Descuentos agresivos.',
         'leg_2_title': 'Acciones 3–5 (0.9x - 1.1x)',
@@ -23,25 +24,38 @@ const translations = {
         'leg_3_title': 'Acciones 6–8 (1.2x - 1.4x)',
         'leg_3_desc': 'Yield management alcista.',
         
-        'doc_title': 'Documentación del Proyecto',
-        'doc_subtitle': 'Explicación de la metodología y parámetros del algoritmo.',
-        'doc_sec1_title': '1. El Problema de Revenue Management',
-        'doc_sec1_desc': 'El objetivo de esta herramienta es optimizar los ingresos de un tren de Alta Velocidad ajustando dinámicamente el precio del billete basándose en dos factores clave: los días restantes para la salida del tren y el número de asientos que aún quedan libres.',
-        'doc_sec2_title': '2. Variables del Entorno',
-        'doc_var1_name': 'Lead Time (Días):',
-        'doc_var1_desc': 'Horizonte temporal. A menor tiempo, menor elasticidad del pasajero (dispuesto a pagar más).',
-        'doc_var2_name': 'Inventario (Plazas):',
-        'doc_var2_desc': 'La capacidad del tren. La escasez es el principal motor para aplicar políticas alcistas.',
-        'doc_sec3_title': '3. Arquitectura del Modelo: Random Forest',
-        'doc_sec3_desc1': 'Para resolver la optimización de precios, se ha implementado un modelo de Machine Learning basado en Random Forest Regressor. Este algoritmo de ensamble es ideal para capturar las complejas relaciones no lineales entre la escasez de plazas y la urgencia temporal del pasajero.',
-        'doc_sec3_desc2': 'El modelo evalúa el estado actual del entorno y determina la acción discreta óptima (escala del 0 al 8). Esta política de precios permite maximizar el Revenue total (Uplift) al equilibrar eficientemente el riesgo de asientos vacíos con la oportunidad de capturar la máxima disposición a pagar por parte de los viajeros.'
+        // DOCUMENTACIÓN EXTENDIDA
+        'doc_title': 'Fundamentos y Arquitectura del Modelo',
+        'doc_subtitle': 'Análisis metodológico del motor de Revenue Management Dinámico.',
+        'doc_sec1_title': 'Formulación del Problema (Revenue Management)',
+        'doc_sec1_p1': 'La optimización de precios en el sector ferroviario de Alta Velocidad requiere un equilibrio continuo entre la maximización del factor de ocupación y el incremento del ingreso marginal por asiento. El objetivo del sistema desarrollado es maximizar el Yield total de un tren ajustando la política de precios de forma dinámica.',
+        'doc_sec1_p2': 'Para lograrlo, el entorno se ha modelado como un Proceso de Decisión de Markov (MDP), donde el agente de inteligencia artificial observa un estado en el tiempo t y ejecuta una acción de fijación de precio para maximizar la recompensa futura esperada.',
+        
+        'doc_sec2_title': 'Espacio de Estados y Acciones (MDP)',
+        'doc_sec2_state': 'Espacio de Estados (S)',
+        'doc_sec2_s1_title': 'Lead Time:',
+        'doc_sec2_s1_desc': 'Días restantes hasta la salida (0 a 30). Captura la evolución de la curva de demanda y la inelasticidad del pasajero de última hora.',
+        'doc_sec2_s2_title': 'Inventario Disponible:',
+        'doc_sec2_s2_desc': 'Asientos libres restantes. A menor capacidad, mayor es el coste de oportunidad de vender barato.',
+        'doc_sec2_action': 'Espacio de Acciones (A)',
+        'doc_sec2_a_desc': 'El sistema acciona una variable discreta escalar entre 0 y 8, que se traduce algorítmicamente en un multiplicador sobre la tarifa base:',
+        
+        'doc_sec3_title': 'Evolución Algorítmica: De PPO a Random Forest',
+        'doc_sec3_p1': 'En la fase experimental inicial, se entrenó un agente mediante Proximal Policy Optimization (PPO) dentro de un entorno Gymnasium. Sin embargo, la complejidad en el diseño de la Reward Function provocó un Policy Collapse: el agente aprendió a converger en un mínimo local, aplicando sistemáticamente la tarifa máxima para mitigar riesgos, perdiendo la sensibilidad a la demanda real.',
+        'doc_sec3_p2': 'Para resolver este sesgo, se implementó una simulación mediante el método de Monte Carlo que generó un dataset masivo de transacciones óptimas simuladas. Sobre estos datos, se entrenó un Random Forest Regressor. Este algoritmo de ensamble demostró una capacidad muy superior para modelar las interacciones no lineales entre el tiempo y la escasez sin sufrir colapsos de política.',
+        'doc_sec3_p3': 'La matriz de decisiones inferida por el modelo de Random Forest logró un incremento en el ingreso global simulado del 17% frente a la política de precios fijos.',
+        
+        'doc_sec4_title': 'Guía de Interpretación del Dashboard',
+        'doc_sec4_p1': 'El Mapa de Política de la interfaz expone visualmente el espacio de decisión completo del modelo. Permite al analista evaluar la estrategia global de un vistazo:',
+        'doc_sec4_li1': 'Zonas Claras (Rosa pálido): Aparecen principalmente con muchos días de antelación y muchas plazas libres. Indican acciones de descuento para estimular compras tempranas y asegurar el Load Factor base.',
+        'doc_sec4_li2': 'Zonas Cálidas (Naranja fuego): Se concentran cuando hay escasez y urgencia temporal. Representan la activación del Yield Management restrictivo para capitalizar la disposición a pagar de los clientes corporativos.'
     },
     'en': {
         'title': 'Revenue Management',
         'subtitle': 'Dynamic Pricing',
         'nav_dashboard': 'Dashboard',
-        'nav_docs': 'Documentation',
-        'export_btn': 'Export',
+        'nav_docs': 'Technical Documentation',
+        'export_btn': 'Export Report',
         'env_params': 'Environment Parameters',
         'days_label': 'Lead Time (Days)',
         'seats_label': 'Inventory (Seats)',
@@ -49,6 +63,7 @@ const translations = {
         'multiplier': 'Price Multiplier',
         'discrete_action': 'Discrete Action:',
         'heatmap_title': 'Policy Map: Random Forest',
+        
         'leg_1_title': 'Actions 0–2 (0.6x - 0.8x)',
         'leg_1_desc': 'Aggressive discounts.',
         'leg_2_title': 'Actions 3–5 (0.9x - 1.1x)',
@@ -56,18 +71,31 @@ const translations = {
         'leg_3_title': 'Actions 6–8 (1.2x - 1.4x)',
         'leg_3_desc': 'Bullish yield management.',
         
-        'doc_title': 'Project Documentation',
-        'doc_subtitle': 'Explanation of the methodology and algorithm parameters.',
-        'doc_sec1_title': '1. The Revenue Management Problem',
-        'doc_sec1_desc': 'The goal of this tool is to optimize the revenue of a High-Speed train by dynamically adjusting ticket prices based on two key factors: days remaining to departure and available seats.',
-        'doc_sec2_title': '2. Environment Variables',
-        'doc_var1_name': 'Lead Time (Days):',
-        'doc_var1_desc': 'Time horizon. Closer to departure means lower passenger elasticity (willing to pay more).',
-        'doc_var2_name': 'Inventory (Seats):',
-        'doc_var2_desc': 'Train capacity. Scarcity is the main driver for bullish pricing policies.',
-        'doc_sec3_title': '3. Model Architecture: Random Forest',
-        'doc_sec3_desc1': 'To solve the price optimization problem, a Machine Learning model based on a Random Forest Regressor was implemented. This ensemble algorithm is ideal for capturing the complex non-linear relationships between seat scarcity and passenger time urgency.',
-        'doc_sec3_desc2': 'The model evaluates the current environment state and determines the optimal discrete action (scale 0 to 8). This pricing policy maximizes total Revenue (Uplift) by efficiently balancing the risk of empty seats against the opportunity to capture the highest willingness to pay from travelers.'
+        // EXTENDED DOCUMENTATION
+        'doc_title': 'Model Fundamentals & Architecture',
+        'doc_subtitle': 'Methodological analysis of the Dynamic Revenue Management engine.',
+        'doc_sec1_title': 'Problem Formulation (Revenue Management)',
+        'doc_sec1_p1': 'Price optimization in the High-Speed railway sector requires a continuous balance between maximizing the load factor and increasing the marginal revenue per seat. The goal of this system is to maximize total Yield by dynamically adjusting the pricing policy.',
+        'doc_sec1_p2': 'To achieve this, the environment is modeled as a Markov Decision Process (MDP), where the AI agent observes a state at time t and executes a pricing action to maximize expected future rewards.',
+        
+        'doc_sec2_title': 'State and Action Space (MDP)',
+        'doc_sec2_state': 'State Space (S)',
+        'doc_sec2_s1_title': 'Lead Time:',
+        'doc_sec2_s1_desc': 'Days remaining until departure (0 to 30). Captures the evolution of the demand curve and last-minute passenger inelasticity.',
+        'doc_sec2_s2_title': 'Available Inventory:',
+        'doc_sec2_s2_desc': 'Remaining free seats. Lower capacity implies a higher opportunity cost of selling cheap.',
+        'doc_sec2_action': 'Action Space (A)',
+        'doc_sec2_a_desc': 'The system triggers a discrete scalar variable between 0 and 8, which translates algorithmically into a base fare multiplier:',
+        
+        'doc_sec3_title': 'Algorithmic Evolution: From PPO to Random Forest',
+        'doc_sec3_p1': 'In the initial experimental phase, an agent was trained using Proximal Policy Optimization (PPO) within a Gymnasium environment. However, complexities in Reward Function design led to a Policy Collapse: the agent converged on a local minimum, systematically applying maximum fares to mitigate risks, losing sensitivity to actual demand.',
+        'doc_sec3_p2': 'To solve this bias, a Monte Carlo simulation was implemented to generate a massive dataset of simulated optimal transactions. A Random Forest Regressor was trained on this data. This ensemble algorithm demonstrated superior capability in modeling non-linear interactions between time and scarcity without suffering policy collapses.',
+        'doc_sec3_p3': 'The decision matrix inferred by the Random Forest model achieved a 17% increase in overall simulated revenue compared to fixed pricing policies.',
+        
+        'doc_sec4_title': 'Dashboard Interpretation Guide',
+        'doc_sec4_p1': 'The interface\'s Policy Map visually exposes the complete decision space of the model, allowing analysts to evaluate the global strategy at a glance:',
+        'doc_sec4_li1': 'Light Zones (Pale Pink): Found mostly with high lead times and abundant seats. They indicate discount actions to stimulate early bookings and secure the base Load Factor.',
+        'doc_sec4_li2': 'Warm Zones (Fire Orange): Concentrated when time and seats are scarce. They represent the activation of restrictive Yield Management to capitalize on the willingness to pay of corporate or urgent travelers.'
     }
 };
 
