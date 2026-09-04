@@ -174,7 +174,6 @@ function ejecutarModeloIA() {
 
     if (elMulti) elMulti.innerText = multi.toFixed(1) + "x";
     
-    // --- LÓGICA DE COLORES CORREGIDA ---
     if (elAccion) {
         elAccion.innerText = accion;
         if (accion <= 2) {
@@ -197,15 +196,37 @@ function ejecutarModeloIA() {
         }
     }
 
+    // --- NUEVA LÓGICA DE JUSTIFICACIÓN INTELIGENTE ---
     let desc = "";
     if (currentLang === 'es') {
-        if (accion <= 2) desc = "Descuento estratégico activado por alta antelación y baja ocupación proyectada.";
-        else if (accion <= 5) desc = "Tarifa base estable en zona de equilibrio del mercado.";
-        else desc = "Recomendación de Yield Management alcista por alta demanda y escasez crítica de inventario.";
+        if (accion <= 2) {
+            desc = "Descuento estratégico activado por alta antelación y baja ocupación proyectada.";
+        } else if (accion <= 5) {
+            desc = "Tarifa base estable en zona de equilibrio del mercado.";
+        } else {
+            // Diferenciamos por qué se sube el precio
+            if (valorDias <= 3) {
+                desc = "Yield Management alcista por inelasticidad de demanda de última hora (viajero corporativo/urgencia).";
+            } else if (valorAsientos <= 25) {
+                desc = "Recomendación de Yield Management alcista por escasez crítica de inventario.";
+            } else {
+                desc = "Recomendación de Yield Management para maximizar el margen por asiento.";
+            }
+        }
     } else {
-        if (accion <= 2) desc = "Strategic discount recommended due to early lead time and low projected occupancy.";
-        else if (accion <= 5) desc = "Stable base fare in market equilibrium zone.";
-        else desc = "Bullish Yield Management recommended due to high demand and critical inventory scarcity.";
+        if (accion <= 2) {
+            desc = "Strategic discount recommended due to early lead time and low projected occupancy.";
+        } else if (accion <= 5) {
+            desc = "Stable base fare in market equilibrium zone.";
+        } else {
+            if (valorDias <= 3) {
+                desc = "Bullish Yield Management due to last-minute demand inelasticity (corporate/urgent travelers).";
+            } else if (valorAsientos <= 25) {
+                desc = "Bullish Yield Management recommended due to critical inventory scarcity.";
+            } else {
+                desc = "Bullish Yield Management recommended to maximize marginal revenue per seat.";
+            }
+        }
     }
     if (elDesc) elDesc.innerText = desc;
 }
