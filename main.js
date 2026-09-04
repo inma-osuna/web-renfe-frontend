@@ -1,4 +1,4 @@
-// main.js - Inferencia Pura del Proyecto (TFM Renfe)
+// main.js - Inferencia directa y pura desde cerebro.js
 let valorDias = 15;
 let valorAsientos = 50;
 let currentLang = 'es';
@@ -46,8 +46,10 @@ const translations = {
 
 function setLang(lang) {
     currentLang = lang;
-    document.getElementById('btnES').className = lang === 'es' ? 'bg-zinc-900 text-white px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all' : 'text-zinc-500 hover:text-zinc-900 px-3.5 py-1.5 rounded-lg text-xs font-bold transition-colors';
-    document.getElementById('btnEN').className = lang === 'en' ? 'bg-zinc-900 text-white px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all' : 'text-zinc-500 hover:text-zinc-900 px-3.5 py-1.5 rounded-lg text-xs font-bold transition-colors';
+    const btnES = document.getElementById('btnES');
+    const btnEN = document.getElementById('btnEN');
+    if (btnES) btnES.className = lang === 'es' ? 'bg-zinc-900 text-white px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all' : 'text-zinc-500 hover:text-zinc-900 px-3.5 py-1.5 rounded-lg text-xs font-bold transition-colors';
+    if (btnEN) btnEN.className = lang === 'en' ? 'bg-zinc-900 text-white px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all' : 'text-zinc-500 hover:text-zinc-900 px-3.5 py-1.5 rounded-lg text-xs font-bold transition-colors';
     
     document.querySelectorAll('[data-i18n]').forEach(el => {
         const key = el.getAttribute('data-i18n');
@@ -57,16 +59,22 @@ function setLang(lang) {
     });
 
     ejecutarModeloIA();
-    renderizarGrafica();
 }
 
 function actualizarValores(d, a) {
     valorDias = parseInt(d);
     valorAsientos = parseInt(a);
-    document.getElementById('sliderDias').value = valorDias;
-    document.getElementById('txtDias').innerText = valorDias + " d";
-    document.getElementById('sliderAsientos').value = valorAsientos;
-    document.getElementById('txtAsientos').innerText = valorAsientos + " pl";
+    
+    const sliderD = document.getElementById('sliderDias');
+    const txtD = document.getElementById('txtDias');
+    const sliderA = document.getElementById('sliderAsientos');
+    const txtA = document.getElementById('txtAsientos');
+
+    if (sliderD) sliderD.value = valorDias;
+    if (txtD) txtD.innerText = valorDias + " d";
+    if (sliderA) sliderA.value = valorAsientos;
+    if (txtA) txtA.innerText = valorAsientos + " pl";
+
     ejecutarModeloIA();
     renderizarGrafica();
 }
@@ -76,17 +84,23 @@ function obtenerAccionPPO(dias, asientos) {
     if (typeof CEREBRO_IA !== 'undefined' && CEREBRO_IA[clave] !== undefined) {
         return CEREBRO_IA[clave];
     }
-    return 4; // Valor por defecto estricto si no existe la clave
+    return 4; // Valor por defecto si no existe la clave
 }
 
 function ejecutarModeloIA() {
     const accion = obtenerAccionPPO(valorDias, valorAsientos);
-    const multi = [0.6, 0.7, 0.8, 0.9, 1.0, 1.1, 1.2, 1.3, 1.4][accion] || 1.0;
+    const multiplicadores = [0.6, 0.7, 0.8, 0.9, 1.0, 1.1, 1.2, 1.3, 1.4];
+    const multi = multiplicadores[accion] !== undefined ? multiplicadores[accion] : 1.0;
     const pct = Math.round((multi - 1) * 100);
 
-    document.getElementById('precioMultiplicador').innerText = multi.toFixed(1) + "x";
-    document.getElementById('accionAgente').innerText = accion;
-    document.getElementById('ajustePorcentaje').innerText = (pct > 0 ? "+" : "") + pct + "%";
+    const elMulti = document.getElementById('precioMultiplicador');
+    const elAccion = document.getElementById('accionAgente');
+    const elPct = document.getElementById('ajustePorcentaje');
+    const elDesc = document.getElementById('textoExplicativoAccion');
+
+    if (elMulti) elMulti.innerText = multi.toFixed(1) + "x";
+    if (elAccion) elAccion.innerText = accion;
+    if (elPct) elPct.innerText = (pct > 0 ? "+" : "") + pct + "%";
 
     let desc = "";
     if (currentLang === 'es') {
@@ -98,14 +112,17 @@ function ejecutarModeloIA() {
         else if (accion <= 5) desc = "Stable base fare in market equilibrium zone.";
         else desc = "Bullish yield management due to critical seat scarcity.";
     }
-    document.getElementById('textoExplicativoAccion').innerText = desc;
+    if (elDesc) elDesc.innerText = desc;
 }
 
 function descargarReporte() {
     const accion = obtenerAccionPPO(valorDias, valorAsientos);
-    const multi = [0.6, 0.7, 0.8, 0.9, 1.0, 1.1, 1.2, 1.3, 1.4][accion];
+    const multiplicadores = [0.6, 0.7, 0.8, 0.9, 1.0, 1.1, 1.2, 1.3, 1.4];
+    const multi = multiplicadores[accion] || 1.0;
     const pct = Math.round((multi - 1) * 100);
     const fecha = new Date().toLocaleString();
+    const descElem = document.getElementById('textoExplicativoAccion');
+    const descText = descElem ? descElem.innerText : "";
 
     let contenido = "";
     if (currentLang === 'es') {
@@ -120,7 +137,7 @@ function descargarReporte() {
         contenido += `RESULTADO DEL AGENTE:\n`;
         contenido += ` - Acción Discreta PPO: ${accion}\n`;
         contenido += ` - Multiplicador de Tarifa: ${multi.toFixed(1)}x (${pct > 0 ? "+" : ""}${pct}%)\n`;
-        contenido += ` - Diagnóstico: ${document.getElementById('textoExplicativoAccion').innerText}\n`;
+        contenido += ` - Diagnóstico: ${descText}\n`;
         contenido += `==================================================\n`;
     } else {
         contenido = `==================================================\n`;
@@ -134,7 +151,7 @@ function descargarReporte() {
         contenido += `AGENT OUTPUT:\n`;
         contenido += ` - PPO Discrete Action: ${accion}\n`;
         contenido += ` - Fare Multiplier: ${multi.toFixed(1)}x (${pct > 0 ? "+" : ""}${pct}%)\n`;
-        contenido += ` - Diagnostic: ${document.getElementById('textoExplicativoAccion').innerText}\n`;
+        contenido += ` - Diagnostic: ${descText}\n`;
         contenido += `==================================================\n`;
     }
 
@@ -149,10 +166,14 @@ function descargarReporte() {
 }
 
 function renderizarGrafica() {
+    const contenedor = document.getElementById('graficaIA');
+    if (!contenedor) return;
+
     let xDias = [];
     for (let i = 0; i <= 30; i++) xDias.push(i);
     let yAsientos = [];
     for (let i = 0; i <= 100; i++) yAsientos.push(i);
+    
     let zAcciones = [];
     for (let a = 0; a <= 100; a++) {
         let fila = [];
@@ -171,7 +192,8 @@ function renderizarGrafica() {
     let data = [
         {
             z: zAcciones, x: xDias, y: yAsientos, type: 'heatmap', zmin: 0, zmax: 8, colorscale: heatmapColors,
-            colorbar: { thickness: 10, len: 0.9, tickfont: { size: 10 } }
+            colorbar: { thickness: 10, len: 0.9, tickfont: { size: 10 } },
+            hoverongaps: false
         },
         {
             x: [valorDias], y: [valorAsientos], mode: 'markers', type: 'scatter',
@@ -194,9 +216,14 @@ window.onload = function() {
     const sliderD = document.getElementById('sliderDias');
     const sliderA = document.getElementById('sliderAsientos');
     
-    if (sliderD) sliderD.addEventListener('input', (e) => actualizarValores(e.target.value, valorAsientos));
-    if (sliderA) sliderA.addEventListener('input', (e) => actualizarValores(valorDias, e.target.value));
+    if (sliderD) {
+        sliderD.addEventListener('input', (e) => actualizarValores(e.target.value, valorAsientos));
+    }
+    if (sliderA) {
+        sliderA.addEventListener('input', (e) => actualizarValores(valorDias, e.target.value));
+    }
     
     setLang('es');
     actualizarValores(15, 45);
+    renderizarGrafica();
 };
