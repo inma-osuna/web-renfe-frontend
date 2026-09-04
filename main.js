@@ -1,4 +1,3 @@
-// main.js - Inferencia directa y pura desde tu cerebro.js real
 let valorDias = 15;
 let valorAsientos = 45;
 let currentLang = 'es';
