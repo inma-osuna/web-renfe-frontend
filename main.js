@@ -162,7 +162,16 @@ function obtenerAccionModelo(dias, asientos) {
 }
 
 function ejecutarModeloIA() {
-    const accion = obtenerAccionModelo(valorDias, valorAsientos);
+    let accion_raw = obtenerAccionModelo(valorDias, valorAsientos);
+    let accion = accion_raw;
+    let guardrailActivado = false;
+
+
+    if (valorAsientos <= 15 && accion <= 5) {
+        accion = 8; 
+        guardrailActivado = true;
+    }
+
     const multiplicadores = [0.6, 0.7, 0.8, 0.9, 1.0, 1.1, 1.2, 1.3, 1.4];
     const multi = multiplicadores[accion] !== undefined ? multiplicadores[accion] : 1.0;
     const pct = Math.round((multi - 1) * 100);
@@ -174,6 +183,7 @@ function ejecutarModeloIA() {
 
     if (elMulti) elMulti.innerText = multi.toFixed(1) + "x";
     
+    // --- LÓGICA DE COLORES ---
     if (elAccion) {
         elAccion.innerText = accion;
         if (accion <= 2) {
@@ -181,7 +191,12 @@ function ejecutarModeloIA() {
         } else if (accion <= 5) {
             elAccion.className = "text-xs font-bold text-white bg-rose-500 shadow-sm px-2 py-0.5 rounded";
         } else {
-            elAccion.className = "text-xs font-bold text-white bg-orange-500 shadow-sm px-2 py-0.5 rounded";
+            // Si entra el guardrail, le ponemos un borde especial para destacarlo
+            if (guardrailActivado) {
+                elAccion.className = "text-xs font-bold text-white bg-orange-600 border-2 border-orange-900 shadow-sm px-2 py-0.5 rounded";
+            } else {
+                elAccion.className = "text-xs font-bold text-white bg-orange-500 shadow-sm px-2 py-0.5 rounded";
+            }
         }
     }
     
@@ -190,39 +205,41 @@ function ejecutarModeloIA() {
         if (pct < 0) {
             elPct.className = "absolute top-4 right-4 text-xs font-bold text-pink-700 bg-pink-50 px-2 py-0.5 rounded-full border border-pink-200";
         } else if (pct > 0) {
-            elPct.className = "absolute top-4 right-4 text-xs font-bold text-orange-700 bg-orange-50 px-2 py-0.5 rounded-full border border-orange-200";
+            if (guardrailActivado) {
+                elPct.className = "absolute top-4 right-4 text-xs font-bold text-orange-900 bg-orange-100 px-2 py-0.5 rounded-full border border-orange-900 shadow-sm";
+            } else {
+                elPct.className = "absolute top-4 right-4 text-xs font-bold text-orange-700 bg-orange-50 px-2 py-0.5 rounded-full border border-orange-200";
+            }
         } else {
             elPct.className = "absolute top-4 right-4 text-xs font-bold text-gray-700 bg-gray-100 px-2 py-0.5 rounded-full border border-gray-200";
         }
     }
 
-    // --- NUEVA LÓGICA DE JUSTIFICACIÓN INTELIGENTE ---
     let desc = "";
     if (currentLang === 'es') {
-        if (accion <= 2) {
-            desc = "Descuento estratégico activado por alta antelación y baja ocupación proyectada.";
+        if (guardrailActivado) {
+            desc = "🛡️ REGLA DE NEGOCIO (GUARDRAIL): El sistema de seguridad ha sobrescrito al modelo algorítmico para forzar protección de inventario y evitar dilución de ingresos ante una escasez extrema.";
+        } else if (accion <= 2) {
+            desc = "Descuento estratégico activado para estimular demanda temprana y asegurar Load Factor.";
         } else if (accion <= 5) {
             desc = "Tarifa base estable en zona de equilibrio del mercado.";
         } else {
-            // Diferenciamos por qué se sube el precio
             if (valorDias <= 3) {
-                desc = "Yield Management alcista por inelasticidad de demanda de última hora (viajero corporativo/urgencia).";
-            } else if (valorAsientos <= 25) {
-                desc = "Recomendación de Yield Management alcista por escasez crítica de inventario.";
+                desc = "Yield Management alcista por inelasticidad de demanda de última hora (viajero corporativo).";
             } else {
-                desc = "Recomendación de Yield Management para maximizar el margen por asiento.";
+                desc = "Recomendación de Yield Management puro para maximizar el margen marginal por asiento.";
             }
         }
     } else {
-        if (accion <= 2) {
-            desc = "Strategic discount recommended due to early lead time and low projected occupancy.";
+        if (guardrailActivado) {
+            desc = "🛡️ BUSINESS GUARDRAIL: The safety system has overridden the algorithmic model to enforce inventory protection and prevent revenue dilution during extreme scarcity.";
+        } else if (accion <= 2) {
+            desc = "Strategic discount activated to stimulate early demand and secure Load Factor.";
         } else if (accion <= 5) {
             desc = "Stable base fare in market equilibrium zone.";
         } else {
             if (valorDias <= 3) {
-                desc = "Bullish Yield Management due to last-minute demand inelasticity (corporate/urgent travelers).";
-            } else if (valorAsientos <= 25) {
-                desc = "Bullish Yield Management recommended due to critical inventory scarcity.";
+                desc = "Bullish Yield Management due to last-minute demand inelasticity (corporate traveler).";
             } else {
                 desc = "Bullish Yield Management recommended to maximize marginal revenue per seat.";
             }
