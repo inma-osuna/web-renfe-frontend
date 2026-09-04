@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pricing Optimization | TFM</title>
+    <!-- FAVICON (Tu logo SVG directo en la pestaña) -->
+    <link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 19L9 11L13 15L21 5" stroke="%23f43f5e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/><circle cx="3" cy="19" r="2.5" fill="%23f43f5e"/><circle cx="9" cy="11" r="2.5" fill="%23f43f5e"/><circle cx="13" cy="15" r="2.5" fill="%23fb923c"/><circle cx="21" cy="5" r="2.5" fill="%23fb923c"/></svg>' type="image/svg+xml">
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -164,9 +167,9 @@
             </section>
 
             <section class="bg-rose-50 border border-rose-100 rounded-xl p-5">
-                <h3 class="text-lg font-bold text-rose-600 mb-3" data-i18n="doc_sec3_title">3. El Algoritmo: Random Forest vs PPO</h3>
-                <p class="mb-3" data-i18n="doc_sec3_desc1">Durante el entrenamiento en el entorno Gym (Markov Decision Process), el agente de Deep Reinforcement Learning (PPO) sufrió un <em>policy collapse</em>, apostando únicamente por las tarifas más altas para evadir penalizaciones complejas.</p>
-                <p data-i18n="doc_sec3_desc2">Por tanto, la validación empírica mediante Monte Carlo demostró que la inteligencia generada mediante <strong>Random Forest Regressor</strong> lograba un uplift de ingresos superior (+17%), ofreciendo un mapa de calor equilibrado, lógico y económicamente viable. Esta interfaz expone dicha matriz optimizada.</p>
+                <h3 class="text-lg font-bold text-rose-600 mb-3" data-i18n="doc_sec3_title">3. Arquitectura del Modelo: Random Forest</h3>
+                <p class="mb-3" data-i18n="doc_sec3_desc1">Para resolver la optimización de precios, se ha implementado un modelo de Machine Learning basado en Random Forest Regressor. Este algoritmo de ensamble es ideal para capturar las complejas relaciones no lineales entre la escasez de plazas y la urgencia temporal del pasajero.</p>
+                <p data-i18n="doc_sec3_desc2">El modelo evalúa el estado actual del entorno y determina la acción discreta óptima (escala del 0 al 8). Esta política de precios permite maximizar el Revenue total (Uplift) al equilibrar eficientemente el riesgo de asientos vacíos con la oportunidad de capturar la máxima disposición a pagar por parte de los viajeros.</p>
             </section>
         </div>
     </main>
