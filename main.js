@@ -1,5 +1,5 @@
 let valorDias = 15;
-let valorAsientos = 45;
+let valorAsientos = 50;
 let currentLang = 'es';
 
 const translations = {
@@ -56,6 +56,7 @@ function setLang(lang) {
     });
 
     ejecutarModeloIA();
+    renderizarGrafica();
 }
 
 function actualizarValores(d, a) {
@@ -66,6 +67,7 @@ function actualizarValores(d, a) {
     document.getElementById('sliderAsientos').value = valorAsientos;
     document.getElementById('txtAsientos').innerText = valorAsientos + " pl";
     ejecutarModeloIA();
+    renderizarGrafica();
 }
 
 function obtenerAccionPPO(dias, asientos) {
@@ -165,15 +167,25 @@ function renderizarGrafica() {
         [0.75, '#be123c'], [0.875, '#9f1239'], [1, '#881337']
     ];
 
-    Plotly.react('graficaIA', [{
-        z: zAcciones, x: xDias, y: yAsientos, type: 'heatmap', zmin: 0, zmax: 8, colorscale: heatmapColors,
-        colorbar: { thickness: 10, len: 0.9, tickfont: { size: 10 } }
-    }], {
+    let data = [
+        {
+            z: zAcciones, x: xDias, y: yAsientos, type: 'heatmap', zmin: 0, zmax: 8, colorscale: heatmapColors,
+            colorbar: { thickness: 10, len: 0.9, tickfont: { size: 10 } }
+        },
+        {
+            x: [valorDias], y: [valorAsientos], mode: 'markers', type: 'scatter',
+            marker: { color: '#09090b', size: 12, symbol: 'circle', line: { color: '#ffffff', width: 2 } },
+            name: 'Selección'
+        }
+    ];
+
+    Plotly.react('graficaIA', data, {
         autosize: true,
         margin: { t: 5, l: 40, r: 10, b: 35 },
         xaxis: { title: { text: currentLang === 'es' ? 'Días' : 'Days', font: { size: 11 } } },
         yaxis: { title: { text: currentLang === 'es' ? 'Plazas' : 'Seats', font: { size: 11 } } },
-        paper_bgcolor: 'rgba(0,0,0,0)', plot_bgcolor: 'rgba(0,0,0,0)'
+        paper_bgcolor: 'rgba(0,0,0,0)', plot_bgcolor: 'rgba(0,0,0,0)',
+        showlegend: false
     }, { responsive: true, displayModeBar: false });
 }
 
@@ -182,7 +194,5 @@ window.onload = function() {
     document.getElementById('sliderAsientos').addEventListener('input', (e) => actualizarValores(valorDias, e.target.value));
     
     setLang('es');
-    
-    renderizarGrafica();
     actualizarValores(15, 45);
 };
