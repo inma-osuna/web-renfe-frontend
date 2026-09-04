@@ -23,7 +23,6 @@ const translations = {
         'leg_3_title': 'Acciones 6–8 (1.2x - 1.4x)',
         'leg_3_desc': 'Yield management alcista.',
         
-        // Textos de Documentación
         'doc_title': 'Documentación del Proyecto',
         'doc_subtitle': 'Explicación de la metodología y parámetros del algoritmo.',
         'doc_sec1_title': '1. El Problema de Revenue Management',
@@ -57,7 +56,6 @@ const translations = {
         'leg_3_title': 'Actions 6–8 (1.2x - 1.4x)',
         'leg_3_desc': 'Bullish yield management.',
         
-        // Documentation Texts
         'doc_title': 'Project Documentation',
         'doc_subtitle': 'Explanation of the methodology and algorithm parameters.',
         'doc_sec1_title': '1. The Revenue Management Problem',
@@ -73,7 +71,6 @@ const translations = {
     }
 };
 
-// Función para cambiar de pestañas (Dashboard <-> Docs)
 function switchTab(tabId) {
     const dashView = document.getElementById('view-dashboard');
     const docsView = document.getElementById('view-docs');
@@ -85,7 +82,6 @@ function switchTab(tabId) {
         docsView.classList.add('hidden');
         navDash.className = "px-4 h-full tab-active transition-colors text-sm";
         navDocs.className = "px-4 h-full tab-inactive transition-colors text-sm";
-        // Al volver al dashboard aseguramos que la gráfica se re-ajuste a su div
         setTimeout(renderizarGrafica, 50);
     } else {
         dashView.classList.add('hidden');
@@ -155,11 +151,11 @@ function ejecutarModeloIA() {
     if (elPct) {
         elPct.innerText = (pct > 0 ? "+" : "") + pct + "%";
         if (pct < 0) {
-            elPct.className = "absolute top-4 right-4 text-xs font-bold text-fuchsia-700 bg-fuchsia-50 px-2 py-0.5 rounded-full border border-fuchsia-100";
+            elPct.className = "absolute top-4 right-4 text-xs font-bold text-rose-700 bg-rose-50 px-2 py-0.5 rounded-full border border-rose-200";
         } else if (pct > 0) {
-            elPct.className = "absolute top-4 right-4 text-xs font-bold text-orange-700 bg-orange-50 px-2 py-0.5 rounded-full border border-orange-100";
+            elPct.className = "absolute top-4 right-4 text-xs font-bold text-orange-700 bg-orange-50 px-2 py-0.5 rounded-full border border-orange-200";
         } else {
-            elPct.className = "absolute top-4 right-4 text-xs font-bold text-purple-700 bg-purple-100 px-2 py-0.5 rounded-full border border-purple-200";
+            elPct.className = "absolute top-4 right-4 text-xs font-bold text-gray-700 bg-gray-100 px-2 py-0.5 rounded-full border border-gray-200";
         }
     }
 
@@ -211,7 +207,6 @@ function descargarReporte() {
 
 function renderizarGrafica() {
     const contenedor = document.getElementById('graficaIA');
-    // Si la pestaña actual no es dashboard, el contenedor estará oculto y Plotly fallará al medir.
     if (!contenedor || contenedor.offsetWidth === 0) return;
 
     let xDias = [];
@@ -228,13 +223,13 @@ function renderizarGrafica() {
         zAcciones.push(fila);
     }
 
-    // Escala de Colores Premium: Púrpura claro -> Violeta Intenso -> Naranja
+    // Escala de Colores adaptada a tu Logo (Rosa a Naranja Fuego)
     let heatmapColors = [
-        [0, '#f3e8ff'],     // purple-100 (Descuento agresivo)
-        [0.25, '#c084fc'],  // purple-400
-        [0.5, '#7e22ce'],   // purple-700 (Neutro)
-        [0.75, '#db2777'],  // pink-600
-        [1, '#ea580c']      // orange-600 (Yield alcista máximo)
+        [0, '#fff1f2'],     // rose-50
+        [0.25, '#fda4af'],  // rose-300
+        [0.5, '#f43f5e'],   // rose-500 (Base de tu logo)
+        [0.75, '#f97316'],  // orange-500
+        [1, '#c2410c']      // orange-700
     ];
 
     let data = [
@@ -245,7 +240,7 @@ function renderizarGrafica() {
         },
         {
             x: [valorDias], y: [valorAsientos], mode: 'markers', type: 'scatter',
-            marker: { color: '#ffffff', size: 14, symbol: 'circle', line: { color: '#581c87', width: 3 } },
+            marker: { color: '#ffffff', size: 14, symbol: 'circle', line: { color: '#9f1239', width: 3 } },
             name: 'Punto de Inferencia'
         }
     ];

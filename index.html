@@ -3,44 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pricing Optimization | TFM Renfe</title>
+    <title>Pricing Optimization | TFM</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Inter', sans-serif; }
-        /* Sliders corporativos color púrpura */
+        /* Sliders corporativos a juego con tu logo */
         input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; }
         input[type=range]::-webkit-slider-thumb {
             -webkit-appearance: none; height: 18px; width: 18px; border-radius: 50%;
-            background: #ffffff; border: 2px solid #7e22ce; box-shadow: 0 1px 3px rgba(0,0,0,0.1); cursor: pointer; margin-top: -7px;
+            background: #ffffff; border: 2px solid #f43f5e; box-shadow: 0 1px 3px rgba(0,0,0,0.1); cursor: pointer; margin-top: -7px;
         }
         input[type=range]::-webkit-slider-runnable-track {
             width: 100%; height: 4px; cursor: pointer; background: #e5e7eb; border-radius: 2px;
         }
-        .tab-active { border-bottom: 2px solid #7e22ce; color: #7e22ce; font-weight: 600; }
+        .tab-active { border-bottom: 2px solid #f43f5e; color: #f43f5e; font-weight: 600; }
         .tab-inactive { color: #6b7280; font-weight: 500; }
         .tab-inactive:hover { color: #374151; }
     </style>
 </head>
-<body class="bg-gray-50 text-gray-900 min-h-screen flex flex-col selection:bg-purple-100 selection:text-purple-900">
+<body class="bg-gray-50 text-gray-900 min-h-screen flex flex-col selection:bg-rose-100 selection:text-rose-900">
 
     <!-- Navegación y Logo -->
     <nav class="bg-white border-b border-gray-200 w-full z-10 sticky top-0">
         <div class="max-w-[1600px] mx-auto px-6 h-16 flex items-center justify-between">
             <div class="flex items-center gap-6">
-                <!-- Logo Abstracto (Tren + Datos) -->
-                <div class="flex items-center gap-2">
-                    <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <rect width="32" height="32" rx="8" fill="#7e22ce"/>
-                        <path d="M8 12C8 10.8954 8.89543 10 10 10H24L20 22H10C8.89543 22 8 21.1046 8 20V12Z" fill="white" fill-opacity="0.2"/>
-                        <circle cx="13" cy="16" r="2" fill="white"/>
-                        <circle cx="19" cy="16" r="2" fill="white"/>
-                        <path d="M10 22V24M18 22V24" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                <!-- Tu Logo SVG -->
+                <div class="flex items-center gap-3">
+                    <svg class="w-8 h-8" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                        <path d="M3 19L9 11L13 15L21 5" stroke="#f43f5e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                        <circle cx="3" cy="19" r="2.5" fill="#f43f5e"/>
+                        <circle cx="9" cy="11" r="2.5" fill="#f43f5e"/>
+                        <circle cx="13" cy="15" r="2.5" fill="#fb923c"/>
+                        <circle cx="21" cy="5" r="2.5" fill="#fb923c"/>
                     </svg>
                     <div>
                         <h1 class="text-sm font-bold tracking-tight text-gray-900 leading-tight" data-i18n="title">Revenue Management</h1>
-                        <p class="text-[10px] uppercase tracking-widest font-bold text-purple-600 leading-tight" data-i18n="subtitle">Dynamic Pricing</p>
+                        <p class="text-[10px] uppercase tracking-widest font-bold text-rose-500 leading-tight" data-i18n="subtitle">Dynamic Pricing</p>
                     </div>
                 </div>
 
@@ -68,19 +68,19 @@
     <main id="view-dashboard" class="flex-1 w-full flex flex-col lg:flex-row max-w-[1600px] mx-auto animate-fade-in">
         <aside class="w-full lg:w-[340px] border-r border-gray-200 bg-white flex flex-col p-6 gap-8 shrink-0 shadow-sm z-0">
             <div>
-                <h2 class="text-[11px] font-bold uppercase tracking-widest text-purple-600 mb-5" data-i18n="env_params">Parámetros del Entorno</h2>
+                <h2 class="text-[11px] font-bold uppercase tracking-widest text-rose-500 mb-5" data-i18n="env_params">Parámetros del Entorno</h2>
                 <div class="space-y-6">
                     <div>
                         <div class="flex justify-between items-center mb-2">
                             <label class="text-sm font-medium text-gray-700" data-i18n="days_label">Días al despegue</label>
-                            <span id="txtDias" class="text-xs font-bold text-purple-700 bg-purple-50 px-2.5 py-1 rounded-md border border-purple-100">15 d</span>
+                            <span id="txtDias" class="text-xs font-bold text-rose-600 bg-rose-50 px-2.5 py-1 rounded-md border border-rose-100">15 d</span>
                         </div>
                         <input id="sliderDias" type="range" min="0" max="30" value="15">
                     </div>
                     <div>
                         <div class="flex justify-between items-center mb-2">
                             <label class="text-sm font-medium text-gray-700" data-i18n="seats_label">Inventario</label>
-                            <span id="txtAsientos" class="text-xs font-bold text-purple-700 bg-purple-50 px-2.5 py-1 rounded-md border border-purple-100">50 pl</span>
+                            <span id="txtAsientos" class="text-xs font-bold text-rose-600 bg-rose-50 px-2.5 py-1 rounded-md border border-rose-100">50 pl</span>
                         </div>
                         <input id="sliderAsientos" type="range" min="0" max="100" value="50">
                     </div>
@@ -90,14 +90,14 @@
             <div class="h-px w-full bg-gray-100"></div>
 
             <div>
-                <h2 class="text-[11px] font-bold uppercase tracking-widest text-purple-600 mb-5" data-i18n="inf_title">Recomendación del Modelo</h2>
+                <h2 class="text-[11px] font-bold uppercase tracking-widest text-rose-500 mb-5" data-i18n="inf_title">Recomendación del Modelo</h2>
                 <div class="bg-gray-50 border border-gray-200 rounded-xl p-5 relative shadow-inner">
-                    <span id="ajustePorcentaje" class="absolute top-4 right-4 text-xs font-bold text-purple-700 bg-purple-100 px-2 py-0.5 rounded-full">+0%</span>
+                    <span id="ajustePorcentaje" class="absolute top-4 right-4 text-xs font-bold text-rose-600 bg-rose-100 px-2 py-0.5 rounded-full">+0%</span>
                     <span class="text-xs font-medium text-gray-500 block mb-1" data-i18n="multiplier">Multiplicador de Precio</span>
                     <span id="precioMultiplicador" class="text-4xl font-extrabold tracking-tight text-gray-900 block mb-4">1.0x</span>
                     <div class="flex items-center gap-2 mb-3">
                         <span class="text-xs font-medium text-gray-500" data-i18n="discrete_action">Acción Discreta:</span>
-                        <span id="accionAgente" class="text-xs font-bold text-white bg-purple-600 shadow-sm px-2 py-0.5 rounded">4</span>
+                        <span id="accionAgente" class="text-xs font-bold text-white bg-rose-500 shadow-sm px-2 py-0.5 rounded">4</span>
                     </div>
                     <p id="textoExplicativoAccion" class="text-[11px] text-gray-600 leading-relaxed pt-3 border-t border-gray-200 font-medium">
                         Evaluando política base...
@@ -110,30 +110,30 @@
             <div class="bg-white border border-gray-200 rounded-xl shadow-sm flex-1 flex flex-col overflow-hidden">
                 <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-white">
                     <h2 class="text-sm font-bold text-gray-800" data-i18n="heatmap_title">Mapa de Política: Random Forest</h2>
-                    <span class="text-[10px] font-bold uppercase tracking-wider text-purple-500 bg-purple-50 px-2 py-1 rounded-md border border-purple-100">Live Data</span>
+                    <span class="text-[10px] font-bold uppercase tracking-wider text-rose-500 bg-rose-50 px-2 py-1 rounded-md border border-rose-100">Live Data</span>
                 </div>
                 <div class="flex-1 p-2">
                     <div id="graficaIA" class="w-full h-full"></div>
                 </div>
                 
-                <!-- Leyenda en el pie del gráfico -->
+                <!-- Leyenda -->
                 <div class="px-6 py-4 border-t border-gray-100 bg-gray-50 flex flex-wrap gap-x-8 gap-y-3 items-center">
                     <div class="flex items-center gap-3">
-                        <div class="w-4 h-4 bg-[#f3e8ff] border border-[#d8b4fe] rounded-sm shadow-sm"></div>
+                        <div class="w-4 h-4 bg-[#ffe4e6] border border-[#fda4af] rounded-sm shadow-sm"></div>
                         <div>
                             <p class="text-[11px] font-bold text-gray-800" data-i18n="leg_1_title">Acciones 0–2 (0.6x - 0.8x)</p>
                             <p class="text-[10px] text-gray-500" data-i18n="leg_1_desc">Descuentos agresivos.</p>
                         </div>
                     </div>
                     <div class="flex items-center gap-3">
-                        <div class="w-4 h-4 bg-[#a855f7] border border-[#7e22ce] rounded-sm shadow-sm"></div>
+                        <div class="w-4 h-4 bg-[#f43f5e] border border-[#e11d48] rounded-sm shadow-sm"></div>
                         <div>
                             <p class="text-[11px] font-bold text-gray-800" data-i18n="leg_2_title">Acciones 3–5 (0.9x - 1.1x)</p>
                             <p class="text-[10px] text-gray-500" data-i18n="leg_2_desc">Tarifa base neutra.</p>
                         </div>
                     </div>
                     <div class="flex items-center gap-3">
-                        <div class="w-4 h-4 bg-[#ea580c] border border-[#c2410c] rounded-sm shadow-sm"></div>
+                        <div class="w-4 h-4 bg-[#f97316] border border-[#c2410c] rounded-sm shadow-sm"></div>
                         <div>
                             <p class="text-[11px] font-bold text-gray-800" data-i18n="leg_3_title">Acciones 6–8 (1.2x - 1.4x)</p>
                             <p class="text-[10px] text-gray-500" data-i18n="leg_3_desc">Yield management alcista.</p>
@@ -151,20 +151,20 @@
         
         <div class="space-y-8 text-sm text-gray-700 leading-relaxed">
             <section>
-                <h3 class="text-lg font-bold text-purple-700 mb-3" data-i18n="doc_sec1_title">1. El Problema de Revenue Management</h3>
+                <h3 class="text-lg font-bold text-rose-500 mb-3" data-i18n="doc_sec1_title">1. El Problema de Revenue Management</h3>
                 <p data-i18n="doc_sec1_desc">El objetivo de esta herramienta es optimizar los ingresos de un tren de Alta Velocidad ajustando dinámicamente el precio del billete basándose en dos factores clave: los días restantes para la salida del tren y el número de asientos que aún quedan libres.</p>
             </section>
             
             <section>
-                <h3 class="text-lg font-bold text-purple-700 mb-3" data-i18n="doc_sec2_title">2. Variables del Entorno</h3>
+                <h3 class="text-lg font-bold text-rose-500 mb-3" data-i18n="doc_sec2_title">2. Variables del Entorno</h3>
                 <ul class="list-disc pl-5 space-y-2">
                     <li><strong class="text-gray-900" data-i18n="doc_var1_name">Lead Time (Días):</strong> <span data-i18n="doc_var1_desc">Horizonte temporal. A menor tiempo, menor elasticidad del pasajero (dispuesto a pagar más).</span></li>
                     <li><strong class="text-gray-900" data-i18n="doc_var2_name">Inventario (Plazas):</strong> <span data-i18n="doc_var2_desc">La capacidad del tren. La escasez es el principal motor para aplicar políticas alcistas.</span></li>
                 </ul>
             </section>
 
-            <section class="bg-purple-50 border border-purple-100 rounded-xl p-5">
-                <h3 class="text-lg font-bold text-purple-700 mb-3" data-i18n="doc_sec3_title">3. El Algoritmo: Random Forest vs PPO</h3>
+            <section class="bg-rose-50 border border-rose-100 rounded-xl p-5">
+                <h3 class="text-lg font-bold text-rose-600 mb-3" data-i18n="doc_sec3_title">3. El Algoritmo: Random Forest vs PPO</h3>
                 <p class="mb-3" data-i18n="doc_sec3_desc1">Durante el entrenamiento en el entorno Gym (Markov Decision Process), el agente de Deep Reinforcement Learning (PPO) sufrió un <em>policy collapse</em>, apostando únicamente por las tarifas más altas para evadir penalizaciones complejas.</p>
                 <p data-i18n="doc_sec3_desc2">Por tanto, la validación empírica mediante Monte Carlo demostró que la inteligencia generada mediante <strong>Random Forest Regressor</strong> lograba un uplift de ingresos superior (+17%), ofreciendo un mapa de calor equilibrado, lógico y económicamente viable. Esta interfaz expone dicha matriz optimizada.</p>
             </section>
