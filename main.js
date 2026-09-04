@@ -1,6 +1,6 @@
 // main.js - Inferencia Pura del Proyecto (TFM Renfe)
 let valorDias = 15;
-let valorAsientos = 45;
+let valorAsientos = 50;
 let currentLang = 'es';
 
 const translations = {
