@@ -4,594 +4,500 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Dynamic Pricing Intelligence — Renfe TFM</title>
+    <title>Renfe · Motor de Precios Dinámicos</title>
 
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-
-    <!-- Plotly -->
     <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
 
-    <!-- Inter / Plus Jakarta Sans -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
 
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                        mono: ['JetBrains Mono', 'monospace']
-                    },
-                    colors: {
-                        brand: {
-                            50: '#eff6ff',
-                            100: '#dbeafe',
-                            500: '#3b82f6',
-                            600: '#2563eb',
-                            700: '#1d4ed8'
-                        }
-                    },
-                    boxShadow: {
-                        soft: '0 10px 40px rgba(15, 23, 42, 0.06)',
-                        glow: '0 0 30px rgba(59, 130, 246, 0.15)'
-                    }
-                }
-            }
-        }
-    </script>
-
     <style>
-        html {
-            scroll-behavior: smooth;
+        * {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            height: 100%;
         }
 
         body {
-            background:
-                radial-gradient(circle at 10% 0%, rgba(59, 130, 246, 0.08), transparent 28%),
-                radial-gradient(circle at 90% 10%, rgba(14, 165, 233, 0.06), transparent 25%),
-                #f8fafc;
+            margin: 0;
+            font-family: Inter, sans-serif;
+            background: #f7f8fa;
+            color: #0f172a;
         }
 
-        .glass {
-            background: rgba(255, 255, 255, 0.88);
-            backdrop-filter: blur(18px);
-            -webkit-backdrop-filter: blur(18px);
-        }
-
-        .grid-bg {
-            background-image:
-                linear-gradient(rgba(148, 163, 184, 0.08) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(148, 163, 184, 0.08) 1px, transparent 1px);
-            background-size: 32px 32px;
+        .mono {
+            font-family: "JetBrains Mono", monospace;
         }
 
         input[type="range"] {
             appearance: none;
-            height: 5px;
+            width: 100%;
+            height: 4px;
             border-radius: 999px;
             background: #e2e8f0;
+            outline: none;
         }
 
         input[type="range"]::-webkit-slider-thumb {
             appearance: none;
-            width: 18px;
-            height: 18px;
+            width: 15px;
+            height: 15px;
             border-radius: 50%;
             background: #2563eb;
-            border: 3px solid white;
-            box-shadow: 0 2px 8px rgba(37, 99, 235, 0.35);
+            border: 3px solid #ffffff;
+            box-shadow: 0 1px 5px rgba(37, 99, 235, 0.25);
             cursor: pointer;
         }
 
         input[type="range"]::-moz-range-thumb {
-            width: 18px;
-            height: 18px;
+            width: 15px;
+            height: 15px;
             border-radius: 50%;
             background: #2563eb;
-            border: 3px solid white;
-            box-shadow: 0 2px 8px rgba(37, 99, 235, 0.35);
+            border: 3px solid #ffffff;
+            box-shadow: 0 1px 5px rgba(37, 99, 235, 0.25);
             cursor: pointer;
-        }
-
-        .metric-number {
-            font-family: 'JetBrains Mono', monospace;
-            letter-spacing: -0.06em;
         }
     </style>
 </head>
 
-<body class="min-h-screen text-slate-900 antialiased">
+<body class="h-screen overflow-hidden">
 
-    <!-- Top navigation -->
-    <header class="border-b border-slate-200/80 bg-white/80 backdrop-blur-xl">
-        <div class="max-w-7xl mx-auto px-5 md:px-8 h-[76px] flex items-center justify-between">
+<div class="h-full flex flex-col">
 
-            <div class="flex items-center gap-4">
+    <!-- HEADER -->
+    <header class="h-16 shrink-0 border-b border-slate-200 bg-white">
+        <div class="w-full max-w-[1500px] mx-auto px-5 h-full flex items-center justify-between">
 
-                <!-- Logo -->
-                <div class="w-10 h-10 rounded-xl bg-slate-950 flex items-center justify-center shadow-lg shadow-slate-900/10">
-                    <svg width="21" height="21" viewBox="0 0 24 24" fill="none">
-                        <path d="M4 17L9 12L13 16L20 8"
-                              stroke="#60a5fa"
-                              stroke-width="2.2"
-                              stroke-linecap="round"
-                              stroke-linejoin="round"/>
-                        <path d="M16 8H20V12"
-                              stroke="#60a5fa"
-                              stroke-width="2.2"
-                              stroke-linecap="round"
-                              stroke-linejoin="round"/>
+            <div class="flex items-center gap-3">
+
+                <div class="w-8 h-8 rounded-lg bg-slate-950 flex items-center justify-center">
+                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
+                        <path
+                            d="M4 17L9 12L13 16L20 8"
+                            stroke="#60a5fa"
+                            stroke-width="2.2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        />
+
+                        <path
+                            d="M16 8H20V12"
+                            stroke="#60a5fa"
+                            stroke-width="2.2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        />
                     </svg>
                 </div>
 
                 <div>
                     <div class="flex items-center gap-2">
-                        <h1 class="text-sm font-bold tracking-tight text-slate-950">
-                            Dynamic Pricing
-                        </h1>
 
-                        <span class="px-2 py-0.5 rounded-md bg-blue-50 border border-blue-100 text-[9px] font-bold uppercase tracking-wider text-blue-600">
-                            AI Engine
+                        <span class="text-xs font-bold tracking-tight">
+                            RENFE
                         </span>
+
+                        <span class="text-[9px] uppercase tracking-wider font-bold text-blue-600 bg-blue-50 border border-blue-100 px-1.5 py-0.5 rounded">
+                            PPO
+                        </span>
+
                     </div>
 
-                    <p class="text-[11px] text-slate-400 font-medium">
-                        Renfe · TFM Research Dashboard
+                    <p
+                        class="text-[9px] text-slate-400"
+                        data-i18n="header_subtitle"
+                    >
+                        Motor de precios dinámicos
                     </p>
                 </div>
+
             </div>
 
-            <div class="flex items-center gap-3">
 
-                <!-- System status -->
-                <div class="hidden sm:flex items-center gap-2 px-3 py-2 rounded-xl bg-emerald-50 border border-emerald-100">
-                    <span class="relative flex h-2 w-2">
-                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-60"></span>
-                        <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+            <div class="flex items-center gap-2">
+
+                <!-- STATUS -->
+                <span class="hidden sm:flex items-center gap-1.5 text-[9px] font-semibold text-emerald-600 mr-2">
+
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+
+                    <span data-i18n="online">
+                        Modelo activo
                     </span>
 
-                    <span class="text-[10px] font-bold uppercase tracking-wider text-emerald-700">
-                        Model Online
-                    </span>
-                </div>
+                </span>
 
-                <!-- Language -->
-                <div class="flex items-center bg-slate-100 border border-slate-200 p-1 rounded-xl">
+
+                <!-- LANGUAGE -->
+                <div class="flex bg-slate-100 rounded-lg p-0.5">
+
                     <button
                         id="btnES"
                         onclick="setLang('es')"
-                        class="bg-white text-slate-900 px-3 py-1.5 rounded-lg text-[10px] font-bold shadow-sm transition-all">
+                        class="px-2.5 py-1 rounded-md text-[9px] font-bold bg-white shadow-sm"
+                    >
                         ES
                     </button>
 
                     <button
                         id="btnEN"
                         onclick="setLang('en')"
-                        class="text-slate-400 hover:text-slate-900 px-3 py-1.5 rounded-lg text-[10px] font-bold transition-all">
+                        class="px-2.5 py-1 rounded-md text-[9px] font-bold text-slate-400"
+                    >
                         EN
                     </button>
+
                 </div>
 
-                <!-- Export -->
+
+                <!-- EXPORT -->
                 <button
                     onclick="descargarReporte()"
-                    class="hidden sm:flex items-center gap-2 bg-slate-950 hover:bg-slate-800 text-white px-4 py-2.5 rounded-xl text-[11px] font-bold transition-all shadow-lg shadow-slate-900/10"
-                    data-i18n="export_btn">
+                    class="ml-2 flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-900 text-white text-[9px] font-bold hover:bg-slate-700 transition"
+                >
 
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-                        <path d="M12 3V15"
-                              stroke="currentColor"
-                              stroke-width="2"
-                              stroke-linecap="round"/>
-                        <path d="M7 11L12 16L17 11"
-                              stroke="currentColor"
-                              stroke-width="2"
-                              stroke-linecap="round"
-                              stroke-linejoin="round"/>
-                        <path d="M5 21H19"
-                              stroke="currentColor"
-                              stroke-width="2"
-                              stroke-linecap="round"/>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
+                        <path
+                            d="M12 3V15M7 11L12 16L17 11M5 21H19"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        />
                     </svg>
 
-                    Exportar Reporte
+                    <span data-i18n="export_btn">
+                        Exportar
+                    </span>
+
                 </button>
+
             </div>
+
         </div>
     </header>
 
 
-    <!-- Main -->
-    <main class="max-w-7xl mx-auto px-5 md:px-8 py-8 md:py-10">
+    <!-- MAIN -->
+    <main class="flex-1 min-h-0 w-full max-w-[1500px] mx-auto px-5 py-4">
 
-        <!-- Page heading -->
-        <section class="mb-8">
+        <div class="h-full grid grid-cols-1 lg:grid-cols-[270px_minmax(300px,390px)_1fr] gap-4">
 
-            <div class="flex flex-col md:flex-row md:items-end justify-between gap-5">
 
-                <div>
-                    <div class="flex items-center gap-2 mb-3">
-                        <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+            <!-- PARAMETROS -->
+            <section class="bg-white border border-slate-200 rounded-2xl p-5 flex flex-col">
 
-                        <span
-                            class="text-[10px] font-bold uppercase tracking-[0.18em] text-blue-600"
-                            data-i18n="subtitle">
-                            Deep Reinforcement Learning
-                        </span>
-                    </div>
+                <div class="mb-7">
+
+                    <p
+                        class="text-[8px] uppercase tracking-[0.18em] font-bold text-slate-400 mb-1"
+                        data-i18n="input"
+                    >
+                        Entrada
+                    </p>
 
                     <h2
-                        class="text-3xl md:text-4xl font-extrabold tracking-[-0.04em] text-slate-950"
-                        data-i18n="title">
-                        Motor de Precios Dinámicos
+                        class="text-sm font-bold"
+                        data-i18n="env_params"
+                    >
+                        Parámetros del entorno
                     </h2>
 
-                    <p class="mt-2 text-sm text-slate-500 max-w-2xl">
-                        Optimización tarifaria basada en aprendizaje por refuerzo para maximizar
-                        rendimiento y adaptar precios a la demanda.
-                    </p>
                 </div>
 
-                <!-- Model badge -->
-                <div class="flex items-center gap-3 px-4 py-3 rounded-2xl glass border border-slate-200 shadow-soft">
 
-                    <div class="w-9 h-9 rounded-xl bg-blue-50 flex items-center justify-center">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                            <path d="M12 3L14.5 9.5L21 12L14.5 14.5L12 21L9.5 14.5L3 12L9.5 9.5L12 3Z"
-                                  stroke="#2563eb"
-                                  stroke-width="1.8"
-                                  stroke-linejoin="round"/>
-                        </svg>
-                    </div>
+                <div class="space-y-7">
 
+                    <!-- DAYS -->
                     <div>
-                        <p class="text-[9px] uppercase tracking-wider font-bold text-slate-400">
-                            Architecture
-                        </p>
-                        <p class="text-xs font-bold text-slate-800">
-                            PPO · Policy Network
-                        </p>
-                    </div>
-                </div>
 
-            </div>
-        </section>
+                        <div class="flex items-end justify-between mb-3">
 
-
-        <!-- Dashboard grid -->
-        <div class="grid grid-cols-1 xl:grid-cols-12 gap-6">
-
-
-            <!-- LEFT -->
-            <div class="xl:col-span-4 flex flex-col gap-6">
-
-                <!-- Environment -->
-                <section class="glass border border-slate-200/80 rounded-3xl shadow-soft overflow-hidden">
-
-                    <div class="px-6 pt-6 pb-5 border-b border-slate-100">
-                        <div class="flex items-center justify-between">
-
-                            <div>
-                                <p class="text-[9px] uppercase tracking-[0.18em] font-bold text-slate-400">
-                                    Input Layer
-                                </p>
-
-                                <h3
-                                    class="mt-1 text-sm font-bold text-slate-900"
-                                    data-i18n="env_params">
-                                    Parámetros del Entorno
-                                </h3>
-                            </div>
-
-                            <div class="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                                    <path d="M4 6H20"
-                                          stroke="#64748b"
-                                          stroke-width="1.8"
-                                          stroke-linecap="round"/>
-                                    <path d="M4 12H20"
-                                          stroke="#64748b"
-                                          stroke-width="1.8"
-                                          stroke-linecap="round"/>
-                                    <path d="M4 18H20"
-                                          stroke="#64748b"
-                                          stroke-width="1.8"
-                                          stroke-linecap="round"/>
-                                </svg>
-                            </div>
-                        </div>
-                    </div>
-
-
-                    <div class="p-6 space-y-7">
-
-                        <!-- Days -->
-                        <div>
-                            <div class="flex justify-between items-end mb-3">
-
-                                <div>
-                                    <label
-                                        class="text-xs font-semibold text-slate-600"
-                                        data-i18n="days_label">
-                                        Días para la salida
-                                    </label>
-
-                                    <p class="text-[10px] text-slate-400 mt-0.5">
-                                        Departure horizon
-                                    </p>
-                                </div>
-
-                                <span
-                                    id="txtDias"
-                                    class="metric-number text-lg font-bold text-slate-950">
-                                    15 d
-                                </span>
-                            </div>
-
-                            <input
-                                id="sliderDias"
-                                type="range"
-                                min="0"
-                                max="30"
-                                value="15"
-                                class="w-full accent-blue-600 cursor-pointer">
-
-                            <div class="flex justify-between mt-2 text-[9px] font-medium text-slate-400">
-                                <span>0 d</span>
-                                <span>30 d</span>
-                            </div>
-                        </div>
-
-
-                        <!-- Seats -->
-                        <div>
-                            <div class="flex justify-between items-end mb-3">
-
-                                <div>
-                                    <label
-                                        class="text-xs font-semibold text-slate-600"
-                                        data-i18n="seats_label">
-                                        Asientos disponibles
-                                    </label>
-
-                                    <p class="text-[10px] text-slate-400 mt-0.5">
-                                        Remaining capacity
-                                    </p>
-                                </div>
-
-                                <span
-                                    id="txtAsientos"
-                                    class="metric-number text-lg font-bold text-slate-950">
-                                    45 pl
-                                </span>
-                            </div>
-
-                            <input
-                                id="sliderAsientos"
-                                type="range"
-                                min="0"
-                                max="100"
-                                value="45"
-                                class="w-full accent-blue-600 cursor-pointer">
-
-                            <div class="flex justify-between mt-2 text-[9px] font-medium text-slate-400">
-                                <span>0</span>
-                                <span>100</span>
-                            </div>
-                        </div>
-
-                    </div>
-                </section>
-
-
-                <!-- Agent output -->
-                <section class="relative overflow-hidden rounded-3xl bg-slate-950 text-white shadow-xl shadow-slate-900/10">
-
-                    <!-- Decorative grid -->
-                    <div class="absolute inset-0 grid-bg opacity-30 pointer-events-none"></div>
-
-                    <!-- Glow -->
-                    <div class="absolute -right-20 -top-20 w-56 h-56 rounded-full bg-blue-500/20 blur-3xl pointer-events-none"></div>
-
-                    <div class="relative p-6">
-
-                        <div class="flex items-center justify-between mb-7">
-
-                            <div>
-                                <p class="text-[9px] uppercase tracking-[0.18em] font-bold text-slate-500">
-                                    AI Decision Layer
-                                </p>
-
-                                <h3
-                                    class="mt-1 text-sm font-bold text-white"
-                                    data-i18n="inf_title">
-                                    Inferencia del Agente PPO
-                                </h3>
-                            </div>
+                            <label
+                                class="text-[11px] font-semibold text-slate-600"
+                                data-i18n="days_label"
+                            >
+                                Días para la salida
+                            </label>
 
                             <span
-                                id="ajustePorcentaje"
-                                class="px-2.5 py-1.5 rounded-lg bg-blue-500/10 border border-blue-400/20 text-blue-300 text-[10px] font-bold font-mono">
-                                +0%
+                                id="txtDias"
+                                class="mono text-sm font-bold"
+                            >
+                                15 d
                             </span>
-                        </div>
-
-
-                        <!-- Main metrics -->
-                        <div class="grid grid-cols-2 gap-4">
-
-                            <div class="rounded-2xl bg-white/[0.04] border border-white/[0.06] p-4">
-                                <span
-                                    class="text-[9px] uppercase tracking-wider font-bold text-slate-500 block mb-2"
-                                    data-i18n="multiplier">
-                                    Multiplicador
-                                </span>
-
-                                <span
-                                    id="precioMultiplicador"
-                                    class="metric-number text-4xl font-bold tracking-tight text-white">
-                                    1.0x
-                                </span>
-                            </div>
-
-                            <div class="rounded-2xl bg-blue-500/10 border border-blue-400/10 p-4">
-                                <span
-                                    class="text-[9px] uppercase tracking-wider font-bold text-slate-500 block mb-2"
-                                    data-i18n="discrete_action">
-                                    Acción Discreta
-                                </span>
-
-                                <span
-                                    id="accionAgente"
-                                    class="metric-number text-4xl font-bold tracking-tight text-blue-400">
-                                    4
-                                </span>
-                            </div>
 
                         </div>
 
+                        <input
+                            id="sliderDias"
+                            type="range"
+                            min="0"
+                            max="30"
+                            value="15"
+                        >
 
-                        <!-- Diagnosis -->
-                        <div class="mt-5 pt-5 border-t border-white/[0.07]">
-
-                            <div class="flex gap-3">
-
-                                <div class="mt-0.5 w-6 h-6 rounded-lg bg-blue-500/10 flex items-center justify-center shrink-0">
-                                    <span class="w-1.5 h-1.5 rounded-full bg-blue-400"></span>
-                                </div>
-
-                                <p
-                                    id="textoExplicativoAccion"
-                                    class="text-xs leading-relaxed text-slate-400">
-                                    Tarifa base estable en zona de equilibrio del mercado.
-                                </p>
-
-                            </div>
-
+                        <div class="flex justify-between mt-1.5 text-[8px] text-slate-400">
+                            <span>0</span>
+                            <span>30</span>
                         </div>
 
                     </div>
-                </section>
-
-            </div>
 
 
-            <!-- RIGHT / HEATMAP -->
-            <section class="xl:col-span-8 glass border border-slate-200/80 rounded-3xl shadow-soft overflow-hidden">
+                    <!-- SEATS -->
+                    <div>
 
-                <div class="px-6 py-5 border-b border-slate-100">
+                        <div class="flex items-end justify-between mb-3">
 
-                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                            <label
+                                class="text-[11px] font-semibold text-slate-600"
+                                data-i18n="seats_label"
+                            >
+                                Plazas disponibles
+                            </label>
 
-                        <div>
-                            <p class="text-[9px] uppercase tracking-[0.18em] font-bold text-slate-400">
-                                Policy Visualization
-                            </p>
-
-                            <h3
-                                class="mt-1 text-sm font-bold text-slate-900"
-                                data-i18n="heatmap_title">
-                                Espacio de Política
-                            </h3>
-                        </div>
-
-                        <div class="flex items-center gap-2">
-
-                            <span class="flex items-center gap-2 text-[9px] font-semibold text-slate-400">
-                                <span class="w-2 h-2 rounded-full bg-blue-500"></span>
-                                Current state
-                            </span>
-
-                            <span class="text-slate-200">|</span>
-
-                            <span class="text-[9px] font-semibold text-slate-400">
-                                PPO Policy
+                            <span
+                                id="txtAsientos"
+                                class="mono text-sm font-bold"
+                            >
+                                50 pl
                             </span>
 
                         </div>
 
-                    </div>
-                </div>
+                        <input
+                            id="sliderAsientos"
+                            type="range"
+                            min="0"
+                            max="100"
+                            value="50"
+                        >
 
+                        <div class="flex justify-between mt-1.5 text-[8px] text-slate-400">
+                            <span>0</span>
+                            <span>100</span>
+                        </div>
 
-                <!-- Graph -->
-                <div class="p-4 md:p-6">
-
-                    <div
-                        id="graficaIA"
-                        class="w-full h-[400px] md:h-[480px]">
                     </div>
 
                 </div>
 
 
-                <!-- Legend -->
-                <div class="px-6 pb-6">
+                <div class="mt-auto pt-5 border-t border-slate-100">
 
-                    <div class="rounded-2xl bg-slate-50 border border-slate-100 p-4">
+                    <div class="flex items-center justify-between">
 
-                        <div class="flex items-center justify-between mb-3">
+                        <span
+                            class="text-[9px] text-slate-400"
+                            data-i18n="state"
+                        >
+                            Estado
+                        </span>
 
-                            <span class="text-[9px] uppercase tracking-wider font-bold text-slate-400">
-                                Pricing policy spectrum
+                        <span class="text-[9px] font-bold text-emerald-600">
+
+                            ●
+
+                            <span data-i18n="ready">
+                                Listo
                             </span>
 
-                            <span class="text-[9px] font-mono text-slate-400">
-                                Action 0 → 8
-                            </span>
+                        </span>
 
-                        </div>
+                    </div>
 
-                        <div class="h-2 rounded-full bg-gradient-to-r from-blue-200 via-slate-300 to-amber-400"></div>
+                </div>
 
-                        <div class="grid grid-cols-3 mt-3 gap-4">
+            </section>
 
-                            <div>
-                                <p
-                                    class="text-[10px] font-bold text-blue-600"
-                                    data-i18n="leg_1_title">
-                                    Acciones 0–2 · 0.6x–0.8x
-                                </p>
 
-                                <p
-                                    class="text-[9px] text-slate-400 mt-1"
-                                    data-i18n="leg_1_desc">
-                                    Descuentos agresivos para estimular la demanda.
-                                </p>
-                            </div>
+            <!-- DECISION PPO -->
+            <section class="bg-slate-950 rounded-2xl p-5 text-white flex flex-col">
 
-                            <div class="text-center">
-                                <p
-                                    class="text-[10px] font-bold text-slate-600"
-                                    data-i18n="leg_2_title">
-                                    Acciones 3–5 · 0.9x–1.1x
-                                </p>
+                <div class="flex items-start justify-between mb-7">
 
-                                <p
-                                    class="text-[9px] text-slate-400 mt-1"
-                                    data-i18n="leg_2_desc">
-                                    Tarifa base neutra de equilibrio.
-                                </p>
-                            </div>
+                    <div>
 
-                            <div class="text-right">
-                                <p
-                                    class="text-[10px] font-bold text-amber-600"
-                                    data-i18n="leg_3_title">
-                                    Acciones 6–8 · 1.2x–1.4x
-                                </p>
+                        <p
+                            class="text-[8px] uppercase tracking-[0.18em] font-bold text-slate-500 mb-1"
+                            data-i18n="decision"
+                        >
+                            Decisión
+                        </p>
 
-                                <p
-                                    class="text-[9px] text-slate-400 mt-1"
-                                    data-i18n="leg_3_desc">
-                                    Yield management alcista por escasez.
-                                </p>
-                            </div>
+                        <h2
+                            class="text-sm font-bold"
+                            data-i18n="inf_title"
+                        >
+                            Inferencia del agente PPO
+                        </h2>
 
-                        </div>
+                    </div>
+
+
+                    <span
+                        id="ajustePorcentaje"
+                        class="mono text-[10px] font-bold px-2 py-1 rounded-md bg-white/5 text-slate-300"
+                    >
+                        +0%
+                    </span>
+
+                </div>
+
+
+                <div class="grid grid-cols-2 gap-3">
+
+                    <!-- MULTIPLIER -->
+                    <div class="rounded-xl border border-white/10 bg-white/[.04] p-4">
+
+                        <p
+                            class="text-[8px] uppercase tracking-wider font-bold text-slate-500 mb-2"
+                            data-i18n="multiplier"
+                        >
+                            Multiplicador
+                        </p>
+
+                        <p
+                            id="precioMultiplicador"
+                            class="mono text-4xl font-bold tracking-tight"
+                        >
+                            1.0x
+                        </p>
+
+                    </div>
+
+
+                    <!-- ACTION -->
+                    <div class="rounded-xl border border-blue-400/10 bg-blue-500/10 p-4">
+
+                        <p
+                            class="text-[8px] uppercase tracking-wider font-bold text-slate-500 mb-2"
+                            data-i18n="discrete_action"
+                        >
+                            Acción
+                        </p>
+
+                        <p
+                            id="accionAgente"
+                            class="mono text-4xl font-bold text-blue-400"
+                        >
+                            4
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <!-- DIAGNOSIS -->
+                <div class="mt-4 pt-4 border-t border-white/10">
+
+                    <p
+                        class="text-[9px] uppercase tracking-wider font-bold text-slate-500 mb-2"
+                        data-i18n="diagnosis"
+                    >
+                        Diagnóstico
+                    </p>
+
+                    <p
+                        id="textoExplicativoAccion"
+                        class="text-[11px] leading-relaxed text-slate-400"
+                    >
+                        Tarifa base estable en zona de equilibrio del mercado.
+                    </p>
+
+                </div>
+
+
+                <div class="mt-auto pt-5 flex items-center justify-between text-[8px] text-slate-500">
+
+                    <span data-i18n="algorithm">
+                        Algoritmo
+                    </span>
+
+                    <span class="mono text-slate-400">
+                        PPO / Actor-Critic
+                    </span>
+
+                </div>
+
+            </section>
+
+
+            <!-- HEATMAP -->
+            <section class="bg-white border border-slate-200 rounded-2xl min-h-0 flex flex-col overflow-hidden">
+
+                <div class="px-5 py-4 border-b border-slate-100 flex items-center justify-between shrink-0">
+
+                    <div>
+
+                        <p
+                            class="text-[8px] uppercase tracking-[0.18em] font-bold text-slate-400 mb-1"
+                            data-i18n="visualization"
+                        >
+                            Visualización
+                        </p>
+
+                        <h2
+                            class="text-sm font-bold"
+                            data-i18n="heatmap_title"
+                        >
+                            Espacio de política
+                        </h2>
+
+                    </div>
+
+
+                    <span class="text-[8px] text-slate-400">
+
+                        <span class="inline-block w-1.5 h-1.5 rounded-full bg-slate-900 mr-1"></span>
+
+                        <span data-i18n="current">
+                            Estado actual
+                        </span>
+
+                    </span>
+
+                </div>
+
+
+                <div
+                    id="graficaIA"
+                    class="flex-1 min-h-0 w-full"
+                ></div>
+
+
+                <div class="px-5 py-3 border-t border-slate-100 shrink-0">
+
+                    <div class="flex items-center justify-between text-[8px] font-medium">
+
+                        <span
+                            class="text-blue-600"
+                            data-i18n="low"
+                        >
+                            Descuento
+                        </span>
+
+                        <span
+                            class="text-slate-400"
+                            data-i18n="neutral"
+                        >
+                            Tarifa base
+                        </span>
+
+                        <span
+                            class="text-amber-600"
+                            data-i18n="high"
+                        >
+                            Incremento
+                        </span>
 
                     </div>
 
@@ -601,81 +507,15 @@
 
         </div>
 
-
-        <!-- Footer stats -->
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-6">
-
-            <div class="glass border border-slate-200 rounded-2xl p-4 flex items-center gap-3 shadow-sm">
-                <div class="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center">
-                    <span class="w-2 h-2 rounded-full bg-blue-500"></span>
-                </div>
-
-                <div>
-                    <p class="text-[9px] uppercase tracking-wider font-bold text-slate-400">
-                        Algorithm
-                    </p>
-                    <p class="text-xs font-bold text-slate-800">
-                        PPO / Actor-Critic
-                    </p>
-                </div>
-            </div>
-
-            <div class="glass border border-slate-200 rounded-2xl p-4 flex items-center gap-3 shadow-sm">
-                <div class="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center">
-                    <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-                </div>
-
-                <div>
-                    <p class="text-[9px] uppercase tracking-wider font-bold text-slate-400">
-                        State Space
-                    </p>
-                    <p class="text-xs font-bold text-slate-800">
-                        31 × 101 states
-                    </p>
-                </div>
-            </div>
-
-            <div class="glass border border-slate-200 rounded-2xl p-4 flex items-center gap-3 shadow-sm">
-                <div class="w-8 h-8 rounded-lg bg-violet-50 flex items-center justify-center">
-                    <span class="w-2 h-2 rounded-full bg-violet-500"></span>
-                </div>
-
-                <div>
-                    <p class="text-[9px] uppercase tracking-wider font-bold text-slate-400">
-                        Action Space
-                    </p>
-                    <p class="text-xs font-bold text-slate-800">
-                        9 pricing actions
-                    </p>
-                </div>
-            </div>
-
-        </div>
-
     </main>
 
-
-    <!-- Footer -->
-    <footer class="border-t border-slate-200/80 bg-white/60 mt-4">
-
-        <div class="max-w-7xl mx-auto px-5 md:px-8 py-5 flex flex-col sm:flex-row items-center justify-between gap-3">
-
-            <p class="text-[9px] text-slate-400 font-medium">
-                Dynamic Pricing Intelligence · Renfe TFM
-            </p>
-
-            <p class="text-[9px] text-slate-400 font-mono">
-                PPO / RL · v1.0
-            </p>
-
-        </div>
-
-    </footer>
+</div>
 
 
-    <!-- Logic -->
-    <script src="cerebro.js"></script>
-    <script src="main.js"></script>
+<!-- IMPORTANTE: cerebro.js antes de main.js -->
+<script src="cerebro.js"></script>
+<script src="main.js"></script>
 
 </body>
 </html>
+```
