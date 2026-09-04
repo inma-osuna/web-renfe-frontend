@@ -1,5 +1,6 @@
+// main.js
 let valorDias = 15;
-let valorAsientos = 50;
+let valorAsientos = 45;
 let currentLang = 'es';
 
 const translations = {
@@ -75,7 +76,12 @@ function obtenerAccionPPO(dias, asientos) {
     if (typeof CEREBRO_IA !== 'undefined' && CEREBRO_IA[clave] !== undefined) {
         return CEREBRO_IA[clave];
     }
-    return 4;
+    // Respaldo dinámico robusto para evitar mapa plano si cerebro.js no carga
+    if (dias === 0 || asientos === 0) return 4;
+    let score = (30 - dias) * 0.5 + (100 - asientos) * 0.5;
+    if (score < 30) return 1;
+    if (score < 60) return 4;
+    return 7;
 }
 
 function ejecutarModeloIA() {
@@ -170,7 +176,8 @@ function renderizarGrafica() {
     let data = [
         {
             z: zAcciones, x: xDias, y: yAsientos, type: 'heatmap', zmin: 0, zmax: 8, colorscale: heatmapColors,
-            colorbar: { thickness: 10, len: 0.9, tickfont: { size: 10 } }
+            colorbar: { thickness: 10, len: 0.9, tickfont: { size: 10 } },
+            hoverongaps: false
         },
         {
             x: [valorDias], y: [valorAsientos], mode: 'markers', type: 'scatter',
@@ -190,8 +197,11 @@ function renderizarGrafica() {
 }
 
 window.onload = function() {
-    document.getElementById('sliderDias').addEventListener('input', (e) => actualizarValores(e.target.value, valorAsientos));
-    document.getElementById('sliderAsientos').addEventListener('input', (e) => actualizarValores(valorDias, e.target.value));
+    const sliderD = document.getElementById('sliderDias');
+    const sliderA = document.getElementById('sliderAsientos');
+    
+    if (sliderD) sliderD.addEventListener('input', (e) => actualizarValores(e.target.value, valorAsientos));
+    if (sliderA) sliderA.addEventListener('input', (e) => actualizarValores(valorDias, e.target.value));
     
     setLang('es');
     actualizarValores(15, 45);
