@@ -1,4 +1,3 @@
-// main.js
 let valorDias = 15;
 let valorAsientos = 45;
 let currentLang = 'es';
@@ -46,8 +45,8 @@ function setLang(lang) {
     currentLang = lang;
     const btnES = document.getElementById('btnES');
     const btnEN = document.getElementById('btnEN');
-    if (btnES) btnES.className = lang === 'es' ? 'bg-emerald-500 text-zinc-950 px-3 py-1 rounded-lg text-xs font-bold transition-all' : 'text-zinc-400 hover:text-zinc-100 px-3 py-1 rounded-lg text-xs font-bold transition-colors';
-    if (btnEN) btnEN.className = lang === 'en' ? 'bg-emerald-500 text-zinc-950 px-3 py-1 rounded-lg text-xs font-bold transition-all' : 'text-zinc-400 hover:text-zinc-100 px-3 py-1 rounded-lg text-xs font-bold transition-colors';
+    if (btnES) btnES.className = lang === 'es' ? 'bg-stone-900 text-white px-3 py-1 rounded-lg text-xs font-bold transition-all' : 'text-stone-500 hover:text-stone-900 px-3 py-1 rounded-lg text-xs font-bold transition-colors';
+    if (btnEN) btnEN.className = lang === 'en' ? 'bg-stone-900 text-white px-3 py-1 rounded-lg text-xs font-bold transition-all' : 'text-stone-500 hover:text-stone-900 px-3 py-1 rounded-lg text-xs font-bold transition-colors';
     
     document.querySelectorAll('[data-i18n]').forEach(el => {
         const key = el.getAttribute('data-i18n');
@@ -181,24 +180,24 @@ function renderizarGrafica() {
         zAcciones.push(fila);
     }
 
-    // Custom dark-mode friendly emerald/amber/zinc heatmap colorscale (No Blue)
+    // Escala de colores para fondo claro (tonos esmeralda / ámbar, sin azul)
     let heatmapColors = [
-        [0, '#042f2e'], 
-        [0.25, '#0f766e'], 
-        [0.5, '#14b8a6'], 
+        [0, '#ecfdf5'], 
+        [0.25, '#99f6e4'], 
+        [0.5, '#2dd4bf'], 
         [0.75, '#f59e0b'], 
-        [1, '#b45309']
+        [1, '#d97706']
     ];
 
     let data = [
         {
             z: zAcciones, x: xDias, y: yAsientos, type: 'heatmap', zmin: 0, zmax: 8, colorscale: heatmapColors,
-            colorbar: { thickness: 10, len: 0.9, tickfont: { size: 10, color: '#a1a1aa' } },
+            colorbar: { thickness: 10, len: 0.9, tickfont: { size: 10, color: '#57534e' } },
             hoverongaps: false
         },
         {
             x: [valorDias], y: [valorAsientos], mode: 'markers', type: 'scatter',
-            marker: { color: '#10b981', size: 12, symbol: 'circle', line: { color: '#ffffff', width: 2 } },
+            marker: { color: '#1c1917', size: 12, symbol: 'circle', line: { color: '#ffffff', width: 2 } },
             name: 'Selección'
         }
     ];
@@ -206,8 +205,8 @@ function renderizarGrafica() {
     Plotly.react('graficaIA', data, {
         autosize: true,
         margin: { t: 10, l: 40, r: 10, b: 35 },
-        xaxis: { title: { text: currentLang === 'es' ? 'Días' : 'Days', font: { size: 11, color: '#a1a1aa' } }, tickfont: { color: '#a1a1aa' }, gridcolor: '#27272a' },
-        yaxis: { title: { text: currentLang === 'es' ? 'Plazas' : 'Seats', font: { size: 11, color: '#a1a1aa' } }, tickfont: { color: '#a1a1aa' }, gridcolor: '#27272a' },
+        xaxis: { title: { text: currentLang === 'es' ? 'Días' : 'Days', font: { size: 11, color: '#78716c' } }, tickfont: { color: '#78716c' }, gridcolor: '#e7e5e4' },
+        yaxis: { title: { text: currentLang === 'es' ? 'Plazas' : 'Seats', font: { size: 11, color: '#78716c' } }, tickfont: { color: '#78716c' }, gridcolor: '#e7e5e4' },
         paper_bgcolor: 'rgba(0,0,0,0)', plot_bgcolor: 'rgba(0,0,0,0)',
         showlegend: false
     }, { responsive: true, displayModeBar: false });
