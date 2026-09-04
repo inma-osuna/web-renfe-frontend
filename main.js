@@ -1,4 +1,4 @@
-// main.js
+// main.js - Inferencia Pura del Proyecto (TFM Renfe)
 let valorDias = 15;
 let valorAsientos = 45;
 let currentLang = 'es';
@@ -76,12 +76,7 @@ function obtenerAccionPPO(dias, asientos) {
     if (typeof CEREBRO_IA !== 'undefined' && CEREBRO_IA[clave] !== undefined) {
         return CEREBRO_IA[clave];
     }
-    // Respaldo dinámico robusto para evitar mapa plano si cerebro.js no carga
-    if (dias === 0 || asientos === 0) return 4;
-    let score = (30 - dias) * 0.5 + (100 - asientos) * 0.5;
-    if (score < 30) return 1;
-    if (score < 60) return 4;
-    return 7;
+    return 4; // Valor por defecto estricto si no existe la clave
 }
 
 function ejecutarModeloIA() {
@@ -176,8 +171,7 @@ function renderizarGrafica() {
     let data = [
         {
             z: zAcciones, x: xDias, y: yAsientos, type: 'heatmap', zmin: 0, zmax: 8, colorscale: heatmapColors,
-            colorbar: { thickness: 10, len: 0.9, tickfont: { size: 10 } },
-            hoverongaps: false
+            colorbar: { thickness: 10, len: 0.9, tickfont: { size: 10 } }
         },
         {
             x: [valorDias], y: [valorAsientos], mode: 'markers', type: 'scatter',
