@@ -1,4 +1,4 @@
-// main.js - Inferencia directa desde cerebro.js sin modificaciones visuales
+// main.js - Inferencia directa y pura desde tu cerebro.js real
 let valorDias = 15;
 let valorAsientos = 45;
 let currentLang = 'es';
