@@ -3,149 +3,228 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Revenue Management - Renfe IA</title>
+    <title>Pricing Optimization | TFM</title>
+    <!-- FAVICON (Logo SVG en la pestaña) -->
+    <link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 19L9 11L13 15L21 5" stroke="%23f43f5e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/><circle cx="3" cy="19" r="2.5" fill="%23f43f5e"/><circle cx="9" cy="11" r="2.5" fill="%23f43f5e"/><circle cx="13" cy="15" r="2.5" fill="%23fb923c"/><circle cx="21" cy="5" r="2.5" fill="%23fb923c"/></svg>' type="image/svg+xml">
+    
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Asegúrate de tener tu archivo cerebro.js en la misma carpeta -->
-    <script src="cerebro.js"></script> 
+    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none; height: 18px; width: 18px; border-radius: 50%;
+            background: #ffffff; border: 2px solid #f43f5e; box-shadow: 0 1px 3px rgba(0,0,0,0.1); cursor: pointer; margin-top: -7px;
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%; height: 4px; cursor: pointer; background: #e5e7eb; border-radius: 2px;
+        }
+        .tab-active { border-bottom: 2px solid #f43f5e; color: #f43f5e; font-weight: 600; }
+        .tab-inactive { color: #6b7280; font-weight: 500; }
+        .tab-inactive:hover { color: #374151; }
+    </style>
 </head>
-<body class="bg-slate-50 font-sans text-slate-800">
+<body class="bg-gray-50 text-gray-900 min-h-screen flex flex-col selection:bg-rose-100 selection:text-rose-900">
 
-    <!-- NAVBAR -->
-    <nav class="bg-white border-b border-slate-200 px-6 py-4 flex justify-between items-center">
-        <div class="flex items-center space-x-2">
-            <div class="text-rose-500 font-black text-2xl">📈</div>
-            <div>
-                <h1 class="text-xl font-bold leading-tight">Revenue Management</h1>
-                <p class="text-xs text-rose-500 font-bold tracking-widest">DYNAMIC PRICING</p>
+    <!-- Navegación y Logo -->
+    <nav class="bg-white border-b border-gray-200 w-full z-10 sticky top-0">
+        <div class="max-w-[1600px] mx-auto px-6 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-6">
+                <div class="flex items-center gap-3">
+                    <svg class="w-8 h-8" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                        <path d="M3 19L9 11L13 15L21 5" stroke="#f43f5e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                        <circle cx="3" cy="19" r="2.5" fill="#f43f5e"/>
+                        <circle cx="9" cy="11" r="2.5" fill="#f43f5e"/>
+                        <circle cx="13" cy="15" r="2.5" fill="#fb923c"/>
+                        <circle cx="21" cy="5" r="2.5" fill="#fb923c"/>
+                    </svg>
+                    <div>
+                        <h1 class="text-sm font-bold tracking-tight text-gray-900 leading-tight" data-i18n="title">Revenue Management</h1>
+                        <p class="text-[10px] uppercase tracking-widest font-bold text-rose-500 leading-tight" data-i18n="subtitle">Dynamic Pricing</p>
+                    </div>
+                </div>
+
+                <div class="hidden md:flex ml-8 h-16">
+                    <button onclick="switchTab('dashboard')" id="nav-dashboard" class="px-4 h-full tab-active transition-colors text-sm" data-i18n="nav_dashboard">Dashboard</button>
+                    <button onclick="switchTab('docs')" id="nav-docs" class="px-4 h-full tab-inactive transition-colors text-sm" data-i18n="nav_docs">Documentación Técnica</button>
+                </div>
             </div>
-        </div>
-        <div class="flex space-x-6 items-center font-semibold text-sm">
-            <a href="#" class="text-rose-500 border-b-2 border-rose-500 pb-1">Dashboard</a>
-            <a href="#" class="text-slate-500 hover:text-slate-800">Documentación Técnica</a>
-        </div>
-        <div class="flex space-x-4">
-            <div class="bg-slate-100 rounded flex overflow-hidden border border-slate-200">
-                <button class="px-3 py-1 bg-white font-bold text-xs shadow-sm">ES</button>
-                <button class="px-3 py-1 text-slate-500 font-bold text-xs">EN</button>
+            
+            <div class="flex items-center gap-4">
+                <div class="flex bg-gray-100 p-0.5 rounded-lg border border-gray-200">
+                    <button id="btnES" onclick="setLang('es')" class="bg-white shadow-sm text-gray-900 px-3 py-1 rounded-md text-xs font-semibold">ES</button>
+                    <button id="btnEN" onclick="setLang('en')" class="text-gray-500 hover:text-gray-900 px-3 py-1 rounded-md text-xs font-semibold">EN</button>
+                </div>
+                <div class="w-px h-6 bg-gray-200"></div>
+                <button onclick="descargarReporte()" class="bg-white hover:bg-gray-50 border border-gray-300 text-gray-700 shadow-sm px-4 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-2" data-i18n="export_btn">
+                    Exportar Reporte
+                </button>
             </div>
-            <button class="border border-slate-300 rounded px-4 py-1 text-sm font-bold hover:bg-slate-50">Exportar Reporte</button>
         </div>
     </nav>
 
-    <!-- MAIN LAYOUT -->
-    <div class="flex h-[calc(100vh-76px)]">
-        
-        <!-- SIDEBAR (CONTROLES) -->
-        <div class="w-1/4 bg-white border-r border-slate-200 p-6 flex flex-col space-y-8 overflow-y-auto">
-            
-            <!-- Parámetros -->
+    <!-- VISTA 1: DASHBOARD -->
+    <main id="view-dashboard" class="flex-1 w-full flex flex-col lg:flex-row max-w-[1600px] mx-auto animate-fade-in">
+        <aside class="w-full lg:w-[340px] border-r border-gray-200 bg-white flex flex-col p-6 gap-8 shrink-0 shadow-sm z-0">
             <div>
-                <h2 class="text-xs font-bold text-rose-500 tracking-widest mb-6">PARÁMETROS DEL ENTORNO</h2>
-                
-                <div class="mb-6">
-                    <div class="flex justify-between mb-2">
-                        <label class="font-semibold text-slate-700">Lead Time (Días)</label>
-                        <span id="valor-dias" class="bg-rose-50 text-rose-600 font-bold px-2 py-0.5 rounded text-sm">15 d</span>
+                <h2 class="text-[11px] font-bold uppercase tracking-widest text-rose-500 mb-5" data-i18n="env_params">Parámetros del Entorno</h2>
+                <div class="space-y-6">
+                    <div>
+                        <div class="flex justify-between items-center mb-2">
+                            <label class="text-sm font-medium text-gray-700" data-i18n="days_label">Días para la salida</label>
+                            <span id="txtDias" class="text-xs font-bold text-rose-600 bg-rose-50 px-2.5 py-1 rounded-md border border-rose-100">15 d</span>
+                        </div>
+                        <input id="sliderDias" type="range" min="0" max="30" value="15">
                     </div>
-                    <input type="range" id="slider-dias" min="0" max="30" value="15" class="w-full accent-rose-500">
-                </div>
-
-                <div>
-                    <div class="flex justify-between mb-2">
-                        <label class="font-semibold text-slate-700">Inventario (Plazas)</label>
-                        <span id="valor-asientos" class="bg-rose-50 text-rose-600 font-bold px-2 py-0.5 rounded text-sm">50 pl</span>
+                    <div>
+                        <div class="flex justify-between items-center mb-2">
+                            <label class="text-sm font-medium text-gray-700" data-i18n="seats_label">Inventario</label>
+                            <span id="txtAsientos" class="text-xs font-bold text-rose-600 bg-rose-50 px-2.5 py-1 rounded-md border border-rose-100">50 pl</span>
+                        </div>
+                        <input id="sliderAsientos" type="range" min="0" max="100" value="50">
                     </div>
-                    <input type="range" id="slider-asientos" min="0" max="100" value="50" class="w-full accent-rose-500">
                 </div>
             </div>
 
-            <!-- Recomendación -->
+            <div class="h-px w-full bg-gray-100"></div>
+
             <div>
-                <h2 class="text-xs font-bold text-rose-500 tracking-widest mb-4">RECOMENDACIÓN DEL MODELO</h2>
-                
-                <div class="bg-slate-50 border border-slate-200 rounded-xl p-5 shadow-sm">
-                    <div class="flex justify-between items-start mb-1">
-                        <span class="text-sm font-semibold text-slate-500">Multiplicador de Precio</span>
-                        <span id="badge-porcentaje" class="text-xs font-bold px-2 py-1 rounded-full border">0%</span>
+                <h2 class="text-[11px] font-bold uppercase tracking-widest text-rose-500 mb-5" data-i18n="inf_title">Recomendación del Modelo</h2>
+                <div class="bg-gray-50 border border-gray-200 rounded-xl p-5 relative shadow-inner">
+                    <span id="ajustePorcentaje" class="absolute top-4 right-4 text-xs font-bold text-rose-600 bg-rose-100 px-2 py-0.5 rounded-full">+0%</span>
+                    <span class="text-xs font-medium text-gray-500 block mb-1" data-i18n="multiplier">Multiplicador de Precio</span>
+                    <span id="precioMultiplicador" class="text-4xl font-extrabold tracking-tight text-gray-900 block mb-4">1.0x</span>
+                    <div class="flex items-center gap-2 mb-3">
+                        <span class="text-xs font-medium text-gray-500" data-i18n="discrete_action">Acción Discreta:</span>
+                        <span id="accionAgente" class="text-xs font-bold text-white bg-rose-500 shadow-sm px-2 py-0.5 rounded">4</span>
                     </div>
-                    
-                    <div class="text-5xl font-black text-slate-800 tracking-tighter mb-4" id="texto-multiplicador">
-                        1.0x
-                    </div>
-
-                    <div class="flex items-center space-x-3 mb-4 pb-4 border-b border-slate-200">
-                        <span class="text-sm font-semibold text-slate-500">Acción Discreta:</span>
-                        <!-- ESTE ES EL RECUADRO QUE CAMBIARÁ DE COLOR -->
-                        <span id="badge-accion" class="text-sm font-bold px-2.5 py-0.5 rounded">4</span>
-                    </div>
-
-                    <p id="texto-explicativo" class="text-sm text-slate-600 font-medium leading-relaxed">
-                        Tarifa base neutra. El entorno presenta condiciones de equilibrio.
+                    <p id="textoExplicativoAccion" class="text-[11px] text-gray-600 leading-relaxed pt-3 border-t border-gray-200 font-medium">
+                        Evaluando política base...
                     </p>
                 </div>
             </div>
-        </div>
+        </aside>
 
-        <!-- MAIN AREA (MAPA DE CALOR) -->
-        <div class="w-3/4 p-8 bg-slate-50 overflow-y-auto flex flex-col">
-            <div class="bg-white border border-slate-200 rounded-xl p-6 shadow-sm flex-1 flex flex-col">
-                
-                <div class="flex justify-between items-center mb-4">
-                    <h2 class="text-lg font-bold text-slate-800">Mapa de Política: Random Forest</h2>
-                    <span class="bg-rose-50 text-rose-500 border border-rose-100 text-xs font-bold px-2 py-1 rounded">LIVE DATA</span>
+        <section class="flex-1 p-6 bg-gray-50/50 flex flex-col h-[calc(100vh-64px)]">
+            <div class="bg-white border border-gray-200 rounded-xl shadow-sm flex-1 flex flex-col overflow-hidden">
+                <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-white">
+                    <h2 class="text-sm font-bold text-gray-800" data-i18n="heatmap_title">Mapa de Política: Random Forest</h2>
+                    <span class="text-[10px] font-bold uppercase tracking-wider text-rose-500 bg-rose-50 px-2 py-1 rounded-md border border-rose-100">Live Data</span>
                 </div>
-
-                <!-- Contenedor del Mapa de Calor -->
-                <div class="relative flex-1 bg-slate-100 rounded border border-slate-200 flex items-center justify-center overflow-hidden">
-                    <!-- Eje Y -->
-                    <div class="absolute left-2 top-0 bottom-8 flex flex-col justify-between py-2 text-xs text-slate-400 font-bold">
-                        <span>100</span><span>80</span><span>60</span><span>40</span><span>20</span><span>0</span>
-                    </div>
-                    <div class="absolute left-8 -rotate-90 origin-left text-xs text-slate-400 font-bold translate-y-[150px]">Asientos Disponibles</div>
-                    
-                    <!-- Canvas donde se dibuja el mapa -->
-                    <canvas id="heatmap-canvas" class="w-[85%] h-[90%] bg-white cursor-crosshair ml-12 mb-6"></canvas>
-                    
-                    <!-- Indicador del cursor en el mapa -->
-                    <div id="cursor-indicador" class="absolute w-4 h-4 rounded-full border-4 border-white shadow-[0_0_0_2px_rgba(0,0,0,0.3)] pointer-events-none transition-all duration-75 ease-out" style="display: none;"></div>
-
-                    <!-- Eje X -->
-                    <div class="absolute bottom-2 left-20 right-[5%] flex justify-between text-xs text-slate-400 font-bold px-2">
-                        <span>0</span><span>5</span><span>10</span><span>15</span><span>20</span><span>25</span><span>30</span>
-                    </div>
-                    <div class="absolute bottom-1 w-full text-center text-xs text-slate-400 font-bold pl-12">Lead Time (Días)</div>
+                <div class="flex-1 p-2">
+                    <div id="graficaIA" class="w-full h-full"></div>
                 </div>
-
-                <!-- LEYENDA INFERIOR -->
-                <div class="flex space-x-8 mt-6">
-                    <div class="flex items-start space-x-2">
-                        <div class="w-4 h-4 rounded bg-pink-200 mt-0.5"></div>
+                <div class="px-6 py-4 border-t border-gray-100 bg-gray-50 flex flex-wrap gap-x-8 gap-y-3 items-center">
+                    <div class="flex items-center gap-3">
+                        <div class="w-4 h-4 bg-[#fbcfe8] border border-[#f472b6] rounded-sm shadow-sm"></div>
                         <div>
-                            <p class="text-xs font-bold text-slate-800">Acciones 0–2 (0.6x - 0.8x)</p>
-                            <p class="text-xs text-slate-500">Descuentos agresivos.</p>
+                            <p class="text-[11px] font-bold text-gray-800" data-i18n="leg_1_title">Acciones 0–2 (0.6x - 0.8x)</p>
+                            <p class="text-[10px] text-gray-500" data-i18n="leg_1_desc">Descuentos agresivos.</p>
                         </div>
                     </div>
-                    <div class="flex items-start space-x-2">
-                        <div class="w-4 h-4 rounded bg-rose-500 mt-0.5"></div>
+                    <div class="flex items-center gap-3">
+                        <div class="w-4 h-4 bg-[#f43f5e] border border-[#e11d48] rounded-sm shadow-sm"></div>
                         <div>
-                            <p class="text-xs font-bold text-slate-800">Acciones 3–5 (0.9x - 1.1x)</p>
-                            <p class="text-xs text-slate-500">Tarifa base neutra.</p>
+                            <p class="text-[11px] font-bold text-gray-800" data-i18n="leg_2_title">Acciones 3–5 (0.9x - 1.1x)</p>
+                            <p class="text-[10px] text-gray-500" data-i18n="leg_2_desc">Tarifa base neutra.</p>
                         </div>
                     </div>
-                    <div class="flex items-start space-x-2">
-                        <div class="w-4 h-4 rounded bg-orange-500 mt-0.5"></div>
+                    <div class="flex items-center gap-3">
+                        <div class="w-4 h-4 bg-[#f97316] border border-[#c2410c] rounded-sm shadow-sm"></div>
                         <div>
-                            <p class="text-xs font-bold text-slate-800">Acciones 6–8 (1.2x - 1.4x)</p>
-                            <p class="text-xs text-slate-500">Yield management alcista.</p>
+                            <p class="text-[11px] font-bold text-gray-800" data-i18n="leg_3_title">Acciones 6–8 (1.2x - 1.4x)</p>
+                            <p class="text-[10px] text-gray-500" data-i18n="leg_3_desc">Yield management alcista.</p>
                         </div>
                     </div>
                 </div>
-
             </div>
-        </div>
-    </div>
+        </section>
+    </main>
 
-    <!-- MAIN SCRIPT -->
+    <!-- VISTA 2: DOCUMENTACIÓN -->
+    <main id="view-docs" class="hidden flex-1 w-full max-w-5xl mx-auto p-8 lg:p-12 animate-fade-in bg-white border-x border-gray-200 min-h-screen">
+        <header class="mb-10 pb-6 border-b border-gray-200">
+            <h2 class="text-3xl font-extrabold text-gray-900 tracking-tight mb-3" data-i18n="doc_title">Fundamentos y Arquitectura del Modelo</h2>
+            <p class="text-gray-500 text-lg" data-i18n="doc_subtitle">Análisis metodológico del motor de Revenue Management Dinámico.</p>
+        </header>
+        
+        <div class="space-y-12 text-gray-700 leading-relaxed">
+            
+            <!-- 1. El Problema -->
+            <section>
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-8 h-8 rounded bg-rose-100 text-rose-600 flex items-center justify-center font-bold">1</div>
+                    <h3 class="text-xl font-bold text-gray-900" data-i18n="doc_sec1_title">Formulación del Problema (Revenue Management)</h3>
+                </div>
+                <p class="mb-4" data-i18n="doc_sec1_p1">La optimización de precios en el sector ferroviario de Alta Velocidad requiere un equilibrio continuo entre la maximización del factor de ocupación y el incremento del ingreso marginal por asiento. El objetivo del sistema desarrollado es maximizar el <em>Yield</em> total de un tren ajustando la política de precios de forma dinámica.</p>
+                <p data-i18n="doc_sec1_p2">Para lograrlo, el entorno se ha modelado como un Proceso de Decisión de Markov (MDP), donde el agente de inteligencia artificial observa un estado en el tiempo <em>t</em> y ejecuta una acción de fijación de precio para maximizar la recompensa futura esperada.</p>
+            </section>
+
+            <!-- 2. MDP -->
+            <section>
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-8 h-8 rounded bg-rose-100 text-rose-600 flex items-center justify-center font-bold">2</div>
+                    <h3 class="text-xl font-bold text-gray-900" data-i18n="doc_sec2_title">Espacio de Estados y Acciones (MDP)</h3>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+                    <div class="bg-gray-50 border border-gray-200 p-5 rounded-xl">
+                        <h4 class="font-bold text-gray-900 mb-2 border-b border-gray-200 pb-2" data-i18n="doc_sec2_state">Espacio de Estados (S)</h4>
+                        <ul class="list-disc pl-5 space-y-2 text-sm mt-3">
+                            <li><strong data-i18n="doc_sec2_s1_title">Lead Time:</strong> <span data-i18n="doc_sec2_s1_desc">Días restantes hasta la salida (0 a 30). Captura la evolución de la curva de demanda y la inelasticidad del pasajero de última hora.</span></li>
+                            <li><strong data-i18n="doc_sec2_s2_title">Inventario Disponible:</strong> <span data-i18n="doc_sec2_s2_desc">Asientos libres restantes. A menor capacidad, mayor es el coste de oportunidad de vender barato.</span></li>
+                        </ul>
+                    </div>
+                    <div class="bg-gray-50 border border-gray-200 p-5 rounded-xl">
+                        <h4 class="font-bold text-gray-900 mb-2 border-b border-gray-200 pb-2" data-i18n="doc_sec2_action">Espacio de Acciones (A)</h4>
+                        <p class="text-sm mt-3 mb-2" data-i18n="doc_sec2_a_desc">El sistema acciona una variable discreta escalar entre 0 y 8, que se traduce algorítmicamente en un multiplicador sobre la tarifa base:</p>
+                        <ul class="list-disc pl-5 space-y-1 text-sm text-gray-600">
+                            <li><strong class="text-rose-500">0 - 2:</strong> Descuentos (0.6x - 0.8x)</li>
+                            <li><strong class="text-gray-700">3 - 5:</strong> Tarifas Neutras (0.9x - 1.1x)</li>
+                            <li><strong class="text-orange-500">6 - 8:</strong> Yield Alcista (1.2x - 1.4x)</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 3. DRL vs RF -->
+            <section class="bg-rose-50 border border-rose-100 rounded-2xl p-8 relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-32 h-32 bg-rose-200 rounded-full blur-3xl opacity-50 -mr-10 -mt-10"></div>
+                <div class="flex items-center gap-3 mb-6 relative z-10">
+                    <div class="w-8 h-8 rounded bg-rose-600 text-white flex items-center justify-center font-bold">3</div>
+                    <h3 class="text-xl font-bold text-gray-900" data-i18n="doc_sec3_title">Evolución Algorítmica: PPO y Random Forest</h3>
+                </div>
+                
+                <div class="space-y-4 relative z-10 text-gray-800">
+                    <p data-i18n="doc_sec3_p1">En la fase experimental, el agente entrenado mediante <strong>Proximal Policy Optimization (PPO)</strong> demostró una alta eficacia económica, adoptando una política extrema de tipo "bang-bang" (grandes descuentos vs. subidas agresivas). Sin embargo, esta polarización resulta poco estable para una operativa comercial continua.</p>
+                    
+                    <p data-i18n="doc_sec3_p2">Por ello, para la capa demostrativa de esta interfaz, se ha implementado como motor operativo un modelo <strong>Random Forest Regressor</strong> (enfoque predict-then-optimize). Este algoritmo de ensamble proporciona una superficie de decisiones mucho más progresiva, granular e interpretable para el usuario de negocio.</p>
+                    
+                    <div class="bg-white/80 p-4 rounded-lg border border-rose-200 mt-4 flex items-center gap-4">
+                        <div class="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center text-orange-600 font-bold text-xl">💡</div>
+                        <p class="text-sm font-medium" data-i18n="doc_sec3_p3">La evaluación Monte Carlo se mantiene en la arquitectura global como un mecanismo de arbitraje independiente, demostrando empíricamente la solidez del sistema frente a diferentes escenarios de estrés de demanda.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 4. Interpretación -->
+            <section>
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-8 h-8 rounded bg-rose-100 text-rose-600 flex items-center justify-center font-bold">4</div>
+                    <h3 class="text-xl font-bold text-gray-900" data-i18n="doc_sec4_title">Guía de Interpretación del Dashboard</h3>
+                </div>
+                <p class="mb-4" data-i18n="doc_sec4_p1">El <strong>Mapa de Política</strong> de la interfaz expone visualmente el espacio de decisión completo del modelo Random Forest. Permite al analista de negocio evaluar la estrategia global de un solo vistazo:</p>
+                <ul class="list-disc pl-5 space-y-3">
+                    <li data-i18n="doc_sec4_li1"><strong>Zonas Claras (Rosa pálido):</strong> Aparecen principalmente en la parte superior derecha de la gráfica (muchos días de antelación, muchas plazas libres). Indican acciones de descuento para estimular compras tempranas y asegurar el <em>Load Factor</em> base del tren.</li>
+                    <li data-i18n="doc_sec4_li2"><strong>Zonas Cálidas (Naranja fuego):</strong> Se concentran en el origen de los ejes (pocos días, pocas plazas). Representan la activación del Yield Management restrictivo para capitalizar la disposición a pagar de los clientes corporativos o de urgencia.</li>
+                </ul>
+            </section>
+
+        </div>
+    </main>
+
+    <!-- Scripts -->
+    <script src="cerebro.js"></script>
     <script src="main.js"></script>
 </body>
 </html>
