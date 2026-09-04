@@ -4,36 +4,96 @@ let currentLang = 'es';
 
 const translations = {
     'es': {
-        'subtitle': 'Dynamic Yield Engine',
-        'title': 'Price Optimization',
-        'export_btn': 'Exportar Reporte',
+        'title': 'Revenue Management',
+        'subtitle': 'Dynamic Pricing',
+        'nav_dashboard': 'Dashboard',
+        'nav_docs': 'Documentación',
+        'export_btn': 'Exportar',
         'env_params': 'Parámetros del Entorno',
-        'days_label': 'Días al despegue (Lead Time)',
+        'days_label': 'Días al despegue',
         'seats_label': 'Inventario',
         'inf_title': 'Recomendación del Modelo',
         'multiplier': 'Multiplicador de Precio',
-        'discrete_action': 'Acción:',
+        'discrete_action': 'Acción Discreta:',
         'heatmap_title': 'Mapa de Política: Random Forest',
-        'leg_1_title': 'Estrategia de Descuento (Acción 0-2)',
-        'leg_2_title': 'Tarifa Neutra (Acción 3-5)',
-        'leg_3_title': 'Yield Alcista (Acción 6-8)'
+        'leg_1_title': 'Acciones 0–2 (0.6x - 0.8x)',
+        'leg_1_desc': 'Descuentos agresivos.',
+        'leg_2_title': 'Acciones 3–5 (0.9x - 1.1x)',
+        'leg_2_desc': 'Tarifa base neutra.',
+        'leg_3_title': 'Acciones 6–8 (1.2x - 1.4x)',
+        'leg_3_desc': 'Yield management alcista.',
+        
+        // Textos de Documentación
+        'doc_title': 'Documentación del Proyecto',
+        'doc_subtitle': 'Explicación de la metodología y parámetros del algoritmo.',
+        'doc_sec1_title': '1. El Problema de Revenue Management',
+        'doc_sec1_desc': 'El objetivo de esta herramienta es optimizar los ingresos de un tren de Alta Velocidad ajustando dinámicamente el precio del billete basándose en dos factores clave: los días restantes para la salida del tren y el número de asientos que aún quedan libres.',
+        'doc_sec2_title': '2. Variables del Entorno',
+        'doc_var1_name': 'Lead Time (Días):',
+        'doc_var1_desc': 'Horizonte temporal. A menor tiempo, menor elasticidad del pasajero (dispuesto a pagar más).',
+        'doc_var2_name': 'Inventario (Plazas):',
+        'doc_var2_desc': 'La capacidad del tren. La escasez es el principal motor para aplicar políticas alcistas.',
+        'doc_sec3_title': '3. El Algoritmo: Random Forest vs PPO',
+        'doc_sec3_desc1': 'Durante el entrenamiento en el entorno Gym (Markov Decision Process), el agente de Deep Reinforcement Learning (PPO) sufrió un policy collapse, apostando únicamente por las tarifas más altas para evadir penalizaciones complejas.',
+        'doc_sec3_desc2': 'Por tanto, la validación empírica mediante Monte Carlo demostró que la inteligencia generada mediante Random Forest Regressor lograba un uplift de ingresos superior (+17%), ofreciendo un mapa de calor equilibrado, lógico y económicamente viable. Esta interfaz expone dicha matriz optimizada.'
     },
     'en': {
-        'subtitle': 'Dynamic Yield Engine',
-        'title': 'Price Optimization',
-        'export_btn': 'Export Report',
+        'title': 'Revenue Management',
+        'subtitle': 'Dynamic Pricing',
+        'nav_dashboard': 'Dashboard',
+        'nav_docs': 'Documentation',
+        'export_btn': 'Export',
         'env_params': 'Environment Parameters',
         'days_label': 'Lead Time (Days)',
-        'seats_label': 'Available Inventory',
+        'seats_label': 'Inventory (Seats)',
         'inf_title': 'Model Recommendation',
         'multiplier': 'Price Multiplier',
-        'discrete_action': 'Action:',
+        'discrete_action': 'Discrete Action:',
         'heatmap_title': 'Policy Map: Random Forest',
-        'leg_1_title': 'Discount Strategy (Action 0-2)',
-        'leg_2_title': 'Neutral Fare (Action 3-5)',
-        'leg_3_title': 'Bullish Yield (Action 6-8)'
+        'leg_1_title': 'Actions 0–2 (0.6x - 0.8x)',
+        'leg_1_desc': 'Aggressive discounts.',
+        'leg_2_title': 'Actions 3–5 (0.9x - 1.1x)',
+        'leg_2_desc': 'Neutral base fare.',
+        'leg_3_title': 'Actions 6–8 (1.2x - 1.4x)',
+        'leg_3_desc': 'Bullish yield management.',
+        
+        // Documentation Texts
+        'doc_title': 'Project Documentation',
+        'doc_subtitle': 'Explanation of the methodology and algorithm parameters.',
+        'doc_sec1_title': '1. The Revenue Management Problem',
+        'doc_sec1_desc': 'The goal of this tool is to optimize the revenue of a High-Speed train by dynamically adjusting ticket prices based on two key factors: days remaining to departure and available seats.',
+        'doc_sec2_title': '2. Environment Variables',
+        'doc_var1_name': 'Lead Time (Days):',
+        'doc_var1_desc': 'Time horizon. Closer to departure means lower passenger elasticity (willing to pay more).',
+        'doc_var2_name': 'Inventory (Seats):',
+        'doc_var2_desc': 'Train capacity. Scarcity is the main driver for bullish pricing policies.',
+        'doc_sec3_title': '3. The Algorithm: Random Forest vs PPO',
+        'doc_sec3_desc1': 'During training in the Gym environment, the Deep Reinforcement Learning (PPO) agent suffered a policy collapse, consistently outputting maximum fares to evade complex penalties.',
+        'doc_sec3_desc2': 'Thus, Monte Carlo empirical validation demonstrated that the intelligence generated by the Random Forest Regressor achieved a superior revenue uplift (+17%), providing a balanced, logical, and economically viable heatmap. This interface exposes that optimized matrix.'
     }
 };
+
+// Función para cambiar de pestañas (Dashboard <-> Docs)
+function switchTab(tabId) {
+    const dashView = document.getElementById('view-dashboard');
+    const docsView = document.getElementById('view-docs');
+    const navDash = document.getElementById('nav-dashboard');
+    const navDocs = document.getElementById('nav-docs');
+
+    if(tabId === 'dashboard') {
+        dashView.classList.remove('hidden');
+        docsView.classList.add('hidden');
+        navDash.className = "px-4 h-full tab-active transition-colors text-sm";
+        navDocs.className = "px-4 h-full tab-inactive transition-colors text-sm";
+        // Al volver al dashboard aseguramos que la gráfica se re-ajuste a su div
+        setTimeout(renderizarGrafica, 50);
+    } else {
+        dashView.classList.add('hidden');
+        docsView.classList.remove('hidden');
+        navDash.className = "px-4 h-full tab-inactive transition-colors text-sm";
+        navDocs.className = "px-4 h-full tab-active transition-colors text-sm";
+    }
+}
 
 function setLang(lang) {
     currentLang = lang;
@@ -50,7 +110,6 @@ function setLang(lang) {
     });
 
     ejecutarModeloIA();
-    renderizarGrafica();
 }
 
 function actualizarValores(d, a) {
@@ -95,24 +154,23 @@ function ejecutarModeloIA() {
     
     if (elPct) {
         elPct.innerText = (pct > 0 ? "+" : "") + pct + "%";
-        // Estilo dinámico del badge según descuento o aumento
         if (pct < 0) {
-            elPct.className = "absolute top-4 right-4 text-xs font-bold text-red-700 bg-red-50 px-2 py-0.5 rounded-full border border-red-100";
+            elPct.className = "absolute top-4 right-4 text-xs font-bold text-fuchsia-700 bg-fuchsia-50 px-2 py-0.5 rounded-full border border-fuchsia-100";
         } else if (pct > 0) {
-            elPct.className = "absolute top-4 right-4 text-xs font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-100";
+            elPct.className = "absolute top-4 right-4 text-xs font-bold text-orange-700 bg-orange-50 px-2 py-0.5 rounded-full border border-orange-100";
         } else {
-            elPct.className = "absolute top-4 right-4 text-xs font-bold text-gray-600 bg-gray-100 px-2 py-0.5 rounded-full border border-gray-200";
+            elPct.className = "absolute top-4 right-4 text-xs font-bold text-purple-700 bg-purple-100 px-2 py-0.5 rounded-full border border-purple-200";
         }
     }
 
     let desc = "";
     if (currentLang === 'es') {
-        if (accion <= 2) desc = "Se recomienda aplicar un descuento estratégico debido a la alta antelación y la baja ocupación proyectada.";
-        else if (accion <= 5) desc = "El sistema sugiere mantener la tarifa en la zona de equilibrio actual del mercado.";
+        if (accion <= 2) desc = "Descuento estratégico activado por alta antelación y baja ocupación proyectada.";
+        else if (accion <= 5) desc = "Tarifa base estable en zona de equilibrio del mercado.";
         else desc = "Recomendación de Yield Management alcista por alta demanda y escasez crítica de inventario.";
     } else {
         if (accion <= 2) desc = "Strategic discount recommended due to early lead time and low projected occupancy.";
-        else if (accion <= 5) desc = "The system suggests maintaining the fare within the current market equilibrium zone.";
+        else if (accion <= 5) desc = "Stable base fare in market equilibrium zone.";
         else desc = "Bullish Yield Management recommended due to high demand and critical inventory scarcity.";
     }
     if (elDesc) elDesc.innerText = desc;
@@ -128,7 +186,7 @@ function descargarReporte() {
     const descText = descElem ? descElem.innerText : "";
 
     let contenido = `==================================================\n`;
-    contenido += `      PIVOTICS - PRICING OPTIMIZATION REPORT      \n`;
+    contenido += `      DYNAMIC PRICING OPTIMIZATION REPORT         \n`;
     contenido += `==================================================\n`;
     contenido += `Fecha / Date: ${fecha}\n`;
     contenido += `Modelo / Model: Random Forest Optimization\n\n`;
@@ -145,7 +203,7 @@ function descargarReporte() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `Pivotics_Report_${valorDias}d_${valorAsientos}s.txt`;
+    a.download = `Pricing_Report_${valorDias}d_${valorAsientos}s.txt`;
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
@@ -153,7 +211,8 @@ function descargarReporte() {
 
 function renderizarGrafica() {
     const contenedor = document.getElementById('graficaIA');
-    if (!contenedor) return;
+    // Si la pestaña actual no es dashboard, el contenedor estará oculto y Plotly fallará al medir.
+    if (!contenedor || contenedor.offsetWidth === 0) return;
 
     let xDias = [];
     for (let i = 0; i <= 30; i++) xDias.push(i);
@@ -169,13 +228,13 @@ function renderizarGrafica() {
         zAcciones.push(fila);
     }
 
-    // Colores SaaS Corporativos: De verde bosque a amarillo/ámbar
+    // Escala de Colores Premium: Púrpura claro -> Violeta Intenso -> Naranja
     let heatmapColors = [
-        [0, '#115e59'],   // teal-800
-        [0.25, '#14b8a6'],// teal-500
-        [0.5, '#fef08a'], // yellow-200
-        [0.75, '#fbbf24'],// amber-400
-        [1, '#d97706']    // amber-600
+        [0, '#f3e8ff'],     // purple-100 (Descuento agresivo)
+        [0.25, '#c084fc'],  // purple-400
+        [0.5, '#7e22ce'],   // purple-700 (Neutro)
+        [0.75, '#db2777'],  // pink-600
+        [1, '#ea580c']      // orange-600 (Yield alcista máximo)
     ];
 
     let data = [
@@ -186,7 +245,7 @@ function renderizarGrafica() {
         },
         {
             x: [valorDias], y: [valorAsientos], mode: 'markers', type: 'scatter',
-            marker: { color: '#ffffff', size: 14, symbol: 'circle', line: { color: '#0f766e', width: 3 } },
+            marker: { color: '#ffffff', size: 14, symbol: 'circle', line: { color: '#581c87', width: 3 } },
             name: 'Punto de Inferencia'
         }
     ];
@@ -221,5 +280,5 @@ window.onload = function() {
     }
     
     setLang('es');
-    actualizarValores(15, 50); // Empieza en 50 asientos
+    actualizarValores(15, 50);
 };
