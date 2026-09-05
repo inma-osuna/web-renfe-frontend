@@ -17,7 +17,7 @@ const i18n = {
     docs_t1: "Pipeline de Datos y Big Data", docs_d1: "El entrenamiento del agente de aprendizaje por refuerzo y el procesamiento masivo de tarifas históricas se ha ejecutado utilizando un entorno distribuido en <strong>PySpark</strong>.",
     docs_t2: "Modelo de Machine Learning", docs_d2: "El núcleo emplea un <strong>Random Forest Regressor</strong> para aproximar los Q-Values. El <em>Espacio de Estados</em> es un plano continuo normalizado [0, 1] que evalúa Lead Time y capacidad.",
     docs_t3: "Espacio de Acciones Discretas", docs_d3: "El agente selecciona sobre 9 acciones que varían el precio. El espectro abarca desde descuentos del <strong>0.80x (-20%)</strong> hasta recargos premium del <strong>1.20x (+20%)</strong>.",
-    docs_t4: "Gobernanza y Límite Legal", docs_d4: "Reglas de negocio estrictas. Cualquier salida del algoritmo que sugiera una tarifa superior al <strong>Techo Histórico Regulado</strong> de la ruta es automáticamente truncada al límite.",
+    docs_t4: "Gobernanza y Límite Legal", docs_d4: "Reglas de negocio estrictas. Cualquier salida del algoritmo que sugiera una tarifa superior a la <strong>Tarifa Base de Referencia</strong> es automáticamente capada al límite del umbral.",
     plot_x_h: "Lead Time (Días)", plot_y_h: "Asientos Disponibles", plot_x_c: "Días Antelación", plot_y_c: "Precio (€)"
   },
   en: {
@@ -35,7 +35,7 @@ const i18n = {
     docs_t1: "Data Pipeline & Big Data", docs_d1: "The training of the reinforcement learning agent and the massive processing of historical fares was executed using a distributed environment in <strong>PySpark</strong>.",
     docs_t2: "Machine Learning Model", docs_d2: "The core uses a <strong>Random Forest Regressor</strong> to approximate Q-Values. The <em>State Space</em> is a continuous normalized plane [0, 1] evaluating Lead Time and capacity.",
     docs_t3: "Discrete Action Space", docs_d3: "The agent selects from 9 actions varying the price. The spectrum ranges from <strong>0.80x (-20%)</strong> discounts to premium surcharges of <strong>1.20x (+20%)</strong>.",
-    docs_t4: "Governance & Legal Limit", docs_d4: "Strict business rules. Any algorithm output suggesting a fare above the route's <strong>Historical Regulated Ceiling</strong> is automatically truncated to the limit.",
+    docs_t4: "Governance & Legal Limit", docs_d4: "Strict business rules. Any algorithm output suggesting a fare above the route's <strong>Base Fare Reference</strong> is automatically truncated to the limit.",
     plot_x_h: "Lead Time (Days)", plot_y_h: "Available Seats", plot_x_c: "Days in Advance", plot_y_c: "Price (€)"
   }
 };
@@ -93,7 +93,7 @@ window.exportarReporte = function() {
   const accion = data.politica[`${dias}_${asientos}`] ?? 4;
   const info = ACCIONES_INFO[lang][accion];
   const precioBase = data.precios_base[String(dias)] || 60;
-  const tarifaMax = data.tarifa_maxima || 250;
+  const tarifaMax = precioBase;
   
   const precioCrudo = precioBase * info.mult;
   const precioFinal = precioCrudo > tarifaMax ? tarifaMax : precioCrudo;
@@ -138,13 +138,12 @@ window.setLang = function(l) {
     document.getElementById('btn_es').className = "px-3 py-1.5 text-gray-400 hover:bg-gray-50 transition-colors";
   }
   
-  // Actualizar textos estáticos
   Object.keys(i18n[lang]).forEach(key => {
     const el = document.getElementById(key);
     if(el) el.innerHTML = i18n[lang][key];
   });
   
-  update(true); // Refresca UI y labels de gráficas
+  update(true);
 };
 
 // PESTAÑAS
@@ -189,18 +188,25 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 function update(cambioRuta) {
+  const ruta = D.selectorRuta.value;
+  const dias = parseInt(D.sliderDias.value);
+  const asientos = parseInt(D.sliderAsientos.value);
+  const data = CEREBRO_IA[ruta];
+
+  D.txtDias.textContent = dias;
+  D.txtAsientos.textContent = asientos;
+
   const accion = data.politica[`${dias}_${asientos}`] ?? 4;
   const info = ACCIONES_INFO[lang][accion];
   const precioBase = data.precios_base[String(dias)] || 60;
   
-  // CAMBIO CLAVE: El techo legal estricto ahora es la propia Tarifa Base del día
+  // El techo legal estricto ahora es la propia Tarifa Base del día
   const tarifaMax = precioBase; 
 
   const precioCrudo = precioBase * info.mult;
   let precioFinal = precioCrudo;
   let veto = false;
 
-  // Si la IA intenta subir por encima del precio base (ej: multiplicador > 1.0), se capa a la base
   if (precioCrudo > tarifaMax) {
     precioFinal = tarifaMax;
     veto = true;
@@ -273,7 +279,7 @@ function renderPlotly(data, diasActual, asientosActual, refrescarTodo) {
     Plotly.newPlot('grafico_curva', [{
       x: diasX, y: preY, type: 'scatter', mode: 'lines', line: { color: '#ef4444', width: 3 }
     }, {
-      x: [0, 30], y: [data.tarifa_maxima, data.tarifa_maxima], type: 'scatter', mode: 'lines',
+      x: [0, 30], y: preY, type: 'scatter', mode: 'lines',
       line: { color: '#ea580c', dash: 'dash', width: 2 }
     }, {
       x: [diasActual], y: [data.precios_base[String(diasActual)] || 60], type: 'scatter', mode: 'markers',
