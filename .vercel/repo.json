@@ -1,0 +1,11 @@
+{
+  "remoteName": "origin",
+  "projects": [
+    {
+      "id": "prj_Qp1iAUPI9GPPM5NmmF23xsRKYGfE",
+      "name": "web-renfe-frontend",
+      "directory": ".",
+      "orgId": "team_A9mubVJ3IptO5teA6OKa9VDZ"
+    }
+  ]
+}
