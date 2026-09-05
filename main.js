@@ -46,21 +46,17 @@ function actualizarDashboard() {
     let precioBase = 50.00;
     let tarifaMaxima = 300.00;
 
-    // Extraer datos estructurados del nuevo cerebro multiruta
     if (typeof CEREBRO_IA !== 'undefined' && CEREBRO_IA[rutaSeleccionada]) {
         const datosRuta = CEREBRO_IA[rutaSeleccionada];
         
-        // 1. Obtener acción del modelo
         if (datosRuta.politica && datosRuta.politica[claveEstado] !== undefined) {
             accionIA = datosRuta.politica[claveEstado];
         }
         
-        // 2. Obtener el precio base real de ese día exacto desde el ETL de PySpark
         if (datosRuta.precios_base && datosRuta.precios_base[dias.toString()] !== undefined) {
             precioBase = datosRuta.precios_base[dias.toString()];
         }
         
-        // 3. Obtener el techo máximo real de la ruta
         if (datosRuta.tarifa_maxima !== undefined) {
             tarifaMaxima = datosRuta.tarifa_maxima;
         }
@@ -69,13 +65,13 @@ function actualizarDashboard() {
     const multiplicador = multiplicadores[accionIA];
     const precioMatematicoOptimo = precioBase * multiplicador;
     
-    // GOBERNANZA DE NEGOCIO: Veto estricto si se supera el techo
+    // GOBERNANZA DE NEGOCIO: Interceptación del límite máximo
     let precioFinal = precioMatematicoOptimo;
-    let restriccionAplicada = null;
+    let superaTope = false;
 
     if (precioMatematicoOptimo > tarifaMaxima) {
         precioFinal = tarifaMaxima;
-        restriccionAplicada = "TECHO";
+        superaTope = true;
     }
 
     const pctCambio = Math.round((multiplicador - 1.0) * 100);
@@ -91,16 +87,17 @@ function actualizarDashboard() {
     const textoAlerta = document.getElementById("texto_alerta_negocio");
     const descEstado = document.getElementById("descripcion_estado");
 
-    if (restriccionAplicada === "TECHO") {
+    // Limpieza absoluta de referencias al precio base en la interfaz visual
+    if (superaTope) {
         elementoPrecio.innerHTML = `${precioFinal.toFixed(2)} € <span class="text-[10px] bg-red-100 text-red-600 px-1.5 py-0.5 rounded font-bold ml-1">VETADO POR TECHO</span>`;
         if (textoAlerta) {
-            textoAlerta.innerText = `El modelo proponía ${precioMatematicoOptimo.toFixed(2)} € (base de ${precioBase.toFixed(2)}€ a ${dias} días x ${multiplicador.toFixed(1)}x), superando el límite histórico de ${tarifaMaxima.toFixed(2)} € para esta línea.`;
+            textoAlerta.innerText = `ALERTA CRÍTICA: El modelo intentó fijar una tarifa de ${precioMatematicoOptimo.toFixed(2)} €, superando el límite regulatorio e histórico de ${tarifaMaxima.toFixed(2)} € para esta línea. Se ha activado el bloqueo automático de negocio.`;
         }
-        if (descEstado) descEstado.innerText = "Tarifa bloqueada por cumplimiento normativo y techos de gobernanza.";
+        if (descEstado) descEstado.innerText = "Incidencias de gobernanza: Orden de la IA interceptada por rebasar el umbral máximo comercial.";
         if (contenedorAlerta) contenedorAlerta.classList.remove("hidden");
     } else {
-        elementoPrecio.innerText = precioFinal.toFixed(2) + " € (Base: " + precioBase.toFixed(2) + "€)";
-        if (descEstado) descEstado.innerText = "Tarifa óptima validada por el modelo dentro del marco de precios de la ruta.";
+        elementoPrecio.innerText = precioFinal.toFixed(2) + " €";
+        if (descEstado) descEstado.innerText = "Tarifa óptima validada por el modelo dentro del marco normativo de la ruta.";
         if (contenedorAlerta) contenedorAlerta.classList.add("hidden");
     }
 
