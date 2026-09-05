@@ -34,6 +34,7 @@ function actualizarDashboard() {
     const tarifaMaxima = tarifasMaximasPorRuta[rutaSeleccionada] || 150.00;
 
     const precioCalculado = precioBase * multiplicador;
+    const superaTope = precioCalculado > tarifaMaxima;
     const precioFinal = Math.min(precioCalculado, tarifaMaxima);
 
     const pctCambio = Math.round((multiplicador - 1.0) * 100);
@@ -43,16 +44,21 @@ function actualizarDashboard() {
 
     document.getElementById("res_multiplicador").innerText = multiplicador.toFixed(1) + "x";
     document.getElementById("res_accion").innerText = accionIA;
-    document.getElementById("res_precio_final").innerText = precioFinal.toFixed(2) + " €" + (precioCalculado > tarifaMaxima ? " (Tope)" : "");
+    
+    const elementoPrecio = document.getElementById("res_precio_final");
+    if (superaTope) {
+        elementoPrecio.innerHTML = `${precioFinal.toFixed(2)} € <span class="text-[10px] bg-red-100 text-red-600 px-1 py-0.5 rounded font-bold block mt-1">TOPE REGULATORIO APLICADO</span>`;
+    } else {
+        elementoPrecio.innerText = precioFinal.toFixed(2) + " €";
+    }
 
     renderizarHeatmapPlotly(rutaSeleccionada, dias, asientos);
 }
 
 function renderizarHeatmapPlotly(ruta, diasActuales, asientosActuales) {
-    const ejeX = Array.from({length: 31}, (_, i) => i); // 0 a 30 días
-    const ejeY = Array.from({length: 101}, (_, i) => i); // 0 a 100 asientos
+    const ejeX = Array.from({length: 31}, (_, i) => i);
+    const ejeY = Array.from({length: 101}, (_, i) => i);
     
-    // Construir matriz Z de 101 filas (asientos) x 31 columnas (días)
     const zData = [];
     for (let a = 100; a >= 0; a--) {
         const fila = [];
@@ -73,11 +79,11 @@ function renderizarHeatmapPlotly(ruta, diasActuales, asientosActuales) {
         y: ejeY.reverse(),
         type: 'heatmap',
         colorscale: [
-            [0.0, '#fbcfe8'], // 0-2
+            [0.0, '#fbcfe8'],
             [0.33, '#fbcfe8'],
-            [0.34, '#ef4444'], // 3-5
+            [0.34, '#ef4444'],
             [0.66, '#ef4444'],
-            [0.67, '#ea580c'], // 6-8
+            [0.67, '#ea580c'],
             [1.0, '#ea580c']
         ],
         showscale: true,
@@ -87,7 +93,6 @@ function renderizarHeatmapPlotly(ruta, diasActuales, asientosActuales) {
         }
     };
 
-    // Traza adicional para marcar el punto seleccionado por los sliders
     const puntoSeleccionado = {
         x: [diasActuales],
         y: [asientosActuales],
