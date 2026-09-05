@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Renfe RM | Dynamic Pricing</title>
   
-  <!-- Enlace a tu propio archivo favicon.svg -->
+  <!-- Logo en la pestaña del buscador -->
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   
   <script src="https://cdn.tailwindcss.com"></script>
@@ -18,17 +18,16 @@
     <!-- NAVBAR -->
     <header class="flex flex-wrap justify-between items-center px-8 py-4 border-b border-gray-100 bg-white shrink-0">
       <div class="flex items-center gap-10">
-        <!-- Logo Principal -->
+        
+        <!-- AQUÍ CARGAMOS TU LOGO REAL DENTRO DE LA PÁGINA -->
         <div class="flex items-center gap-2">
-          <svg class="w-6 h-6 text-red-500" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M3 17l6-6 4 4 8-8"></path>
-            <path stroke-linecap="round" stroke-linejoin="round" d="M17 7h4v4"></path>
-          </svg>
+          <img src="favicon.svg" alt="Logo RM" class="w-7 h-7">
           <div class="leading-tight">
             <h1 class="text-sm font-extrabold text-gray-900 tracking-tight">Revenue Management</h1>
             <p class="text-[10px] font-bold text-red-500 tracking-wider">DYNAMIC PRICING</p>
           </div>
         </div>
+        
         <!-- Enlaces a las pestañas -->
         <nav class="hidden md:flex gap-6 text-sm font-semibold text-gray-500">
           <button id="tab_dashboard" class="text-red-500 border-b-2 border-red-500 pb-1" onclick="switchTab('dashboard')">Dashboard</button>
