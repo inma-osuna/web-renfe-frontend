@@ -30,7 +30,7 @@
 
   <main class="max-w-7xl mx-auto px-6 py-8 space-y-6">
 
-    <!-- ALARMA DE GOBERNANZA (Precios Regulados) -->
+    <!-- ALARMA DE GOBERNANZA -->
     <div id="banner_gobernanza" class="hidden rounded-xl border-l-4 p-4 shadow-sm transition-all duration-300">
       <div class="flex items-start gap-3">
         <div id="icono_gobernanza" class="text-2xl mt-0.5">⚠️</div>
@@ -74,7 +74,7 @@
       <div class="lg:col-span-2 grid grid-cols-2 gap-4">
         
         <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex flex-col justify-center">
-          <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Tarifa Base Mínima</div>
+          <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Tarifa Base (Ref. Histórica)</div>
           <div class="text-3xl font-black text-slate-800 mt-1"><span id="kpi_precio_base">--</span> €</div>
         </div>
 
@@ -100,15 +100,15 @@
       </div>
     </div>
 
-    <!-- Gráficos Plotly -->
+    <!-- Gráficos Plotly: Se ha añadido overflow-hidden, flex y altura fija para evitar desbordes -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
-        <h3 class="text-xs font-bold uppercase text-slate-500 mb-2">Matriz de Decisión</h3>
-        <div id="grafico_heatmap" class="w-full h-72"></div>
+      <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-col h-[400px] overflow-hidden">
+        <h3 class="text-xs font-bold uppercase text-slate-500 mb-2 shrink-0">Matriz de Decisión</h3>
+        <div id="grafico_heatmap" class="w-full flex-1"></div>
       </div>
-      <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
-        <h3 class="text-xs font-bold uppercase text-slate-500 mb-2">Proyección Tarifa vs Límite</h3>
-        <div id="grafico_curva" class="w-full h-72"></div>
+      <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-col h-[400px] overflow-hidden">
+        <h3 class="text-xs font-bold uppercase text-slate-500 mb-2 shrink-0">Proyección Tarifa vs Límite</h3>
+        <div id="grafico_curva" class="w-full flex-1"></div>
       </div>
     </div>
 

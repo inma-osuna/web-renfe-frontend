@@ -63,7 +63,7 @@ function update(cambioRuta) {
   const precioBase = data.precios_base[dias] || 60;
   const tarifaMax = data.tarifa_maxima || 250;
 
-  // LÓGICA DE GOBERNANZA: EL PRECIO NUNCA SUPERA EL REGULADO
+  // LÓGICA DE GOBERNANZA
   const precioCrudo = precioBase * info.mult;
   let precioFinal = precioCrudo;
   let veto = false;
@@ -101,6 +101,9 @@ function update(cambioRuta) {
 }
 
 function renderPlotly(data, diasActual, asientosActual, refrescarTodo) {
+  // CLAVE PARA QUE NO SE SALGAN LOS GRÁFICOS
+  const config = { responsive: true, displayModeBar: false };
+
   if (refrescarTodo) {
     // 1. Heatmap
     const zValues = [];
@@ -113,27 +116,53 @@ function renderPlotly(data, diasActual, asientosActual, refrescarTodo) {
     }
     
     Plotly.react('grafico_heatmap', [{
-      z: zValues, x: Array.from({length: 101}, (_, i) => i), y: Array.from({length: 31}, (_, i) => i),
-      type: 'heatmap', colorscale: [[0,'#10b981'], [0.5,'#e2e8f0'], [1,'#ef4444']], zmin: 0, zmax: 8,
-      colorbar: { thickness: 10 }
+      z: zValues, 
+      x: Array.from({length: 101}, (_, i) => i), 
+      y: Array.from({length: 31}, (_, i) => i),
+      type: 'heatmap', 
+      // ESCALA DE COLORES: ROSA A NARANJA
+      colorscale: [
+        [0.0, '#fce7f3'],  // Rosa clarito (Descuentos)
+        [0.5, '#f472b6'],  // Rosa intenso (Base)
+        [1.0, '#ea580c']   // Naranja fuerte (Premium)
+      ], 
+      zmin: 0, zmax: 8,
+      colorbar: { thickness: 12 }
     }, {
-      x: [asientosActual], y: [diasActual], mode: 'markers',
-      marker: { color: '#702082', size: 10, line: { color: 'white', width: 2 } }
-    }], { margin: { t: 10, r: 10, b: 30, l: 30 }, xaxis: { title: 'Plazas' }, yaxis: { title: 'Días' } });
+      x: [asientosActual], y: [diasActual], mode: 'markers', name: 'Estado Actual',
+      marker: { color: '#ffffff', size: 10, line: { color: '#ea580c', width: 2 } }
+    }], { 
+      autosize: true,
+      margin: { t: 15, r: 15, b: 35, l: 45 }, 
+      xaxis: { title: 'Plazas Libres' }, 
+      yaxis: { title: 'Días Antelación' },
+      paper_bgcolor: 'transparent',
+      plot_bgcolor: 'transparent',
+      showlegend: false
+    }, config);
 
     // 2. Curva
     const diasX = Array.from({ length: 31 }, (_, i) => i);
     const preY = diasX.map(d => data.precios_base[d] || 60);
     
     Plotly.newPlot('grafico_curva', [{
-      x: diasX, y: preY, type: 'scatter', mode: 'lines', name: 'Base', line: { color: '#702082' }
+      x: diasX, y: preY, type: 'scatter', mode: 'lines', name: 'Tarifa Base', 
+      line: { color: '#f472b6', width: 3 } // Línea rosa
     }, {
       x: [0, 30], y: [data.tarifa_maxima, data.tarifa_maxima], type: 'scatter', mode: 'lines',
-      name: 'Tope Legal', line: { color: '#ef4444', dash: 'dash' }
+      name: 'Tope Legal', line: { color: '#ea580c', dash: 'dash', width: 2 } // Línea naranja a trazos
     }, {
-      x: [diasActual], y: [data.precios_base[diasActual]], mode: 'markers', name: 'Actual',
-      marker: { color: '#10b981', size: 10 }
-    }], { margin: { t: 10, r: 10, b: 30, l: 30 }, showlegend: false });
+      x: [diasActual], y: [data.precios_base[diasActual]], type: 'scatter', mode: 'markers', name: 'Día Actual',
+      marker: { color: '#ea580c', size: 10, line: { color: '#ffffff', width: 2 } } // Punto naranja
+    }], { 
+      autosize: true,
+      margin: { t: 15, r: 15, b: 35, l: 45 },
+      xaxis: { title: 'Días Antelación' },
+      yaxis: { title: 'Precio (€)' },
+      paper_bgcolor: 'transparent',
+      plot_bgcolor: 'transparent',
+      showlegend: false 
+    }, config);
   } else {
     Plotly.restyle('grafico_heatmap', { 'x': [[asientosActual]], 'y': [[diasActual]] }, [1]);
     Plotly.restyle('grafico_curva', { 'x': [[diasActual]], 'y': [[data.precios_base[diasActual]]] }, [2]);
