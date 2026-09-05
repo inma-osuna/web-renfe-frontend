@@ -7,17 +7,17 @@ const i18n = {
     tit_params: "Parámetros del Entorno", lbl_ruta: "Corredor Ferroviario",
     lbl_dias: "Días para la salida", lbl_plazas: "Inventario", lbl_d: "d", lbl_pl: "pl",
     tit_recom: "Recomendación del Modelo", lbl_mult: "Multiplicador de Precio", lbl_accion: "Acción Discreta:",
-    kpi_tit_base: "Tarifa Base (Día actual)", kpi_tit_techo: "Techo Legal",
+    kpi_tit_base: "Tarifa Base (Día actual)", kpi_tit_techo: "Techo Histórico",
     kpi_tit_var: "Variación Aplicada", kpi_tit_final: "Precio Final Cliente",
     tit_heatmap: "Mapa de Política: Random Forest", tit_curva: "Proyección de Tarifa Base",
     leg_1: "Descuentos", leg_2: "Neutro", leg_3: "Yield alcista",
-    tit_gob: "VETO POR LÍMITE REGULADO", text_capado: "CAPADO AL LÍMITE",
+    tit_gob: "VETO POR MÁXIMO HISTÓRICO", text_capado: "CAPADO AL LÍMITE",
     docs_h2: "Arquitectura del Motor de Precios",
     docs_p: "Especificaciones técnicas del despliegue del modelo predictivo y reglas de negocio. Este dashboard interactúa con el objeto JSON <code class='font-mono text-red-500 bg-red-50 px-1.5 py-0.5 rounded'>CEREBRO_IA</code> exportado en tiempo real.",
     docs_t1: "Pipeline de Datos y Big Data", docs_d1: "El entrenamiento del agente de aprendizaje por refuerzo y el procesamiento masivo de tarifas históricas se ha ejecutado utilizando un entorno distribuido en <strong>PySpark</strong>.",
-    docs_t2: "Modelo de Machine Learning", docs_d2: "El núcleo emplea un <strong>Random Forest Regressor</strong> para aproximar los Q-Values. El <em>Espacio de Estados</em> es un plano continuo normalizado [0, 1] que evalúa Lead Time y capacidad.",
+    docs_t2: "Modelo de Machine Learning", docs_d2: "El núcleo emplea un <strong>Random Forest Regressor</strong> para aproximar los Q-Values. El <em>Espacio de Estados</em> es un plano continuo normalizado [0, 1] y evalúa Lead Time y capacidad.",
     docs_t3: "Espacio de Acciones Discretas", docs_d3: "El agente selecciona sobre 9 acciones que varían el precio. El espectro abarca desde descuentos del <strong>0.80x (-20%)</strong> hasta recargos premium del <strong>1.20x (+20%)</strong>.",
-    docs_t4: "Gobernanza y Límite Legal", docs_d4: "Reglas de negocio estrictas. Cualquier salida del algoritmo que sugiera una tarifa superior al <strong>Techo Histórico Regulado</strong> de la ruta es automáticamente truncada al límite.",
+    docs_t4: "Gobernanza y Límite Histórico", docs_d4: "Reglas de negocio estrictas. Cualquier salida del algoritmo que sugiera una tarifa superior al <strong>Techo Histórico</strong> de la ruta es automáticamente truncada al límite.",
     plot_x_h: "Lead Time (Días)", plot_y_h: "Asientos Disponibles", plot_x_c: "Días Antelación", plot_y_c: "Precio (€)"
   },
   en: {
@@ -25,17 +25,17 @@ const i18n = {
     tit_params: "Environment Parameters", lbl_ruta: "Railway Corridor",
     lbl_dias: "Days to departure", lbl_plazas: "Inventory", lbl_d: "d", lbl_pl: "sts",
     tit_recom: "Model Recommendation", lbl_mult: "Price Multiplier", lbl_accion: "Discrete Action:",
-    kpi_tit_base: "Base Fare (Current Day)", kpi_tit_techo: "Legal Ceiling",
+    kpi_tit_base: "Base Fare (Current Day)", kpi_tit_techo: "Historical Ceiling",
     kpi_tit_var: "Applied Variation", kpi_tit_final: "Final Client Price",
     tit_heatmap: "Policy Map: Random Forest", tit_curva: "Base Fare Projection",
     leg_1: "Discounts", leg_2: "Neutral", leg_3: "Bullish Yield",
-    tit_gob: "VETO BY REGULATED LIMIT", text_capado: "CAPPED AT LIMIT",
+    tit_gob: "VETO BY HISTORICAL MAXIMUM", text_capado: "CAPPED AT LIMIT",
     docs_h2: "Pricing Engine Architecture",
     docs_p: "Technical specs for the deployment of the predictive model and business rules. This dashboard interacts with the JSON object <code class='font-mono text-red-500 bg-red-50 px-1.5 py-0.5 rounded'>CEREBRO_IA</code> exported in real-time.",
     docs_t1: "Data Pipeline & Big Data", docs_d1: "The training of the reinforcement learning agent and the massive processing of historical fares was executed using a distributed environment in <strong>PySpark</strong>.",
     docs_t2: "Machine Learning Model", docs_d2: "The core uses a <strong>Random Forest Regressor</strong> to approximate Q-Values. The <em>State Space</em> is a continuous normalized plane [0, 1] evaluating Lead Time and capacity.",
     docs_t3: "Discrete Action Space", docs_d3: "The agent selects from 9 actions varying the price. The spectrum ranges from <strong>0.80x (-20%)</strong> discounts to premium surcharges of <strong>1.20x (+20%)</strong>.",
-    docs_t4: "Governance & Legal Limit", docs_d4: "Strict business rules. Any algorithm output suggesting a fare above the route's <strong>Historical Regulated Ceiling</strong> is automatically truncated to the limit.",
+    docs_t4: "Governance & Historical Limit", docs_d4: "Strict business rules. Any algorithm output suggesting a fare above the route's <strong>Historical Ceiling</strong> is automatically truncated to the limit.",
     plot_x_h: "Lead Time (Days)", plot_y_h: "Available Seats", plot_x_c: "Days in Advance", plot_y_c: "Price (€)"
   }
 };
@@ -114,8 +114,8 @@ window.exportarReporte = function() {
                 `Multiplicador Aplicado: ${info.mult.toFixed(2)}x\n` +
                 `Tarifa Base Histórica: ${precioBase.toFixed(2)} €\n\n` +
                 `[ GOBERNANZA COMERCIAL ]\n` +
-                `Techo Legal Aplicable: ${tarifaMax.toFixed(2)} €\n` +
-                `Límite Legal Rebasado: ${veto}\n\n` +
+                `Techo Histórico Aplicable: ${tarifaMax.toFixed(2)} €\n` +
+                `Máximo Histórico Rebasado: ${veto}\n\n` +
                 `[ PRECIO FINAL CLIENTE ]\n` +
                 `Tarifa Final Recomendada: ${precioFinal.toFixed(2)} €\n` +
                 `=========================================`;
@@ -235,8 +235,8 @@ function update(cambioRuta) {
   if (veto) {
     D.kpiVarTexto.innerHTML = `<span class="text-red-600 text-sm font-bold bg-red-50 px-2 py-1 rounded">${i18n[lang].text_capado}</span>`;
     D.descGob.innerHTML = lang === 'es' 
-      ? `La IA intentó aplicar un recargo, superando el Techo Histórico Regulado de <b>${tarifaMax.toFixed(2)}€</b>.`
-      : `AI attempted a surcharge, exceeding the Historical Regulated Ceiling of <b>${tarifaMax.toFixed(2)}€</b>.`;
+      ? `La IA intentó aplicar un recargo, superando el Techo Histórico de <b>${tarifaMax.toFixed(2)}€</b>.`
+      : `AI attempted a surcharge, exceeding the Historical Ceiling of <b>${tarifaMax.toFixed(2)}€</b>.`;
     D.bannerGob.classList.remove("hidden");
   } else {
     D.kpiVarTexto.innerHTML = `<span class="${variacion > 0 ? 'text-orange-500' : variacion < 0 ? 'text-emerald-500' : 'text-gray-500'}">
