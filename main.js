@@ -10,30 +10,50 @@ const ACCIONES_INFO = {
   8: { mult: 1.20, label: "Recargo premium de escasez absoluta. Maximización de ingresos.", badge: "+20%" }
 };
 
+// VINCULACIÓN EXACTA CON LOS IDS DEL HTML ARREGLADOS
 const D = {
   selectorRuta: document.getElementById("selector_ruta"),
   sliderDias: document.getElementById("slider_dias"),
   sliderAsientos: document.getElementById("slider_asientos"),
   txtDias: document.getElementById("txt_dias"),
   txtAsientos: document.getElementById("txt_asientos"),
-  txtEstadoNorm: document.getElementById("txt_estado_norm"),
-  txtClaveMatriz: document.getElementById("txt_clave_matriz"),
   
-  // Sidebar
+  // Panel Lateral Izquierdo
   sbPct: document.getElementById("sb_pct"),
   sbMult: document.getElementById("sb_multiplicador"),
   sbAccion: document.getElementById("sb_accion"),
   sbDesc: document.getElementById("sb_desc"),
 
-  // Cuadritos
+  // Cuadritos (KPIs Superiores)
   kpiBase: document.getElementById("kpi_base"),
   kpiTecho: document.getElementById("kpi_techo"),
   kpiVarTexto: document.getElementById("kpi_var_texto"),
   kpiFinal: document.getElementById("kpi_final"),
 
-  // Gobernanza
-  bannerGob: document.getElementById("banner_gobernanza"),
-  descGob: document.getElementById("desc_gobernanza"),
+  // Pestañas de Navegación
+  tabDash: document.getElementById("tab_dashboard"),
+  tabDocs: document.getElementById("tab_docs"),
+  vistaDash: document.getElementById("vista_dashboard"),
+  vistaDocs: document.getElementById("vista_docs")
+};
+
+// FUNCIÓN PARA CAMBIAR ENTRE PESTAÑAS (DASHBOARD Y DOCUMENTACIÓN)
+window.switchTab = function(tab) {
+  if(tab === 'dashboard') {
+    D.vistaDash.classList.remove('hidden');
+    D.vistaDash.classList.add('flex');
+    D.vistaDocs.classList.add('hidden');
+    D.tabDash.className = "text-red-500 border-b-2 border-red-500 pb-1";
+    D.tabDocs.className = "text-gray-500 hover:text-gray-900 pb-1 transition-colors";
+    Plotly.Plots.resize('grafico_heatmap');
+    Plotly.Plots.resize('grafico_curva');
+  } else {
+    D.vistaDash.classList.add('hidden');
+    D.vistaDash.classList.remove('flex');
+    D.vistaDocs.classList.remove('hidden');
+    D.tabDash.className = "text-gray-500 hover:text-gray-900 pb-1 transition-colors";
+    D.tabDocs.className = "text-red-500 border-b-2 border-red-500 pb-1";
+  }
 };
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -61,15 +81,15 @@ function update(cambioRuta) {
 
   D.txtDias.textContent = dias;
   D.txtAsientos.textContent = asientos;
-  D.txtEstadoNorm.textContent = `[${(dias / 30).toFixed(2)}, ${(asientos / 100).toFixed(2)}]`;
-  D.txtClaveMatriz.textContent = `${dias}_${asientos}`;
 
   const accion = data.politica[`${dias}_${asientos}`] ?? 4;
   const info = ACCIONES_INFO[accion];
-  const precioBase = data.precios_base[dias] || 60;
+  
+  // Extraemos el precio del JSON (usamos String para garantizar lectura segura de las claves)
+  const precioBase = data.precios_base[String(dias)] || 60;
   const tarifaMax = data.tarifa_maxima || 250;
 
-  // Gobernanza
+  // LÓGICA DE GOBERNANZA: EL PRECIO NUNCA SUPERA EL REGULADO
   const precioCrudo = precioBase * info.mult;
   let precioFinal = precioCrudo;
   let veto = false;
@@ -79,7 +99,7 @@ function update(cambioRuta) {
     veto = true;
   }
 
-  // Sidebar Updates
+  // 1. Actualizar Tarjeta del Sidebar
   D.sbMult.textContent = info.mult.toFixed(2);
   D.sbAccion.textContent = accion;
   D.sbDesc.textContent = info.label;
@@ -92,26 +112,20 @@ function update(cambioRuta) {
     isNegative ? "text-red-500 bg-pink-50" : "text-orange-600 bg-orange-50"
   }`;
 
-  // Cuadritos Updates
+  // 2. Actualizar Cuadritos Superiores (KPIs)
   D.kpiBase.textContent = precioBase.toFixed(2);
   D.kpiTecho.textContent = tarifaMax.toFixed(2);
   D.kpiFinal.textContent = precioFinal.toFixed(2);
 
   const variacion = ((precioFinal - precioBase) / precioBase) * 100;
+  
   if (veto) {
-    D.kpiVarTexto.innerHTML = `<span class="text-red-600">CAPADO AL TOPE</span>`;
+    D.kpiVarTexto.innerHTML = `<span class="text-red-600 text-sm font-bold bg-red-50 px-2 py-1 rounded">CAPADO AL LÍMITE</span>`;
+    D.sbDesc.innerHTML = `<span class="font-bold text-red-600">⚠️ VETO ACTIVO:</span> La IA superó el límite de ${tarifaMax.toFixed(2)}€. Tarifa regulada aplicada.`;
   } else {
     D.kpiVarTexto.innerHTML = `<span class="${variacion > 0 ? 'text-orange-500' : variacion < 0 ? 'text-emerald-500' : 'text-gray-500'}">
       ${variacion > 0 ? '+' : ''}${variacion.toFixed(1)}%
     </span>`;
-  }
-
-  // Alarma
-  if (veto) {
-    D.bannerGob.classList.remove("hidden");
-    D.descGob.innerHTML = `La IA determinó un precio óptimo de <b>${precioCrudo.toFixed(2)}€</b> (Base ${precioBase.toFixed(2)}€ x ${info.mult.toFixed(2)}), superando el techo legal de <b>${tarifaMax.toFixed(2)}€</b>.`;
-  } else {
-    D.bannerGob.classList.add("hidden");
   }
 
   renderPlotly(data, dias, asientos, cambioRuta);
@@ -130,21 +144,21 @@ function renderPlotly(data, diasActual, asientosActual, refrescarTodo) {
       zValues.push(fila);
     }
     
-    // HEATMAP (Rosa y Naranja)
+    // HEATMAP SEGMENTADO (Rosa, Rojo, Naranja)
     Plotly.react('grafico_heatmap', [{
       z: zValues, 
       x: Array.from({length: 31}, (_, i) => i), 
       y: Array.from({length: 101}, (_, i) => i).reverse(),
       type: 'heatmap', 
       colorscale: [
-        [0.0, '#fbcfe8'],  // Rosa claro
-        [0.5, '#ef4444'],  // Rojo (neutro)
-        [1.0, '#ea580c']   // Naranja fuerte
+        [0.0, '#fbcfe8'], [0.33, '#fbcfe8'], // 0, 1, 2 = Rosa
+        [0.33, '#ef4444'], [0.66, '#ef4444'], // 3, 4, 5 = Rojo
+        [0.66, '#ea580c'], [1.0, '#ea580c']   // 6, 7, 8 = Naranja
       ], 
       zmin: 0, zmax: 8,
-      showscale: false // Ocultamos la barra lateral porque la leyenda va por HTML debajo
+      showscale: false
     }, {
-      x: [diasActual], y: [asientosActual], mode: 'markers', name: 'Actual',
+      x: [diasActual], y: [asientosActual], mode: 'markers', name: 'Estado Actual',
       marker: { color: '#ffffff', size: 12, line: { color: '#000000', width: 2 } }
     }], { 
       autosize: true, 
@@ -156,18 +170,18 @@ function renderPlotly(data, diasActual, asientosActual, refrescarTodo) {
       showlegend: false
     }, config);
 
-    // CURVA
+    // CURVA DE PRECIOS BASE
     const diasX = Array.from({ length: 31 }, (_, i) => i);
-    const preY = diasX.map(d => data.precios_base[d] || 60);
+    const preY = diasX.map(d => data.precios_base[String(d)] || 60);
     
     Plotly.newPlot('grafico_curva', [{
-      x: diasX, y: preY, type: 'scatter', mode: 'lines', name: 'Base',
+      x: diasX, y: preY, type: 'scatter', mode: 'lines', name: 'Tarifa Base',
       line: { color: '#ef4444', width: 3 }
     }, {
       x: [0, 30], y: [data.tarifa_maxima, data.tarifa_maxima], type: 'scatter', mode: 'lines',
-      name: 'Tope Legal', line: { color: '#ea580c', dash: 'dash', width: 2 }
+      name: 'Techo Legal', line: { color: '#ea580c', dash: 'dash', width: 2 }
     }, {
-      x: [diasActual], y: [data.precios_base[diasActual]], type: 'scatter', mode: 'markers', name: 'Actual',
+      x: [diasActual], y: [data.precios_base[String(diasActual)] || 60], type: 'scatter', mode: 'markers', name: 'Actual',
       marker: { color: '#ea580c', size: 10, line: { color: '#ffffff', width: 2 } }
     }], { 
       autosize: true, 
@@ -180,6 +194,6 @@ function renderPlotly(data, diasActual, asientosActual, refrescarTodo) {
     }, config);
   } else {
     Plotly.restyle('grafico_heatmap', { 'x': [[diasActual]], 'y': [[asientosActual]] }, [1]);
-    Plotly.restyle('grafico_curva', { 'x': [[diasActual]], 'y': [[data.precios_base[diasActual]]] }, [2]);
+    Plotly.restyle('grafico_curva', { 'x': [[diasActual]], 'y': [[data.precios_base[String(diasActual)] || 60]] }, [2]);
   }
 }
