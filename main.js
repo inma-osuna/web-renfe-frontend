@@ -1,13 +1,13 @@
 const ACCIONES_INFO = {
-  0: { mult: 0.80, label: "Descuento máximo para estimular demanda.", badge: "bg-emerald-100 text-emerald-800" },
-  1: { mult: 0.85, label: "Descuento agresivo para corregir desvíos.", badge: "bg-emerald-100 text-emerald-800" },
-  2: { mult: 0.90, label: "Descuento moderado, incentivo temprano.", badge: "bg-emerald-100 text-emerald-800" },
-  3: { mult: 0.95, label: "Ajuste leve a la baja.", badge: "bg-teal-100 text-teal-800" },
-  4: { mult: 1.00, label: "Tarifa neutra fijada por el modelo.", badge: "bg-slate-200 text-slate-800" },
-  5: { mult: 1.05, label: "Recargo leve por aumento de presión.", badge: "bg-amber-100 text-amber-800" },
-  6: { mult: 1.10, label: "Subida por escasez de plazas.", badge: "bg-orange-100 text-orange-800" },
-  7: { mult: 1.15, label: "Yield management alcista.", badge: "bg-orange-200 text-orange-900" },
-  8: { mult: 1.20, label: "Recargo premium de escasez absoluta.", badge: "bg-red-100 text-red-800" }
+  0: { mult: 0.80, label: "Descuento agresivo para estimular la demanda ante exceso de inventario.", badge: "-20%" },
+  1: { mult: 0.85, label: "Descuento alto para corregir desvíos en la curva de reservas.", badge: "-15%" },
+  2: { mult: 0.90, label: "Descuento moderado, incentivo de compra temprana.", badge: "-10%" },
+  3: { mult: 0.95, label: "Ajuste a la baja leve para mantener tracción comercial.", badge: "-5%" },
+  4: { mult: 1.00, label: "Tarifa neutra fijada por el modelo para mantener el volumen en la zona de equilibrio.", badge: "0%" },
+  5: { mult: 1.05, label: "Ligero recargo por aumento detectado en la presión de demanda.", badge: "+5%" },
+  6: { mult: 1.10, label: "Protección de inventario mediante subida de yield management.", badge: "+10%" },
+  7: { mult: 1.15, label: "Yield management alcista por escasez de plazas a corto plazo.", badge: "+15%" },
+  8: { mult: 1.20, label: "Recargo premium de escasez absoluta. Maximización de ingresos.", badge: "+20%" }
 };
 
 const D = {
@@ -19,22 +19,21 @@ const D = {
   txtEstadoNorm: document.getElementById("txt_estado_norm"),
   txtClaveMatriz: document.getElementById("txt_clave_matriz"),
   
-  kpiPrecioBase: document.getElementById("kpi_precio_base"),
-  kpiLeadTime: document.getElementById("kpi_lead_time"),
-  kpiTarifaMaxima: document.getElementById("kpi_tarifa_maxima"),
-  kpiMargen: document.getElementById("kpi_margen"),
-  kpiBadgeAccion: document.getElementById("kpi_badge_accion"),
-  kpiMultiplicador: document.getElementById("kpi_multiplicador"),
-  kpiDescAccion: document.getElementById("kpi_desc_accion"),
-  kpiIdxAccion: document.getElementById("kpi_idx_accion"),
-  kpiPrecioFinal: document.getElementById("kpi_precio_final"),
-  kpiVariacion: document.getElementById("kpi_variacion"),
-  kpiPrecioCrudo: document.getElementById("kpi_precio_crudo"),
+  // Sidebar
+  sbPct: document.getElementById("sb_pct"),
+  sbMult: document.getElementById("sb_multiplicador"),
+  sbAccion: document.getElementById("sb_accion"),
+  sbDesc: document.getElementById("sb_desc"),
 
+  // Cuadritos
+  kpiBase: document.getElementById("kpi_base"),
+  kpiTecho: document.getElementById("kpi_techo"),
+  kpiVarTexto: document.getElementById("kpi_var_texto"),
+  kpiFinal: document.getElementById("kpi_final"),
+
+  // Gobernanza
   bannerGob: document.getElementById("banner_gobernanza"),
-  titGob: document.getElementById("titulo_gobernanza"),
   descGob: document.getElementById("desc_gobernanza"),
-  iconoGob: document.getElementById("icono_gobernanza")
 };
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -80,45 +79,39 @@ function update(cambioRuta) {
     veto = true;
   }
 
-  // Actualizar UI
-  D.kpiPrecioBase.textContent = precioBase.toFixed(2);
-  D.kpiLeadTime.textContent = `${dias} días`;
-  D.kpiTarifaMaxima.textContent = tarifaMax.toFixed(2);
-  D.kpiMargen.textContent = (tarifaMax - precioFinal).toFixed(2);
+  // Sidebar Updates
+  D.sbMult.textContent = info.mult.toFixed(2);
+  D.sbAccion.textContent = accion;
+  D.sbDesc.textContent = info.label;
+  D.sbPct.textContent = info.badge;
   
-  D.kpiBadgeAccion.textContent = `Acción ${accion}`;
-  D.kpiBadgeAccion.className = `px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide ${info.badge}`;
-  D.kpiMultiplicador.textContent = info.mult.toFixed(2);
-  D.kpiDescAccion.textContent = info.label;
-  D.kpiIdxAccion.textContent = accion;
+  const isNegative = info.mult < 1;
+  const isNeutral = info.mult === 1;
+  D.sbPct.className = `text-xs font-bold px-2 py-0.5 rounded-full ${
+    isNeutral ? "text-gray-500 bg-gray-100" : 
+    isNegative ? "text-red-500 bg-pink-50" : "text-orange-600 bg-orange-50"
+  }`;
 
-  D.kpiPrecioFinal.textContent = precioFinal.toFixed(2);
-  D.kpiPrecioCrudo.textContent = precioCrudo.toFixed(2);
+  // Cuadritos Updates
+  D.kpiBase.textContent = precioBase.toFixed(2);
+  D.kpiTecho.textContent = tarifaMax.toFixed(2);
+  D.kpiFinal.textContent = precioFinal.toFixed(2);
 
-  const deltaPct = ((precioFinal - precioBase) / precioBase) * 100;
-  if (deltaPct > 0) {
-    D.kpiVariacion.textContent = `▲ +${deltaPct.toFixed(1)}% vs tarifa base`;
-    D.kpiVariacion.className = "text-xs font-bold text-amber-600 mt-1";
-  } else if (deltaPct < 0) {
-    D.kpiVariacion.textContent = `▼ ${deltaPct.toFixed(1)}% vs tarifa base`;
-    D.kpiVariacion.className = "text-xs font-bold text-emerald-600 mt-1";
+  const variacion = ((precioFinal - precioBase) / precioBase) * 100;
+  if (veto) {
+    D.kpiVarTexto.innerHTML = `<span class="text-red-600">CAPADO AL TOPE</span>`;
   } else {
-    D.kpiVariacion.textContent = `■ 0.0% (Tarifa Neutra)`;
-    D.kpiVariacion.className = "text-xs font-bold text-slate-500 mt-1";
+    D.kpiVarTexto.innerHTML = `<span class="${variacion > 0 ? 'text-orange-500' : variacion < 0 ? 'text-emerald-500' : 'text-gray-500'}">
+      ${variacion > 0 ? '+' : ''}${variacion.toFixed(1)}%
+    </span>`;
   }
 
+  // Alarma
   if (veto) {
-    D.bannerGob.className = "rounded-xl border border-red-300 bg-red-50 p-4 shadow-sm text-red-900";
-    D.iconoGob.textContent = "🛑";
-    D.titGob.textContent = "LÍMITE REGULADO SUPERADO - PRECIO CAPADO";
-    D.descGob.textContent = `La IA pidió ${precioCrudo.toFixed(2)}€ pero la normativa impide superar ${tarifaMax.toFixed(2)}€. Se aplica el tope legal.`;
     D.bannerGob.classList.remove("hidden");
+    D.descGob.innerHTML = `La IA determinó un precio óptimo de <b>${precioCrudo.toFixed(2)}€</b> (Base ${precioBase.toFixed(2)}€ x ${info.mult.toFixed(2)}), superando el techo legal de <b>${tarifaMax.toFixed(2)}€</b>.`;
   } else {
-    D.bannerGob.className = "rounded-xl border border-emerald-300 bg-emerald-50 p-4 shadow-sm text-emerald-900";
-    D.iconoGob.textContent = "✅";
-    D.titGob.textContent = "TARIFA DENTRO DE LOS MÁRGENES LEGALES";
-    D.descGob.textContent = `El precio (${precioFinal.toFixed(2)}€) respeta la regulación máxima del corredor (${tarifaMax.toFixed(2)}€).`;
-    D.bannerGob.classList.remove("hidden");
+    D.bannerGob.classList.add("hidden");
   }
 
   renderPlotly(data, dias, asientos, cambioRuta);
@@ -137,39 +130,39 @@ function renderPlotly(data, diasActual, asientosActual, refrescarTodo) {
       zValues.push(fila);
     }
     
-    // HEATMAP: Eje X = Días, Eje Y = Asientos (Igual que en la foto)
+    // HEATMAP (Rosa y Naranja)
     Plotly.react('grafico_heatmap', [{
       z: zValues, 
       x: Array.from({length: 31}, (_, i) => i), 
       y: Array.from({length: 101}, (_, i) => i).reverse(),
       type: 'heatmap', 
       colorscale: [
-        [0.0, '#fce7f3'],  // Rosado claro
-        [0.5, '#f472b6'],  // Rosa 
+        [0.0, '#fbcfe8'],  // Rosa claro
+        [0.5, '#ef4444'],  // Rojo (neutro)
         [1.0, '#ea580c']   // Naranja fuerte
       ], 
       zmin: 0, zmax: 8,
-      colorbar: { thickness: 12, outlinecolor: 'transparent', ticklen: 0 }
+      showscale: false // Ocultamos la barra lateral porque la leyenda va por HTML debajo
     }, {
-      x: [diasActual], y: [asientosActual], mode: 'markers', name: 'Estado Actual',
-      marker: { color: '#ffffff', size: 10, line: { color: '#ea580c', width: 2 } }
+      x: [diasActual], y: [asientosActual], mode: 'markers', name: 'Actual',
+      marker: { color: '#ffffff', size: 12, line: { color: '#000000', width: 2 } }
     }], { 
       autosize: true, 
-      margin: { t: 10, r: 0, b: 35, l: 35 }, 
+      margin: { t: 5, r: 5, b: 35, l: 35 }, 
       xaxis: { title: 'Lead Time (Días)' }, 
-      yaxis: { title: 'Plazas Disponibles' },
+      yaxis: { title: 'Asientos Disponibles' },
       paper_bgcolor: 'transparent', 
       plot_bgcolor: 'transparent', 
       showlegend: false
     }, config);
 
-    // CURVA DE PRECIOS
+    // CURVA
     const diasX = Array.from({ length: 31 }, (_, i) => i);
     const preY = diasX.map(d => data.precios_base[d] || 60);
     
     Plotly.newPlot('grafico_curva', [{
-      x: diasX, y: preY, type: 'scatter', mode: 'lines', name: 'Tarifa Base',
-      line: { color: '#f472b6', width: 3 }
+      x: diasX, y: preY, type: 'scatter', mode: 'lines', name: 'Base',
+      line: { color: '#ef4444', width: 3 }
     }, {
       x: [0, 30], y: [data.tarifa_maxima, data.tarifa_maxima], type: 'scatter', mode: 'lines',
       name: 'Tope Legal', line: { color: '#ea580c', dash: 'dash', width: 2 }
@@ -178,7 +171,7 @@ function renderPlotly(data, diasActual, asientosActual, refrescarTodo) {
       marker: { color: '#ea580c', size: 10, line: { color: '#ffffff', width: 2 } }
     }], { 
       autosize: true, 
-      margin: { t: 10, r: 10, b: 35, l: 35 },
+      margin: { t: 5, r: 5, b: 35, l: 35 },
       xaxis: { title: 'Días Antelación' }, 
       yaxis: { title: 'Precio (€)' },
       paper_bgcolor: 'transparent', 

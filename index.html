@@ -3,157 +3,190 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Renfe RM | Dynamic Pricing & Gobernanza</title>
+  <title>Renfe RM | Dynamic Pricing</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
 </head>
-<body class="bg-slate-100 text-slate-800 font-sans min-h-screen">
+<body class="bg-gray-100 flex justify-center p-4 sm:p-8 font-sans text-slate-800 min-h-screen">
 
-  <!-- NAVBAR CLÁSICO RENFE (#702082) -->
-  <nav style="background-color: #702082;" class="shadow-md">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="flex justify-between h-16 items-center">
-        <div class="flex items-center gap-6">
-          <span class="text-white text-xl font-bold tracking-wider">RENFE RM</span>
-          <div class="hidden md:flex space-x-4">
-            <a href="#" class="bg-white/20 text-white px-3 py-2 rounded-md text-sm font-medium">Dashboard TFM</a>
-            <a href="#" class="text-purple-200 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors">Documentación Técnica</a>
+  <!-- Contenedor Principal (Estilo de la foto) -->
+  <div class="bg-white w-full max-w-[1400px] rounded-2xl shadow-xl border border-gray-200 flex flex-col overflow-hidden">
+    
+    <!-- NAVBAR -->
+    <header class="flex flex-wrap justify-between items-center px-8 py-4 border-b border-gray-100 bg-white">
+      <div class="flex items-center gap-10">
+        <!-- Logo -->
+        <div class="flex items-center gap-2">
+          <svg class="w-6 h-6 text-red-500" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3 17l6-6 4 4 8-8"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" d="M17 7h4v4"></path>
+          </svg>
+          <div class="leading-tight">
+            <h1 class="text-sm font-extrabold text-gray-900 tracking-tight">Revenue Management</h1>
+            <p class="text-[10px] font-bold text-red-500 tracking-wider">DYNAMIC PRICING</p>
           </div>
         </div>
-        <div class="flex items-center gap-2 text-xs bg-black/20 text-white px-3 py-1.5 rounded-full border border-white/10">
-          <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
-          <span id="status_cerebro" class="font-medium tracking-wide">CEREBRO_IA Online</span>
-        </div>
+        <!-- Enlaces -->
+        <nav class="hidden md:flex gap-6 text-sm font-semibold text-gray-500">
+          <a href="#" class="text-red-500 border-b-2 border-red-500 pb-1">Dashboard</a>
+          <a href="#" class="hover:text-gray-900 pb-1 transition-colors">Documentación Técnica</a>
+        </nav>
       </div>
-    </div>
-  </nav>
 
-  <main class="max-w-7xl mx-auto px-6 py-8 space-y-6">
-
-    <!-- ALARMA DE GOBERNANZA -->
-    <div id="banner_gobernanza" class="hidden rounded-xl border-l-4 p-4 shadow-sm transition-all duration-300">
-      <div class="flex items-start gap-3">
-        <div id="icono_gobernanza" class="text-2xl mt-0.5">⚠️</div>
-        <div class="flex-1">
-          <h3 id="titulo_gobernanza" class="text-sm font-bold"></h3>
-          <p id="desc_gobernanza" class="text-xs mt-1"></p>
+      <!-- Botones derecha -->
+      <div class="flex items-center gap-3">
+        <div class="flex border border-gray-200 rounded-md text-xs font-semibold overflow-hidden">
+          <button class="px-3 py-1.5 bg-gray-100 text-gray-800">ES</button>
+          <button class="px-3 py-1.5 text-gray-400 hover:bg-gray-50">EN</button>
         </div>
+        <button class="px-4 py-1.5 border border-gray-200 rounded-md text-xs font-semibold text-gray-600 hover:bg-gray-50 transition-colors">
+          Exportar Reporte
+        </button>
       </div>
-    </div>
+    </header>
 
-    <!-- GRID PRINCIPAL: Controles y las 4 Cuadrículas de KPIs -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <!-- CUERPO DEL DASHBOARD -->
+    <div class="flex flex-col lg:flex-row flex-1 bg-white">
       
-      <!-- Controles -->
-      <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 space-y-5 flex flex-col justify-between">
-        <div>
-          <h2 class="text-sm font-bold uppercase tracking-wider text-slate-400 mb-4 border-b pb-2">Parámetros</h2>
-          
-          <div class="mb-5">
-            <label class="block text-xs font-semibold text-slate-600 mb-2">Corredor Ferroviario</label>
-            <select id="selector_ruta" class="w-full bg-slate-50 border border-slate-300 text-sm rounded-lg p-2.5 outline-none focus:border-[#702082] focus:ring-1 focus:ring-[#702082]"></select>
-          </div>
-
-          <div class="mb-5">
-            <div class="flex justify-between items-center mb-1">
-              <label class="text-xs font-semibold text-slate-600">Lead Time (Días)</label>
-              <span class="text-sm font-bold text-[#702082]" id="txt_dias">15</span>
-            </div>
-            <input type="range" id="slider_dias" min="0" max="30" value="15" class="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-[#702082]">
-          </div>
-
-          <div>
-            <div class="flex justify-between items-center mb-1">
-              <label class="text-xs font-semibold text-slate-600">Plazas Libres</label>
-              <span class="text-sm font-bold text-[#702082]" id="txt_asientos">50</span>
-            </div>
-            <input type="range" id="slider_asientos" min="0" max="100" value="50" class="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-[#702082]">
-          </div>
-        </div>
-
-        <div class="bg-slate-50 rounded-lg p-3 border border-slate-200 text-xs mt-4">
-          <div class="flex justify-between text-slate-500 mb-1">
-            <span>Estado normalizado:</span>
-            <span id="txt_estado_norm" class="font-mono font-medium text-slate-800">[0.50, 0.50]</span>
-          </div>
-          <div class="flex justify-between text-slate-500">
-            <span>Clave de decisión en matriz:</span>
-            <span id="txt_clave_matriz" class="font-mono font-medium text-slate-800">15_50</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- LAS 4 CUADRÍCULAS DE MÉTRICAS -->
-      <div class="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <!-- SIDEBAR IZQUIERDO -->
+      <aside class="w-full lg:w-[320px] border-r border-gray-100 p-8 flex flex-col gap-8 shrink-0">
         
-        <!-- Tarifa Base -->
-        <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex flex-col justify-between">
-          <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Tarifa Base (Ref. Histórica)</div>
-          <div class="my-2">
-            <div class="text-3xl font-black text-slate-800"><span id="kpi_precio_base">--</span> €</div>
-            <div class="text-xs text-slate-500 mt-1">Precio estacional del modelo</div>
-          </div>
-          <div class="text-[11px] text-slate-400 border-t pt-2">Días hasta salida: <span id="kpi_lead_time" class="font-semibold text-slate-600">--</span></div>
-        </div>
-
-        <!-- Techo Regulado -->
-        <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex flex-col justify-between">
-          <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Techo Regulado Legal</div>
-          <div class="my-2">
-            <div class="text-3xl font-black text-slate-800"><span id="kpi_tarifa_maxima">--</span> €</div>
-            <div class="text-xs text-slate-500 mt-1">Límite comercial del corredor</div>
-          </div>
-          <div class="text-[11px] text-slate-400 border-t pt-2">Margen disponible: <span id="kpi_margen" class="font-semibold text-slate-600">--</span> €</div>
-        </div>
-
-        <!-- Acción IA -->
-        <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex flex-col justify-between">
-          <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Acción del Agente IA</div>
-          <div class="my-2">
-            <div class="flex items-center gap-2 mb-1">
-              <span id="kpi_badge_accion" class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide">--</span>
-              <span class="text-2xl font-black text-slate-800"><span id="kpi_multiplicador">--</span>x</span>
+        <!-- Controles -->
+        <section>
+          <h2 class="text-[10px] font-bold text-red-500 uppercase tracking-widest mb-5">Parámetros del Entorno</h2>
+          
+          <div class="space-y-6">
+            <!-- Corredor -->
+            <div>
+              <label class="block text-xs font-semibold text-gray-700 mb-2">Corredor Ferroviario</label>
+              <select id="selector_ruta" class="w-full bg-gray-50 border border-gray-200 text-gray-800 text-xs font-bold rounded-md p-2.5 focus:ring-1 focus:ring-red-400 outline-none"></select>
             </div>
-            <div id="kpi_desc_accion" class="text-xs text-slate-600 leading-tight">--</div>
+
+            <!-- Días -->
+            <div>
+              <div class="flex justify-between items-center mb-2">
+                <label class="text-xs font-semibold text-gray-700">Días para la salida</label>
+                <span class="text-xs font-bold text-red-500 bg-red-50 px-2 py-0.5 rounded-md"><span id="txt_dias">15</span> d</span>
+              </div>
+              <input type="range" id="slider_dias" min="0" max="30" value="15" class="w-full h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-red-500">
+            </div>
+
+            <!-- Inventario -->
+            <div>
+              <div class="flex justify-between items-center mb-2">
+                <label class="text-xs font-semibold text-gray-700">Inventario</label>
+                <span class="text-xs font-bold text-red-500 bg-red-50 px-2 py-0.5 rounded-md"><span id="txt_asientos">50</span> pl</span>
+              </div>
+              <input type="range" id="slider_asientos" min="0" max="100" value="50" class="w-full h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-red-500">
+            </div>
           </div>
-          <div class="text-[11px] text-slate-400 border-t pt-2">Índice acción en matriz: <span id="kpi_idx_accion" class="font-semibold text-slate-600">--</span></div>
-        </div>
+        </section>
 
-        <!-- Precio Final -->
-        <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex flex-col justify-between border-l-4 border-l-[#702082]">
-          <div class="text-[10px] font-bold uppercase tracking-wider text-[#702082]">Precio Final al Cliente</div>
-          <div class="my-2">
-            <div class="text-4xl font-black text-[#702082]"><span id="kpi_precio_final">--</span> €</div>
-            <div id="kpi_variacion" class="text-xs font-bold mt-1">--</div>
+        <!-- Recomendación del modelo (Tarjeta de la foto) -->
+        <section>
+          <h2 class="text-[10px] font-bold text-red-500 uppercase tracking-widest mb-3">Recomendación del Modelo</h2>
+          
+          <div class="bg-white rounded-2xl border border-gray-100 p-5 shadow-[0_4px_20px_rgba(0,0,0,0.04)] relative">
+            <div class="flex justify-between items-start">
+              <span class="text-xs font-semibold text-gray-500">Multiplicador de Precio</span>
+              <span id="sb_pct" class="text-xs font-bold text-red-500 bg-pink-50 px-2 py-0.5 rounded-full">-10%</span>
+            </div>
+            
+            <div class="text-4xl font-black text-gray-900 mt-2 mb-4"><span id="sb_multiplicador">0.9</span>x</div>
+            
+            <div class="flex items-center gap-2 mb-4">
+              <span class="text-xs font-semibold text-gray-500">Acción Discreta:</span>
+              <span id="sb_accion" class="bg-red-500 text-white text-xs font-bold w-5 h-5 flex items-center justify-center rounded">3</span>
+            </div>
+
+            <p id="sb_desc" class="text-[10px] text-gray-400 leading-relaxed pt-3 border-t border-gray-50">
+              Tarifa neutra fijada por el modelo para mantener el volumen en la zona de equilibrio.
+            </p>
           </div>
-          <div class="text-[11px] text-slate-400 border-t pt-2">Precio antes de veto: <span id="kpi_precio_crudo" class="font-semibold text-slate-600">--</span> €</div>
+        </section>
+
+      </aside>
+
+      <!-- ÁREA PRINCIPAL DERECHA -->
+      <main class="flex-1 p-6 sm:p-8 bg-gray-50/50 flex flex-col gap-6 min-w-0">
+        
+        <!-- Banner Gobernanza -->
+        <div id="banner_gobernanza" class="hidden rounded-xl border border-red-200 bg-red-50 p-4 shadow-sm">
+          <div class="flex items-start gap-3">
+            <div class="text-xl mt-0.5">🛑</div>
+            <div class="flex-1">
+              <h3 class="text-sm font-bold text-red-900">VETO POR LÍMITE REGULADO</h3>
+              <p id="desc_gobernanza" class="text-xs mt-1 text-red-800"></p>
+            </div>
+          </div>
         </div>
 
-      </div>
+        <!-- LOS CUADRITOS (4 KPIs) -->
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex flex-col justify-center">
+            <div class="text-[10px] font-bold uppercase tracking-wider text-gray-400">Tarifa Base (Día actual)</div>
+            <div class="text-2xl font-black text-gray-800 mt-1"><span id="kpi_base">--</span>€</div>
+          </div>
+          <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex flex-col justify-center">
+            <div class="text-[10px] font-bold uppercase tracking-wider text-gray-400">Techo Legal</div>
+            <div class="text-2xl font-black text-gray-800 mt-1"><span id="kpi_techo">--</span>€</div>
+          </div>
+          <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex flex-col justify-center">
+            <div class="text-[10px] font-bold uppercase tracking-wider text-gray-400">Variación Aplicada</div>
+            <div class="text-xl font-bold mt-1" id="kpi_var_texto">--</div>
+          </div>
+          <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex flex-col justify-center border-l-4 border-l-red-500">
+            <div class="text-[10px] font-bold uppercase tracking-wider text-red-500">Precio Final Cliente</div>
+            <div class="text-3xl font-black text-red-600 mt-1"><span id="kpi_final">--</span>€</div>
+          </div>
+        </div>
+
+        <!-- GRÁFICOS -->
+        <div class="grid grid-cols-1 xl:grid-cols-2 gap-6 flex-1">
+          
+          <!-- Heatmap -->
+          <div class="bg-white border border-gray-100 rounded-xl p-5 flex flex-col shadow-sm h-[400px] overflow-hidden">
+            <div class="flex justify-between items-center mb-2 shrink-0">
+              <h3 class="text-sm font-bold text-gray-900">Mapa de Política: Random Forest</h3>
+              <span class="text-[9px] font-bold text-red-500 bg-pink-50 px-2 py-1 rounded tracking-wider border border-pink-100">LIVE DATA</span>
+            </div>
+            <div id="grafico_heatmap" class="w-full flex-1 min-h-0"></div>
+            <!-- Leyenda Inferior (Estilo Foto) -->
+            <div class="flex items-center justify-center gap-6 mt-2 pt-3 border-t border-gray-50 shrink-0">
+              <div class="flex items-center gap-2">
+                <div class="w-3 h-3 bg-[#fbcfe8] rounded-sm"></div>
+                <div class="text-[9px] text-gray-500 leading-tight">
+                  <strong class="text-gray-800 block">0-2 (0.8x - 0.9x)</strong> Descuentos
+                </div>
+              </div>
+              <div class="flex items-center gap-2">
+                <div class="w-3 h-3 bg-[#ef4444] rounded-sm"></div>
+                <div class="text-[9px] text-gray-500 leading-tight">
+                  <strong class="text-gray-800 block">3-5 (0.9x - 1.1x)</strong> Neutro
+                </div>
+              </div>
+              <div class="flex items-center gap-2">
+                <div class="w-3 h-3 bg-[#ea580c] rounded-sm"></div>
+                <div class="text-[9px] text-gray-500 leading-tight">
+                  <strong class="text-gray-800 block">6-8 (1.1x - 1.2x)</strong> Yield alcista
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Curva de Precios -->
+          <div class="bg-white border border-gray-100 rounded-xl p-5 flex flex-col shadow-sm h-[400px] overflow-hidden">
+            <div class="flex justify-between items-center mb-2 shrink-0">
+              <h3 class="text-sm font-bold text-gray-900">Proyección de Tarifa Base</h3>
+            </div>
+            <div id="grafico_curva" class="w-full flex-1 min-h-0"></div>
+          </div>
+
+        </div>
+
+      </main>
     </div>
-
-    <!-- GRÁFICOS PLOTLY (Sin desbordes, con diseño rosa/naranja) -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      
-      <!-- Heatmap -->
-      <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex flex-col h-[400px] overflow-hidden">
-        <div class="flex justify-between items-center mb-2 shrink-0">
-          <h3 class="text-xs font-bold uppercase text-slate-500">Matriz de Decisión IA</h3>
-        </div>
-        <div id="grafico_heatmap" class="w-full flex-1 min-h-0"></div>
-      </div>
-
-      <!-- Curva -->
-      <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex flex-col h-[400px] overflow-hidden">
-        <div class="flex justify-between items-center mb-2 shrink-0">
-          <h3 class="text-xs font-bold uppercase text-slate-500">Proyección Tarifa vs Límite</h3>
-        </div>
-        <div id="grafico_curva" class="w-full flex-1 min-h-0"></div>
-      </div>
-
-    </div>
-
-  </main>
+  </div>
 
   <script src="cerebro.js"></script>
   <script src="main.js"></script>
