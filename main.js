@@ -1,311 +1,141 @@
-/**
- * RENFE Dynamic Pricing Engine - Frontend Controller
- * Conecta los controles con el modelo de decisión CEREBRO_IA y renderiza las políticas en Plotly.
- */
-
-// Mapeo canónico de las 9 acciones discretas del entorno de precios Renfe
 const ACCIONES_INFO = {
-  0: { mult: 0.80, label: "Desc. Agresivo (-20%)", color: "#10b981", badge: "bg-emerald-100 text-emerald-800" },
-  1: { mult: 0.85, label: "Desc. Alto (-15%)", color: "#34d399", badge: "bg-emerald-100 text-emerald-800" },
-  2: { mult: 0.90, label: "Desc. Medio (-10%)", color: "#6ee7b7", badge: "bg-emerald-100 text-emerald-800" },
-  3: { mult: 0.95, label: "Desc. Leve (-5%)", color: "#a7f3d0", badge: "bg-teal-100 text-teal-800" },
-  4: { mult: 1.00, label: "Tarifa Base Neutra (0%)", color: "#94a3b8", badge: "bg-slate-200 text-slate-800" },
-  5: { mult: 1.05, label: "Recargo Leve (+5%)", color: "#fed7aa", badge: "bg-amber-100 text-amber-800" },
-  6: { mult: 1.10, label: "Recargo Medio (+10%)", color: "#fdba74", badge: "bg-orange-100 text-orange-800" },
-  7: { mult: 1.15, label: "Yield Alto (+15%)", color: "#fb923c", badge: "bg-orange-200 text-orange-900" },
-  8: { mult: 1.20, label: "Yield Premium (+20%)", color: "#ef4444", badge: "bg-red-100 text-red-800" }
+  0: { mult: 0.80, label: "Descuento (-20%)" },
+  1: { mult: 0.85, label: "Descuento (-15%)" },
+  2: { mult: 0.90, label: "Descuento (-10%)" },
+  3: { mult: 0.95, label: "Descuento (-5%)" },
+  4: { mult: 1.00, label: "Neutro (0%)" },
+  5: { mult: 1.05, label: "Recargo (+5%)" },
+  6: { mult: 1.10, label: "Recargo (+10%)" },
+  7: { mult: 1.15, label: "Yield Alto (+15%)" },
+  8: { mult: 1.20, label: "Premium (+20%)" }
 };
 
-// Elementos del DOM
-const selectorRuta = document.getElementById("selector_ruta");
-const sliderDias = document.getElementById("slider_dias");
-const sliderAsientos = document.getElementById("slider_asientos");
-const txtDias = document.getElementById("txt_dias");
-const txtAsientos = document.getElementById("txt_asientos");
-const txtEstadoNorm = document.getElementById("txt_estado_norm");
-const txtClaveMatriz = document.getElementById("txt_clave_matriz");
+const D = {
+  selectorRuta: document.getElementById("selector_ruta"),
+  sliderDias: document.getElementById("slider_dias"),
+  sliderAsientos: document.getElementById("slider_asientos"),
+  txtDias: document.getElementById("txt_dias"),
+  txtAsientos: document.getElementById("txt_asientos"),
+  kpiPrecioBase: document.getElementById("kpi_precio_base"),
+  kpiTarifaMaxima: document.getElementById("kpi_tarifa_maxima"),
+  kpiMultiplicador: document.getElementById("kpi_multiplicador"),
+  kpiDescAccion: document.getElementById("kpi_desc_accion"),
+  kpiPrecioFinal: document.getElementById("kpi_precio_final"),
+  kpiVariacion: document.getElementById("kpi_variacion"),
+  bannerGob: document.getElementById("banner_gobernanza"),
+  titGob: document.getElementById("titulo_gobernanza"),
+  descGob: document.getElementById("desc_gobernanza"),
+  iconoGob: document.getElementById("icono_gobernanza")
+};
 
-const kpiPrecioBase = document.getElementById("kpi_precio_base");
-const kpiLeadTime = document.getElementById("kpi_lead_time");
-const kpiBadgeAccion = document.getElementById("kpi_badge_accion");
-const kpiMultiplicador = document.getElementById("kpi_multiplicador");
-const kpiDescAccion = document.getElementById("kpi_desc_accion");
-const kpiIdxAccion = document.getElementById("kpi_idx_accion");
-const kpiPrecioFinal = document.getElementById("kpi_precio_final");
-const kpiVariacion = document.getElementById("kpi_variacion");
-const kpiPrecioCrudo = document.getElementById("kpi_precio_crudo");
-const kpiTarifaMaxima = document.getElementById("kpi_tarifa_maxima");
-const kpiMargen = document.getElementById("kpi_margen");
-
-const bannerGobernanza = document.getElementById("banner_gobernanza");
-const iconoGobernanza = document.getElementById("icono_gobernanza");
-const tituloGobernanza = document.getElementById("titulo_gobernanza");
-const descGobernanza = document.getElementById("desc_gobernanza");
-
-// Inicialización de la aplicación
 document.addEventListener("DOMContentLoaded", () => {
-  if (typeof CEREBRO_IA === "undefined" || !CEREBRO_IA || Object.keys(CEREBRO_IA).length === 0) {
-    document.getElementById("status_cerebro").textContent = "Error: cerebro.js no detectado";
-    document.getElementById("status_cerebro").className = "text-xs text-red-300 font-bold";
-    console.error("No se ha encontrado el objeto CEREBRO_IA. Asegúrate de que cerebro.js está cargado correctamente.");
+  if (typeof CEREBRO_IA === "undefined") {
+    document.getElementById("status_cerebro").textContent = "Error: Sin Cerebro";
+    document.getElementById("status_cerebro").className = "text-red-300 font-bold";
     return;
   }
+  
+  Object.keys(CEREBRO_IA).forEach(ruta => {
+    const opt = document.createElement("option");
+    opt.value = ruta;
+    opt.textContent = ruta.replace("_", " ➔ ");
+    D.selectorRuta.appendChild(opt);
+  });
 
-  poblarSelectorRutas();
-  registrarEventos();
-  actualizarSimulacion(true);
+  D.selectorRuta.addEventListener("change", () => update(true));
+  D.sliderDias.addEventListener("input", () => update(false));
+  D.sliderAsientos.addEventListener("input", () => update(false));
+  
+  update(true);
 });
 
-function poblarSelectorRutas() {
-  selectorRuta.innerHTML = "";
-  const rutas = Object.keys(CEREBRO_IA);
+function update(cambioRuta) {
+  const ruta = D.selectorRuta.value;
+  const dias = parseInt(D.sliderDias.value);
+  const asientos = parseInt(D.sliderAsientos.value);
+  const data = CEREBRO_IA[ruta];
 
-  rutas.forEach((clave) => {
-    const partes = clave.split("_");
-    const nombreLegible = partes.length === 2 
-      ? `${formatearNombre(partes[0])} ➔ ${formatearNombre(partes[1])}`
-      : clave;
+  D.txtDias.textContent = dias;
+  D.txtAsientos.textContent = asientos;
 
-    const opt = document.createElement("option");
-    opt.value = clave;
-    opt.textContent = nombreLegible;
-    selectorRuta.appendChild(opt);
-  });
-}
+  const accion = data.politica[`${dias}_${asientos}`] ?? 4;
+  const info = ACCIONES_INFO[accion];
+  const precioBase = data.precios_base[dias] || 60;
+  const tarifaMax = data.tarifa_maxima || 250;
 
-function formatearNombre(str) {
-  return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
-}
-
-function registrarEventos() {
-  selectorRuta.addEventListener("change", () => actualizarSimulacion(true));
-  
-  sliderDias.addEventListener("input", () => {
-    txtDias.textContent = sliderDias.value;
-    actualizarSimulacion(false);
-  });
-
-  sliderAsientos.addEventListener("input", () => {
-    txtAsientos.textContent = sliderAsientos.value;
-    actualizarSimulacion(false);
-  });
-}
-
-function actualizarSimulacion(cambioRuta = false) {
-  const ruta = selectorRuta.value;
-  const dias = parseInt(sliderDias.value, 10);
-  const asientos = parseInt(sliderAsientos.value, 10);
-  const datosRuta = CEREBRO_IA[ruta];
-
-  if (!datosRuta) return;
-
-  // 1. Textos y claves de estado
-  txtDias.textContent = dias;
-  txtAsientos.textContent = asientos;
-  txtEstadoNorm.textContent = `[${(dias / 30).toFixed(2)}, ${(asientos / 100).toFixed(2)}]`;
-  const claveEstado = `${dias}_${asientos}`;
-  txtClaveMatriz.textContent = claveEstado;
-
-  // 2. Extracción de decisiones y precios base
-  const accion = datosRuta.politica[claveEstado] !== undefined ? datosRuta.politica[claveEstado] : 4;
-  const infoAccion = ACCIONES_INFO[accion] || ACCIONES_INFO[4];
-  const precioBase = datosRuta.precios_base[String(dias)] || datosRuta.precios_base[dias] || 60.0;
-  const tarifaMax = datosRuta.tarifa_maxima || 250.0;
-
-  // 3. Cálculo de la tarifa y lógica de gobernanza
-  const precioCrudo = precioBase * infoAccion.mult;
+  // LÓGICA DE GOBERNANZA: EL PRECIO NUNCA SUPERA EL REGULADO
+  const precioCrudo = precioBase * info.mult;
   let precioFinal = precioCrudo;
-  let vetoActivado = false;
+  let veto = false;
 
   if (precioCrudo > tarifaMax) {
     precioFinal = tarifaMax;
-    vetoActivado = true;
+    veto = true;
   }
 
-  // 4. Actualización de KPIs en el DOM
-  kpiPrecioBase.textContent = precioBase.toFixed(2);
-  kpiLeadTime.textContent = `${dias} días antes`;
+  D.kpiPrecioBase.textContent = precioBase.toFixed(2);
+  D.kpiTarifaMaxima.textContent = tarifaMax.toFixed(2);
+  D.kpiMultiplicador.textContent = info.mult.toFixed(2) + "x";
+  D.kpiDescAccion.textContent = info.label;
+  D.kpiPrecioFinal.textContent = precioFinal.toFixed(2);
 
-  kpiBadgeAccion.textContent = `Acción ${accion}`;
-  kpiBadgeAccion.className = `px-2.5 py-1 rounded-lg text-xs font-extrabold uppercase tracking-wide ${infoAccion.badge}`;
-  kpiMultiplicador.textContent = infoAccion.mult.toFixed(2);
-  kpiDescAccion.textContent = infoAccion.label;
-  kpiIdxAccion.textContent = accion;
+  const variacion = ((precioFinal - precioBase) / precioBase) * 100;
+  D.kpiVariacion.textContent = `${variacion > 0 ? '+' : ''}${variacion.toFixed(1)}% vs tarifa base`;
 
-  kpiPrecioFinal.textContent = precioFinal.toFixed(2);
-  kpiPrecioCrudo.textContent = precioCrudo.toFixed(2);
-
-  const deltaPct = ((precioFinal - precioBase) / precioBase) * 100;
-  if (deltaPct > 0) {
-    kpiVariacion.textContent = `▲ +${deltaPct.toFixed(1)}% vs base`;
-    kpiVariacion.className = "text-xs font-semibold text-amber-600 mt-1";
-  } else if (deltaPct < 0) {
-    kpiVariacion.textContent = `▼ ${deltaPct.toFixed(1)}% vs base`;
-    kpiVariacion.className = "text-xs font-semibold text-emerald-600 mt-1";
+  // UI ALARMA
+  if (veto) {
+    D.bannerGob.classList.remove("hidden", "border-emerald-400", "bg-emerald-50");
+    D.bannerGob.classList.add("border-red-400", "bg-red-50", "text-red-900");
+    D.iconoGob.textContent = "🛑";
+    D.titGob.textContent = "LÍMITE REGULADO SUPERADO - PRECIO CAPADO";
+    D.descGob.textContent = `La IA pidió ${precioCrudo.toFixed(2)}€ pero la normativa impide superar ${tarifaMax.toFixed(2)}€. Se aplica el tope.`;
   } else {
-    kpiVariacion.textContent = `■ 0.0% (Tarifa Neutra)`;
-    kpiVariacion.className = "text-xs font-semibold text-slate-500 mt-1";
+    D.bannerGob.classList.remove("hidden", "border-red-400", "bg-red-50");
+    D.bannerGob.classList.add("border-emerald-400", "bg-emerald-50", "text-emerald-900");
+    D.iconoGob.textContent = "✅";
+    D.titGob.textContent = "TARIFA DENTRO DE LOS MÁRGENES LEGALES";
+    D.descGob.textContent = `El precio (${precioFinal.toFixed(2)}€) respeta la regulación máxima del corredor (${tarifaMax.toFixed(2)}€).`;
   }
 
-  kpiTarifaMaxima.textContent = tarifaMax.toFixed(2);
-  const margen = tarifaMax - precioFinal;
-  kpiMargen.textContent = margen.toFixed(2);
-
-  // 5. Renderizado de banner de gobernanza
-  actualizarBannerGobernanza(vetoActivado, precioCrudo, tarifaMax);
-
-  // 6. Gráficos interactivos
-  renderizarHeatmap(datosRuta, dias, asientos, cambioRuta);
-  if (cambioRuta) {
-    renderizarCurvaPrecios(datosRuta, dias);
-  } else {
-    actualizarPuntoCurvaPrecios(dias, precioBase);
-  }
+  renderPlotly(data, dias, asientos, cambioRuta);
 }
 
-function actualizarBannerGobernanza(vetoActivado, precioCrudo, tarifaMax) {
-  if (vetoActivado) {
-    bannerGobernanza.className = "rounded-xl border border-red-300 bg-red-50 p-4 shadow-sm text-red-900";
-    iconoGobernanza.textContent = "🛑";
-    tituloGobernanza.textContent = "VETO DE GOBERNANZA COMERCIAL ACTIVADO";
-    descGobernanza.textContent = `La IA recomendó ${precioCrudo.toFixed(2)}€, superando el techo regulatorio legal de ${tarifaMax.toFixed(2)}€. Se aplica recorte forzoso al límite máximo permitido.`;
-    bannerGobernanza.classList.remove("hidden");
-  } else {
-    bannerGobernanza.className = "rounded-xl border border-emerald-300 bg-emerald-50 p-4 shadow-sm text-emerald-900";
-    iconoGobernanza.textContent = "✅";
-    tituloGobernanza.textContent = "TARIFACIÓN DINÁMICA CONFORME CON REGULACIÓN";
-    descGobernanza.textContent = `El precio calculado opera con total solvencia dentro de la banda tarifaria autorizada (Techo: ${tarifaMax.toFixed(2)}€).`;
-    bannerGobernanza.classList.remove("hidden");
-  }
-}
-
-/**
- * Renderiza o actualiza el Heatmap en Plotly
- */
-function renderizarHeatmap(datosRuta, leadTimeActual, plazasActual, cambioRuta) {
-  const maxDias = 30;
-  const maxAsientos = 100;
-  
-  const zValues = [];
-  for (let d = 0; d <= maxDias; d++) {
-    const fila = [];
-    for (let a = 0; a <= maxAsientos; a++) {
-      const val = datosRuta.politica[`${d}_${a}`];
-      fila.push(val !== undefined ? val : 4);
+function renderPlotly(data, diasActual, asientosActual, refrescarTodo) {
+  if (refrescarTodo) {
+    // 1. Heatmap
+    const zValues = [];
+    for (let d = 0; d <= 30; d++) {
+      const fila = [];
+      for (let a = 0; a <= 100; a++) {
+        fila.push(data.politica[`${d}_${a}`] ?? 4);
+      }
+      zValues.push(fila);
     }
-    zValues.push(fila);
+    
+    Plotly.react('grafico_heatmap', [{
+      z: zValues, x: Array.from({length: 101}, (_, i) => i), y: Array.from({length: 31}, (_, i) => i),
+      type: 'heatmap', colorscale: [[0,'#10b981'], [0.5,'#e2e8f0'], [1,'#ef4444']], zmin: 0, zmax: 8,
+      colorbar: { thickness: 10 }
+    }, {
+      x: [asientosActual], y: [diasActual], mode: 'markers',
+      marker: { color: '#702082', size: 10, line: { color: 'white', width: 2 } }
+    }], { margin: { t: 10, r: 10, b: 30, l: 30 }, xaxis: { title: 'Plazas' }, yaxis: { title: 'Días' } });
+
+    // 2. Curva
+    const diasX = Array.from({ length: 31 }, (_, i) => i);
+    const preY = diasX.map(d => data.precios_base[d] || 60);
+    
+    Plotly.newPlot('grafico_curva', [{
+      x: diasX, y: preY, type: 'scatter', mode: 'lines', name: 'Base', line: { color: '#702082' }
+    }, {
+      x: [0, 30], y: [data.tarifa_maxima, data.tarifa_maxima], type: 'scatter', mode: 'lines',
+      name: 'Tope Legal', line: { color: '#ef4444', dash: 'dash' }
+    }, {
+      x: [diasActual], y: [data.precios_base[diasActual]], mode: 'markers', name: 'Actual',
+      marker: { color: '#10b981', size: 10 }
+    }], { margin: { t: 10, r: 10, b: 30, l: 30 }, showlegend: false });
+  } else {
+    Plotly.restyle('grafico_heatmap', { 'x': [[asientosActual]], 'y': [[diasActual]] }, [1]);
+    Plotly.restyle('grafico_curva', { 'x': [[diasActual]], 'y': [[data.precios_base[diasActual]]] }, [2]);
   }
-
-  // Traza del Heatmap
-  const traceHeatmap = {
-    z: zValues,
-    x: Array.from({ length: maxAsientos + 1 }, (_, i) => i),
-    y: Array.from({ length: maxDias + 1 }, (_, i) => i),
-    type: 'heatmap',
-    colorscale: [
-      [0.0, '#10b981'], // Verde (Descuentos)
-      [0.375, '#a7f3d0'],
-      [0.5, '#94a3b8'],  // Gris neutro (Tarifa Base)
-      [0.625, '#fed7aa'],
-      [1.0, '#ef4444']   // Rojo (Yield Premium)
-    ],
-    zmin: 0,
-    zmax: 8,
-    colorbar: {
-      title: 'Acción IA',
-      titleside: 'right',
-      tickmode: 'array',
-      tickvals: [0, 2, 4, 6, 8],
-      ticktext: ['-20%', '-10%', 'Base', '+10%', '+20%'],
-      len: 0.9,
-      thickness: 14
-    },
-    hoverongaps: false
-  };
-
-  // Marcador del estado actual
-  const tracePunto = {
-    x: [plazasActual],
-    y: [leadTimeActual],
-    mode: 'markers',
-    type: 'scatter',
-    marker: {
-      color: '#ffffff',
-      size: 14,
-      symbol: 'circle',
-      line: { color: '#5c2483', width: 3 }
-    },
-    name: 'Estado Actual',
-    hoverinfo: 'name+x+y'
-  };
-
-  const layout = {
-    margin: { t: 20, r: 20, b: 40, l: 45 },
-    xaxis: { title: 'Plazas Libres (Inventario)', range: [0, 100], dtick: 20 },
-    yaxis: { title: 'Días hasta Salida (Lead Time)', range: [0, 30], dtick: 5 },
-    showlegend: false,
-    paper_bgcolor: 'transparent',
-    plot_bgcolor: 'transparent'
-  };
-
-  const config = { responsive: true, displayModeBar: false };
-
-  Plotly.react('grafico_heatmap', [traceHeatmap, tracePunto], layout, config);
-}
-
-/**
- * Renderiza la curva histórica de precios por Lead Time
- */
-function renderizarCurvaPrecios(datosRuta, leadTimeActual) {
-  const diasX = Array.from({ length: 31 }, (_, i) => i);
-  const preciosY = diasX.map(d => datosRuta.precios_base[String(d)] || datosRuta.precios_base[d] || 60);
-
-  const traceCurva = {
-    x: diasX,
-    y: preciosY,
-    type: 'scatter',
-    mode: 'lines+markers',
-    name: 'Precio Base',
-    line: { color: '#5c2483', width: 2.5 },
-    marker: { size: 5 }
-  };
-
-  const traceMaximo = {
-    x: [0, 30],
-    y: [datosRuta.tarifa_maxima, datosRuta.tarifa_maxima],
-    type: 'scatter',
-    mode: 'lines',
-    name: 'Techo Legal',
-    line: { color: '#ef4444', dash: 'dash', width: 2 }
-  };
-
-  const tracePuntoActual = {
-    x: [leadTimeActual],
-    y: [datosRuta.precios_base[String(leadTimeActual)] || 60],
-    type: 'scatter',
-    mode: 'markers',
-    name: 'Día Seleccionado',
-    marker: { color: '#fb923c', size: 10, line: { color: '#ffffff', width: 2 } }
-  };
-
-  const layout = {
-    margin: { t: 20, r: 20, b: 40, l: 45 },
-    xaxis: { title: 'Días de Antelación', range: [0, 30], dtick: 5 },
-    yaxis: { title: 'Tarifa (€)', rangemode: 'tozero' },
-    showlegend: true,
-    legend: { orientation: 'h', y: 1.15, x: 0.1 },
-    paper_bgcolor: 'transparent',
-    plot_bgcolor: 'transparent'
-  };
-
-  const config = { responsive: true, displayModeBar: false };
-
-  Plotly.newPlot('grafico_curva', [traceCurva, traceMaximo, tracePuntoActual], layout, config);
-}
-
-function actualizarPuntoCurvaPrecios(leadTimeActual, precioBase) {
-  Plotly.restyle('grafico_curva', {
-    x: [[leadTimeActual]],
-    y: [[precioBase]]
-  }, [2]);
 }
