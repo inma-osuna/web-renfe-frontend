@@ -45,11 +45,18 @@ function actualizarDashboard() {
     document.getElementById("res_multiplicador").innerText = multiplicador.toFixed(1) + "x";
     document.getElementById("res_accion").innerText = accionIA;
     
+    // Elementos de UI para el precio y la alerta de tope
     const elementoPrecio = document.getElementById("res_precio_final");
+    const contenedorAlerta = document.getElementById("alerta_tope");
+    const textoAlerta = document.getElementById("texto_alerta_tope");
+
     if (superaTope) {
-        elementoPrecio.innerHTML = `${precioFinal.toFixed(2)} € <span class="text-[10px] bg-red-100 text-red-600 px-1 py-0.5 rounded font-bold block mt-1">TOPE REGULATORIO APLICADO</span>`;
+        elementoPrecio.innerHTML = `${precioFinal.toFixed(2)} € <span class="text-[10px] bg-red-100 text-red-600 px-1.5 py-0.5 rounded font-bold ml-1">TOPADO</span>`;
+        textoAlerta.innerText = `El modelo propuso ${precioCalculado.toFixed(2)} € (${multiplicador.toFixed(1)}x sobre base de ${precioBase.toFixed(2)}€), superando el techo regulatorio histórico de ${tarifaMaxima.toFixed(2)} € para esta ruta. Se ha aplicado el bloqueo de conformidad.`;
+        contenedorAlerta.classList.remove("hidden");
     } else {
         elementoPrecio.innerText = precioFinal.toFixed(2) + " €";
+        contenedorAlerta.classList.add("hidden");
     }
 
     renderizarHeatmapPlotly(rutaSeleccionada, dias, asientos);
