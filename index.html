@@ -3,51 +3,56 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Revenue Management - Dynamic Pricing</title>
+    <title>Revenue Management - Dynamic Pricing | TFM UCM</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f4f5f7;
         }
     </style>
 </head>
-<body class="bg-[#f8f9fa] text-gray-800 antialiased m-0 p-6">
+<body class="text-gray-900 antialiased m-0 p-6">
 
-    <div class="max-w-7xl mx-auto bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+    <div class="max-w-7xl mx-auto bg-white rounded-2xl shadow-sm border border-gray-200/80 overflow-hidden">
         
         <!-- Header -->
-        <header class="flex flex-wrap justify-between items-center px-6 py-4 border-b border-gray-200">
-            <div class="flex items-center space-x-2">
-                <span class="text-red-600 font-bold text-lg tracking-tight flex items-center gap-1.5">
+        <header class="flex flex-wrap justify-between items-center px-8 py-5 border-b border-gray-100 bg-white">
+            <div class="flex items-center space-x-3">
+                <div class="w-9 h-9 rounded-xl bg-red-50 flex items-center justify-center">
                     <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
-                    Revenue Management
-                </span>
-                <span class="text-[10px] bg-gray-100 text-gray-600 px-2 py-0.5 rounded font-semibold tracking-wide uppercase">Dynamic Pricing</span>
+                </div>
+                <div>
+                    <h1 class="font-bold text-gray-900 text-base tracking-tight">Revenue Management</h1>
+                    <p class="text-[11px] text-gray-400 font-medium tracking-wide uppercase">Dynamic Pricing Engine</p>
+                </div>
             </div>
-            <nav class="flex space-x-6 text-sm font-medium">
-                <a href="#" class="text-red-600 border-b-2 border-red-600 pb-1">Dashboard</a>
-                <a href="#" class="text-gray-500 hover:text-gray-800 transition-colors">Documentación Técnica</a>
+            
+            <nav class="flex space-x-8 text-sm font-semibold">
+                <button onclick="cambiarVista('dashboard')" id="nav_dashboard" class="text-red-600 border-b-2 border-red-600 pb-1 transition-all">Dashboard</button>
+                <button onclick="cambiarVista('docs')" id="nav_docs" class="text-gray-400 hover:text-gray-700 pb-1 transition-all">Documentación Técnica</button>
             </nav>
+
             <div class="flex items-center space-x-3">
                 <div class="bg-gray-100 p-1 rounded-lg flex text-xs font-semibold">
-                    <span class="bg-white px-2.5 py-1 rounded shadow-sm text-gray-800">ES</span>
-                    <span class="px-2.5 py-1 text-gray-400 hover:text-gray-600 cursor-pointer">EN</span>
+                    <span class="bg-white px-2.5 py-1 rounded shadow-sm text-gray-900">ES</span>
+                    <span class="px-2.5 py-1 text-gray-400">EN</span>
                 </div>
-                <button class="bg-white border border-gray-200 text-gray-700 text-xs px-3.5 py-1.5 rounded-lg hover:bg-gray-50 font-medium transition-colors">Exportar Reporte</button>
+                <button class="bg-gray-900 text-white text-xs px-4 py-2 rounded-xl hover:bg-gray-800 font-medium transition-all shadow-sm">Exportar Reporte</button>
             </div>
         </header>
 
-        <!-- Main Grid Layout -->
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 p-6">
+        <!-- VISTA 1: DASHBOARD PRINCIPAL -->
+        <div id="vista_dashboard" class="grid grid-cols-1 lg:grid-cols-12 gap-8 p-8">
             
             <!-- Left Panel -->
-            <div class="lg:col-span-4 space-y-5">
+            <div class="lg:col-span-4 space-y-6">
                 
                 <!-- Selector de Ruta -->
-                <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm space-y-2">
-                    <label class="block text-xs font-bold uppercase tracking-wider text-red-600">Parámetros de Ruta</label>
-                    <select id="selector_ruta" class="w-full bg-gray-50 border border-gray-200 rounded-lg p-2.5 text-sm font-medium focus:ring-2 focus:ring-red-500 outline-none transition-all">
+                <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm space-y-2">
+                    <label class="block text-xs font-bold uppercase tracking-wider text-red-600">Trayecto Ferroviario</label>
+                    <select id="selector_ruta" class="w-full bg-gray-50 border border-gray-200 rounded-xl p-3 text-sm font-medium focus:ring-2 focus:ring-red-500 focus:bg-white outline-none transition-all">
                         <option value="MADRID_BARCELONA">Madrid - Barcelona</option>
                         <option value="MADRID_SEVILLA">Madrid - Sevilla</option>
                         <option value="MADRID_VALENCIA">Madrid - Valencia</option>
@@ -55,31 +60,31 @@
                 </div>
 
                 <!-- Parámetros del Entorno -->
-                <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm space-y-5">
+                <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm space-y-5">
                     <h3 class="text-xs font-bold uppercase tracking-wider text-red-600">Parámetros del Entorno</h3>
                     
                     <div class="space-y-2">
                         <div class="flex justify-between items-center text-sm">
                             <span class="font-medium text-gray-700">Días para la salida</span>
-                            <span id="val_dias" class="bg-red-50 text-red-600 font-bold px-2 py-0.5 rounded text-xs">15 d</span>
+                            <span id="val_dias" class="bg-red-50 text-red-600 font-bold px-2.5 py-1 rounded-lg text-xs">15 d</span>
                         </div>
                         <input type="range" id="slider_dias" min="0" max="30" value="15" class="w-full accent-red-600 cursor-pointer">
                     </div>
 
                     <div class="space-y-2">
                         <div class="flex justify-between items-center text-sm">
-                            <span class="font-medium text-gray-700">Inventario</span>
-                            <span id="val_asientos" class="bg-red-50 text-red-600 font-bold px-2 py-0.5 rounded text-xs">50 pl</span>
+                            <span class="font-medium text-gray-700">Inventario disponible</span>
+                            <span id="val_asientos" class="bg-red-50 text-red-600 font-bold px-2.5 py-1 rounded-lg text-xs">50 pl</span>
                         </div>
                         <input type="range" id="slider_asientos" min="0" max="100" value="50" class="w-full accent-red-600 cursor-pointer">
                     </div>
                 </div>
 
                 <!-- Recomendación del Modelo -->
-                <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm space-y-4">
+                <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm space-y-4">
                     <h3 class="text-xs font-bold uppercase tracking-wider text-red-600">Recomendación del Modelo</h3>
                     
-                    <div class="bg-gray-50 p-4 rounded-xl border border-gray-200 space-y-3">
+                    <div class="bg-gray-50/80 p-5 rounded-xl border border-gray-100 space-y-3">
                         <div class="flex justify-between items-center">
                             <span class="text-xs font-medium text-gray-500">Multiplicador de Precio</span>
                             <span id="badge_pct" class="text-xs font-bold px-2 py-0.5 rounded bg-green-50 text-green-600">-10%</span>
@@ -89,61 +94,88 @@
                         </div>
                         <div class="flex items-center space-x-2">
                             <span class="text-xs text-gray-500 font-medium">Acción Discreta:</span>
-                            <span id="res_accion" class="bg-red-600 text-white font-bold text-xs px-2 py-0.5 rounded">3</span>
+                            <span id="res_accion" class="bg-red-600 text-white font-bold text-xs px-2.5 py-1 rounded-md">3</span>
                         </div>
-                        <div class="pt-2 border-t border-gray-200 flex flex-col space-y-1">
-                            <div class="flex justify-between items-center">
-                                <span class="text-xs text-gray-500 font-medium">Precio Sugerido:</span>
-                                <span id="res_precio_final" class="text-lg font-bold text-red-600">-- €</span>
-                            </div>
+                        <div class="pt-3 border-t border-gray-200/60 flex justify-between items-center">
+                            <span class="text-xs font-semibold text-gray-600">Precio Sugerido:</span>
+                            <span id="res_precio_final" class="text-lg font-extrabold text-red-600">-- €</span>
                         </div>
                     </div>
 
-                    <!-- Alerta Explícita de Cumplimiento / Tope Regulatorio -->
-                    <div id="alerta_tope" class="hidden bg-red-50 border-l-4 border-red-500 p-3 rounded-r-lg">
+                    <!-- Alerta Estricta de Leyes de Negocio (Topes y Suelos) -->
+                    <div id="alerta_negocio" class="hidden bg-amber-50 border-l-4 border-amber-500 p-3.5 rounded-r-xl">
                         <div class="flex items-start">
-                            <div class="flex-shrink-0">
-                                <svg class="h-4 w-4 text-red-500 mt-0.5" viewBox="0 0 20 20" fill="currentColor">
-                                    <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
-                                </svg>
-                            </div>
-                            <div class="ml-2">
-                                <p class="text-xs font-bold text-red-800">Alerta de Cumplimiento Comercial</p>
-                                <p id="texto_alerta_tope" class="text-[11px] text-red-700 mt-0.5 leading-snug">Se ha superado el techo histórico de la ruta. El sistema ha aplicado un bloqueo normativo limitando el importe a la tarifa máxima autorizada.</p>
+                            <svg class="h-4 w-4 text-amber-600 mt-0.5 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                            </svg>
+                            <div class="ml-2.5">
+                                <p class="text-xs font-bold text-amber-900">Ley de Negocio Aplicada</p>
+                                <p id="texto_alerta_negocio" class="text-[11px] text-amber-800 mt-0.5 leading-snug">El sistema ha interceptado el valor propuesto por el modelo para cumplir estrictamente con los límites comerciales de la ruta.</p>
                             </div>
                         </div>
                     </div>
-
-                    <p class="text-xs text-gray-400 leading-relaxed">Tarifa neutra fijada por el modelo para mantener el volumen en la zona de equilibrio.</p>
                 </div>
 
             </div>
 
             <!-- Right Panel: Heatmap -->
-            <div class="lg:col-span-8 bg-white p-5 rounded-xl border border-gray-200 shadow-sm flex flex-col justify-between">
-                <div class="flex justify-between items-center mb-2">
-                    <h3 class="text-sm font-bold text-gray-800">Mapa de Política: Random Forest / PPO (Multiruta)</h3>
-                    <span class="bg-red-50 text-red-600 text-xs font-bold px-2.5 py-1 rounded-full flex items-center space-x-1">
+            <div class="lg:col-span-8 bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex flex-col justify-between">
+                <div class="flex justify-between items-center mb-4">
+                    <div>
+                        <h3 class="text-sm font-bold text-gray-900">Mapa de Política: Random Forest / PPO (Multiruta)</h3>
+                        <p class="text-xs text-gray-400">Distribución óptima de acciones según disponibilidad y horizonte temporal.</p>
+                    </div>
+                    <span class="bg-red-50 text-red-600 text-xs font-bold px-3 py-1 rounded-full flex items-center space-x-1.5 border border-red-100">
                         <span class="w-2 h-2 bg-red-600 rounded-full animate-pulse"></span>
                         <span>LIVE DATA</span>
                     </span>
                 </div>
 
                 <!-- Plotly Container -->
-                <div id="plotly_heatmap" class="w-full h-[420px]"></div>
+                <div id="plotly_heatmap" class="w-full h-[450px]"></div>
 
                 <!-- Legend -->
-                <div class="flex flex-wrap justify-between items-center mt-4 pt-4 border-t border-gray-100 text-xs text-gray-500">
-                    <div class="flex items-center space-x-4">
-                        <div class="flex items-center space-x-1.5"><span class="w-3 h-3 bg-pink-200 rounded"></span><span>Acciones 0-2 (Descuentos)</span></div>
-                        <div class="flex items-center space-x-1.5"><span class="w-3 h-3 bg-red-500 rounded"></span><span>Acciones 3-5 (Neutro)</span></div>
-                        <div class="flex items-center space-x-1.5"><span class="w-3 h-3 bg-orange-600 rounded"></span><span>Acciones 6-8 (Alcista)</span></div>
+                <div class="flex flex-wrap justify-between items-center mt-6 pt-4 border-t border-gray-100 text-xs text-gray-500">
+                    <div class="flex items-center space-x-6">
+                        <div class="flex items-center space-x-2"><span class="w-3.5 h-3.5 bg-pink-200 rounded-md"></span><span class="font-medium">Acciones 0-2 (Descuentos agresivos)</span></div>
+                        <div class="flex items-center space-x-2"><span class="w-3.5 h-3.5 bg-red-500 rounded-md"></span><span class="font-medium">Acciones 3-5 (Tarifa neutra)</span></div>
+                        <div class="flex items-center space-x-2"><span class="w-3.5 h-3.5 bg-orange-600 rounded-md"></span><span class="font-medium">Acciones 6-8 (Yield alcista)</span></div>
                     </div>
-                    <span class="font-medium text-gray-400">Lead Time (Días) / Asientos Disponibles</span>
+                    <span class="font-semibold text-gray-400">Lead Time (Días)</span>
                 </div>
             </div>
 
         </div>
+
+        <!-- VISTA 2: DOCUMENTACIÓN TÉCNICA -->
+        <div id="vista_docs" class="hidden p-10 space-y-8 max-w-4xl mx-auto">
+            <div>
+                <h2 class="text-2xl font-extrabold text-gray-900">Memoria y Documentación Técnica del TFM</h2>
+                <p class="text-sm text-gray-500 mt-1">Universidad Complutense de Madrid — Máster en Big Data e Inteligencia Artificial</p>
+            </div>
+
+            <div class="space-y-6 text-sm text-gray-700 leading-relaxed">
+                <div class="bg-gray-50 p-6 rounded-2xl border border-gray-200/60 space-y-3">
+                    <h3 class="font-bold text-gray-900 text-base">1. Arquitectura del Modelo Multiruta</h3>
+                    <p>El sistema implementa un entorno de simulación basado en <strong>Gymnasium</strong> donde un agente de Aprendizaje por Refuerzo (PPO - Proximal Policy Optimization) interactúa con series temporales históricas extraídas de los datasets de Renfe mediante flujos ETL en <strong>PySpark</strong>.</p>
+                </div>
+
+                <div class="bg-gray-50 p-6 rounded-2xl border border-gray-200/60 space-y-3">
+                    <h3 class="font-bold text-gray-900 text-base">2. Restricciones de Gobernanza y Leyes de Negocio</h3>
+                    <p>Para evitar comportamientos anómalos o subidas desreguladas que vulneren las políticas comerciales, el motor aplica de forma automática dos barreras físicas inquebrantables:</p>
+                    <ul class="list-disc pl-5 space-y-1.5 text-gray-600">
+                        <li><strong>Techo Regulatorio (Price Ceiling):</strong> Ninguna recomendación de la IA puede superar el precio máximo histórico registrado para cada corredor específico.</li>
+                        <li><strong>Suelo de Rentabilidad (Price Floor):</strong> Se respeta un umbral mínimo de tarifa para proteger los márgenes operativos ante descuentos agresivos.</li>
+                    </ul>
+                </div>
+
+                <div class="bg-gray-50 p-6 rounded-2xl border border-gray-200/60 space-y-3">
+                    <h3 class="font-bold text-gray-900 text-base">3. Despliegue y Arquitectura Frontend</h3>
+                    <p>El backend genera una matriz de decisión jerárquica exportada como objeto JSON estático (<code>cerebro.js</code>), permitiendo una inferencia instantánea en el navegador web cliente sin latencia de servidor, integrada con visualizaciones científicas mediante <strong>Plotly.js</strong> y maquetación corporativa.</p>
+                </div>
+            </div>
+        </div>
+
     </div>
 
     <script src="cerebro.js"></script>
