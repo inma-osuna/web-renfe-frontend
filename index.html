@@ -48,14 +48,13 @@
             <div class="lg:col-span-4 space-y-6">
                 
                 <!-- Selector de Trayecto (Multiruta) -->
-                <div class="bg-white p-5 rounded-xl border border-gray-100 shadow-sm space-y-2">
-                    <label class="block text-xs font-bold uppercase tracking-wider text-red-600">Trayecto Ferroviario</label>
-                    <select id="selector_ruta" class="w-full bg-gray-50 border border-gray-200 rounded-lg p-2.5 text-sm font-medium focus:ring-2 focus:ring-red-500 outline-none">
-                        <option value="MADRID_BARCELONA">Madrid - Barcelona</option>
-                        <option value="MADRID_SEVILLA">Madrid - Sevilla</option>
-                        <option value="MADRID_VALENCIA">Madrid - Valencia</option>
-                    </select>
-                </div>
+               <!-- Selector de Ruta Multiruta Dinámico -->
+<div class="bg-white p-5 rounded-xl border border-gray-100 shadow-sm space-y-2">
+    <label class="block text-xs font-bold uppercase tracking-wider text-red-600">Trayecto Ferroviario</label>
+    <select id="selector_ruta" class="w-full bg-gray-50 border border-gray-200 rounded-lg p-2.5 text-sm font-medium focus:ring-2 focus:ring-red-500 outline-none">
+        <!-- Se rellenará automáticamente desde main.js con las rutas de cerebro.js -->
+    </select>
+</div>
 
                 <!-- Parámetros del Entorno -->
                 <div class="bg-white p-5 rounded-xl border border-gray-100 shadow-sm space-y-5">

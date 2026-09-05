@@ -1,23 +1,48 @@
 const multiplicadores = [0.6, 0.7, 0.8, 0.9, 1.0, 1.1, 1.2, 1.3, 1.4];
 
+// Precios base genéricos o específicos por ruta
 const preciosBasePorRuta = {
     "MADRID_BARCELONA": 65.00,
+    "BARCELONA_MADRID": 65.00,
     "MADRID_SEVILLA": 50.00,
-    "MADRID_VALENCIA": 40.00
+    "SEVILLA_MADRID": 50.00,
+    "MADRID_VALENCIA": 40.00,
+    "VALENCIA_MADRID": 40.00,
+    "MADRID_GRANADA": 45.00,
+    "GRANADA_MADRID": 45.00,
+    "MADRID_PONFERRADA": 50.00,
+    "PONFERRADA_MADRID": 50.00
 };
 
-// Leyes de negocio: Límites regulatorios y comerciales infranqueables
+// Topes máximos (Techazos) y mínimos por defecto
 const tarifasMaximasPorRuta = {
-    "MADRID_BARCELONA": 130.00,
-    "MADRID_SEVILLA": 105.00,
-    "MADRID_VALENCIA": 85.00
+    "MADRID_BARCELONA": 342.8,
+    "BARCELONA_MADRID": 342.8,
+    "MADRID_SEVILLA": 166.6,
+    "SEVILLA_MADRID": 166.6,
+    "MADRID_VALENCIA": 159.6,
+    "VALENCIA_MADRID": 159.6
 };
 
 const tarifasMinimasPorRuta = {
     "MADRID_BARCELONA": 35.00,
-    "MADRID_SEVILLA": 28.00,
-    "MADRID_VALENCIA": 22.00
+    "BARCELONA_MADRID": 35.00
 };
+
+// Rellenar el desplegable automáticamente con las rutas que existan en CEREBRO_IA
+function inicializarSelectorRutas() {
+    const select = document.getElementById("selector_ruta");
+    if (!select || typeof CEREBRO_IA === 'undefined') return;
+    
+    select.innerHTML = "";
+    Object.keys(CEREBRO_IA).forEach(ruta => {
+        const option = document.createElement("option");
+        option.value = ruta;
+        // Formatear el texto de la ruta (ej: "MADRID_BARCELONA" -> "Madrid - Barcelona")
+        option.innerText = ruta.replace("_", " - ");
+        select.appendChild(option);
+    });
+}
 
 function cambiarVista(vista) {
     const vistaDash = document.getElementById("vista_dashboard");
@@ -58,18 +83,17 @@ function actualizarDashboard() {
 
     const multiplicador = multiplicadores[accionIA];
     const precioBase = preciosBasePorRuta[rutaSeleccionada] || 55.00;
-    const tarifaMaxima = tarifasMaximasPorRuta[rutaSeleccionada] || 130.00;
-    const tarifaMinima = tarifasMinimasPorRuta[rutaSeleccionada] || 30.00;
+    const tarifaMaxima = tarifasMaximasPorRuta[rutaSeleccionada] || 300.00;
+    const tarifaMinima = tarifasMinimasPorRuta[rutaSeleccionada] || 25.00;
 
     const precioMatematicoOptimo = precioBase * multiplicador;
     
-    // FILTRO DE GOBERNANZA: Las reglas de negocio mandan sobre el óptimo de la IA
+    // GOBERNANZA: Las reglas de negocio mandan sobre el óptimo de la IA
     let precioFinal = precioMatematicoOptimo;
     let restriccionAplicada = null;
 
     if (precioMatematicoOptimo > tarifaMaxima) {
         precioFinal = tarifaMaxima;
-        restringidoPorNegocio = true;
         restriccionAplicada = "TECHO";
     } else if (precioMatematicoOptimo < tarifaMinima) {
         precioFinal = tarifaMinima;
@@ -89,21 +113,24 @@ function actualizarDashboard() {
     const textoAlerta = document.getElementById("texto_alerta_negocio");
     const descEstado = document.getElementById("descripcion_estado");
 
-    // Interceptación explícita para demostrar que la regla de negocio domina al óptimo
     if (restriccionAplicada === "TECHO") {
         elementoPrecio.innerHTML = `${precioFinal.toFixed(2)} € <span class="text-[10px] bg-red-100 text-red-600 px-1.5 py-0.5 rounded font-bold ml-1">VETADO POR TECHO</span>`;
-        textoAlerta.innerText = `El modelo proponía un óptimo de ${precioMatematicoOptimo.toFixed(2)} € (${multiplicador.toFixed(1)}x), superando el precio máximo regulado (${tarifaMaxima.toFixed(2)} €). La regla de negocio ha interceptado y limitado la tarifa.`;
-        descEstado.innerText = "Tarifa bloqueada por cumplimiento normativo y techos históricos comerciales.";
-        contenedorAlerta.classList.remove("hidden");
+        if (textoAlerta) {
+            textoAlerta.innerText = `El modelo proponía un óptimo de ${precioMatematicoOptimo.toFixed(2)} € (${multiplicador.toFixed(1)}x), superando el precio máximo regulado (${tarifaMaxima.toFixed(2)} €). La regla de negocio ha interceptado y limitado la tarifa.`;
+        }
+        if (descEstado) descEstado.innerText = "Tarifa bloqueada por cumplimiento normativo y techos históricos comerciales.";
+        if (contenedorAlerta) contenedorAlerta.classList.remove("hidden");
     } else if (restriccionAplicada === "SUELO") {
         elementoPrecio.innerHTML = `${precioFinal.toFixed(2)} € <span class="text-[10px] bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded font-bold ml-1">PISO DE RENTABILIDAD</span>`;
-        textoAlerta.innerText = `El óptimo de la IA situaba el precio en ${precioMatematicoOptimo.toFixed(2)} €, por debajo del umbral mínimo de seguridad (${tarifaMinima.toFixed(2)} €). Se ha aplicado el suelo comercial.`;
-        descEstado.innerText = "Tarifa ajustada al suelo mínimo operativo para proteger los márgenes de ruta.";
-        contenedorAlerta.classList.remove("hidden");
+        if (textoAlerta) {
+            textoAlerta.innerText = `El óptimo de la IA situaba el precio en ${precioMatematicoOptimo.toFixed(2)} €, por debajo del umbral mínimo de seguridad (${tarifaMinima.toFixed(2)} €). Se ha aplicado el suelo comercial.`;
+        }
+        if (descEstado) descEstado.innerText = "Tarifa ajustada al suelo mínimo operativo para proteger los márgenes de ruta.";
+        if (contenedorAlerta) contenedorAlerta.classList.remove("hidden");
     } else {
         elementoPrecio.innerText = precioFinal.toFixed(2) + " €";
-        descEstado.innerText = "Tarifa óptima validada por el modelo dentro del margen de gobernanza comercial.";
-        contenedorAlerta.classList.add("hidden");
+        if (descEstado) descEstado.innerText = "Tarifa óptima validada por el modelo dentro del margen de gobernanza comercial.";
+        if (contenedorAlerta) contenedorAlerta.classList.add("hidden");
     }
 
     renderizarHeatmapPlotly(rutaSeleccionada, dias, asientos);
@@ -173,5 +200,6 @@ document.getElementById("slider_dias").addEventListener("input", actualizarDashb
 document.getElementById("slider_asientos").addEventListener("input", actualizarDashboard);
 
 window.onload = function() {
+    inicializarSelectorRutas();
     actualizarDashboard();
 };
