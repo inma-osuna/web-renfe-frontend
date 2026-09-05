@@ -28,86 +28,143 @@
     </div>
   </nav>
 
-  <main class="max-w-7xl mx-auto px-6 py-8 space-y-6">
+  <main class="max-w-7xl mx-auto px-6 py-6 space-y-6">
 
-    <!-- ALARMA DE GOBERNANZA -->
-    <div id="banner_gobernanza" class="hidden rounded-xl border-l-4 p-4 shadow-sm transition-all duration-300">
+    <!-- Panel de Alerta de Gobernanza Comercial -->
+    <div id="banner_gobernanza" class="hidden rounded-xl border p-4 shadow-sm transition-all duration-300">
       <div class="flex items-start gap-3">
-        <div id="icono_gobernanza" class="text-2xl mt-0.5">⚠️</div>
+        <div id="icono_gobernanza" class="text-2xl">⚠️</div>
         <div class="flex-1">
           <h3 id="titulo_gobernanza" class="text-sm font-bold"></h3>
-          <p id="desc_gobernanza" class="text-xs mt-1"></p>
+          <p id="desc_gobernanza" class="text-xs mt-0.5"></p>
         </div>
       </div>
     </div>
 
-    <!-- Controles y KPIs -->
+    <!-- Grid Principal: Controles y KPIs -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-      
-      <!-- Controles -->
-      <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 space-y-5">
-        <h2 class="text-sm font-bold uppercase tracking-wider text-slate-400 mb-4 border-b pb-2">Parámetros</h2>
-        
+
+      <!-- Controles de Simulación -->
+      <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200/80 space-y-5">
+        <h2 class="text-base font-bold text-slate-900 flex items-center gap-2">
+          <span>⚙️</span> Parámetros del Viaje
+        </h2>
+
+        <!-- Selector de Ruta -->
         <div>
-          <label class="block text-xs font-semibold text-slate-600 mb-2">Corredor Ferroviario</label>
-          <select id="selector_ruta" class="w-full bg-slate-50 border border-slate-300 text-sm rounded-lg p-2.5 outline-none focus:border-[#702082] focus:ring-1 focus:ring-[#702082]"></select>
+          <label for="selector_ruta" class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-2">
+            Corredor Ferroviario
+          </label>
+          <select id="selector_ruta" class="w-full bg-slate-50 border border-slate-300 text-slate-900 text-sm rounded-xl p-3 focus:ring-2 focus:ring-[#702082] focus:outline-none font-medium">
+          </select>
         </div>
 
+        <!-- Slider: Días -->
         <div>
           <div class="flex justify-between items-center mb-1">
-            <label class="text-xs font-semibold text-slate-600">Lead Time (Días)</label>
-            <span class="text-sm font-bold text-[#702082]" id="txt_dias">15</span>
+            <label for="slider_dias" class="text-xs font-semibold uppercase tracking-wider text-slate-500">Lead Time</label>
+            <span class="text-sm font-bold text-[#702082]"><span id="txt_dias">15</span> días</span>
           </div>
-          <input type="range" id="slider_dias" min="0" max="30" value="15" class="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-[#702082]">
+          <input type="range" id="slider_dias" min="0" max="30" value="15" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-[#702082]">
+          <div class="flex justify-between text-[10px] text-slate-400 mt-1">
+            <span>0 (Salida hoy)</span>
+            <span>30 días antes</span>
+          </div>
         </div>
 
+        <!-- Slider: Plazas -->
         <div>
           <div class="flex justify-between items-center mb-1">
-            <label class="text-xs font-semibold text-slate-600">Plazas Libres</label>
-            <span class="text-sm font-bold text-[#702082]" id="txt_asientos">50</span>
+            <label for="slider_asientos" class="text-xs font-semibold uppercase tracking-wider text-slate-500">Capacidad Remanente</label>
+            <span class="text-sm font-bold text-[#702082]"><span id="txt_asientos">50</span> plazas</span>
           </div>
-          <input type="range" id="slider_asientos" min="0" max="100" value="50" class="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-[#702082]">
+          <input type="range" id="slider_asientos" min="0" max="100" value="50" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-[#702082]">
+          <div class="flex justify-between text-[10px] text-slate-400 mt-1">
+            <span>0 (Tren Lleno)</span>
+            <span>100 (Vacío)</span>
+          </div>
+        </div>
+
+        <div class="bg-slate-50 rounded-xl p-3 border border-slate-200 text-xs space-y-1">
+          <div class="flex justify-between text-slate-500">
+            <span>Estado normalizado:</span>
+            <span id="txt_estado_norm" class="font-mono font-medium text-slate-800">[0.50, 0.50]</span>
+          </div>
+          <div class="flex justify-between text-slate-500">
+            <span>Clave de decisión en matriz:</span>
+            <span id="txt_clave_matriz" class="font-mono font-medium text-slate-800">15_50</span>
+          </div>
         </div>
       </div>
 
-      <!-- KPIs -->
-      <div class="lg:col-span-2 grid grid-cols-2 gap-4">
-        
-        <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex flex-col justify-center">
-          <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Tarifa Base (Ref. Histórica)</div>
-          <div class="text-3xl font-black text-slate-800 mt-1"><span id="kpi_precio_base">--</span> €</div>
-        </div>
+      <!-- KPIs (ESTRUCTURA ORIGINAL COMPLETA) -->
+      <div class="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
 
-        <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex flex-col justify-center">
-          <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Techo Regulado Legal</div>
-          <div class="text-3xl font-black text-slate-800 mt-1"><span id="kpi_tarifa_maxima">--</span> €</div>
-        </div>
-
-        <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex flex-col justify-center">
-          <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Acción IA</div>
-          <div class="flex items-center gap-2 mt-1">
-            <span id="kpi_multiplicador" class="text-3xl font-black text-slate-800">--</span>
-            <span id="kpi_desc_accion" class="text-xs font-semibold px-2 py-1 rounded bg-slate-100 text-slate-600">--</span>
+        <!-- KPI: Tarifa Base -->
+        <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200/80 flex flex-col justify-between">
+          <div class="text-xs font-bold uppercase tracking-wider text-slate-400">Tarifa Base (Ref. Histórica)</div>
+          <div class="my-2">
+            <div class="text-3xl font-extrabold text-slate-800"><span id="kpi_precio_base">--</span> €</div>
+            <div class="text-xs text-slate-500 mt-1">Media empírica según lead time</div>
           </div>
+          <div class="text-[11px] text-slate-400 border-t pt-2">Lead time actual: <span id="kpi_lead_time" class="font-semibold text-slate-600">--</span></div>
         </div>
 
-        <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex flex-col justify-center border-l-4 border-l-[#702082]">
-          <div class="text-[10px] font-bold uppercase tracking-wider text-[#702082]">Precio Final al Cliente</div>
-          <div class="text-4xl font-black text-[#702082] mt-1"><span id="kpi_precio_final">--</span> €</div>
-          <div id="kpi_variacion" class="text-xs font-medium text-slate-500 mt-1">--</div>
+        <!-- KPI: Decisión IA -->
+        <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200/80 flex flex-col justify-between">
+          <div class="text-xs font-bold uppercase tracking-wider text-slate-400">Acción del Agente IA</div>
+          <div class="my-2">
+            <div class="flex items-center gap-2">
+              <span id="kpi_badge_accion" class="px-2.5 py-1 rounded-lg text-xs font-extrabold uppercase tracking-wide bg-slate-100 text-slate-800">--</span>
+              <span class="text-2xl font-extrabold text-slate-800"><span id="kpi_multiplicador">--</span>x</span>
+            </div>
+            <div id="kpi_desc_accion" class="text-xs font-medium text-slate-600 mt-1">--</div>
+          </div>
+          <div class="text-[11px] text-slate-400 border-t pt-2">Índice acción en matriz: <span id="kpi_idx_accion" class="font-semibold text-slate-600">--</span></div>
+        </div>
+
+        <!-- KPI: Tarifa Dinámica Final -->
+        <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200/80 flex flex-col justify-between">
+          <div class="text-xs font-bold uppercase tracking-wider text-slate-400">Tarifa Dinámica Final</div>
+          <div class="my-2">
+            <div class="text-4xl font-black text-[#702082]"><span id="kpi_precio_final">--</span> €</div>
+            <div id="kpi_variacion" class="text-xs font-semibold mt-1">--</div>
+          </div>
+          <div class="text-[11px] text-slate-400 border-t pt-2">Precio antes de veto: <span id="kpi_precio_crudo" class="font-semibold text-slate-600">--</span> €</div>
+        </div>
+
+        <!-- KPI: Techo Regulatorio -->
+        <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200/80 flex flex-col justify-between">
+          <div class="text-xs font-bold uppercase tracking-wider text-slate-400">Límite Regulatorio</div>
+          <div class="my-2">
+            <div class="text-3xl font-extrabold text-slate-800"><span id="kpi_tarifa_maxima">--</span> €</div>
+            <div class="text-xs text-slate-500 mt-1">Tarifa máxima legal del corredor</div>
+          </div>
+          <div class="text-[11px] text-slate-400 border-t pt-2">Margen disponible: <span id="kpi_margen" class="font-semibold text-slate-600">--</span> €</div>
         </div>
 
       </div>
     </div>
 
-    <!-- Gráficos Plotly: Se ha añadido overflow-hidden, flex y altura fija para evitar desbordes -->
+    <!-- Gráficos (Plotly) -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-col h-[400px] overflow-hidden">
-        <h3 class="text-xs font-bold uppercase text-slate-500 mb-2 shrink-0">Matriz de Decisión</h3>
+      <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200/80 flex flex-col h-[400px] overflow-hidden">
+        <div class="flex justify-between items-center mb-2 shrink-0">
+          <div>
+            <h3 class="text-sm font-bold text-slate-900">Matriz de Política IA</h3>
+            <p class="text-xs text-slate-400">Estrategia óptima</p>
+          </div>
+        </div>
         <div id="grafico_heatmap" class="w-full flex-1"></div>
       </div>
-      <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-col h-[400px] overflow-hidden">
-        <h3 class="text-xs font-bold uppercase text-slate-500 mb-2 shrink-0">Proyección Tarifa vs Límite</h3>
+
+      <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200/80 flex flex-col h-[400px] overflow-hidden">
+        <div class="flex justify-between items-center mb-2 shrink-0">
+          <div>
+            <h3 class="text-sm font-bold text-slate-900">Curva de Precios</h3>
+            <p class="text-xs text-slate-400">Evolución de base y tarifa máxima</p>
+          </div>
+        </div>
         <div id="grafico_curva" class="w-full flex-1"></div>
       </div>
     </div>
