@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Renfe RM | Dynamic Pricing</title>
+  <!-- AQUÍ ESTÁ EL LOGO DE LA PESTAÑA DEL NAVEGADOR -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ef4444' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'><path d='M3 17l6-6 4 4 8-8'/><path d='M17 7h4v4'/></svg>" type="image/svg+xml">
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
 </head>
@@ -11,10 +13,10 @@
 
   <div class="bg-white w-full max-w-[1400px] rounded-2xl shadow-xl border border-gray-200 flex flex-col overflow-hidden">
     
-    <!-- NAVBAR (Estilo de tu foto) -->
+    <!-- NAVBAR -->
     <header class="flex flex-wrap justify-between items-center px-8 py-4 border-b border-gray-100 bg-white shrink-0">
       <div class="flex items-center gap-10">
-        <!-- Logo -->
+        <!-- Logo Principal -->
         <div class="flex items-center gap-2">
           <svg class="w-6 h-6 text-red-500" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" d="M3 17l6-6 4 4 8-8"></path>
@@ -25,7 +27,7 @@
             <p class="text-[10px] font-bold text-red-500 tracking-wider">DYNAMIC PRICING</p>
           </div>
         </div>
-        <!-- Enlaces (Ahora funcionan) -->
+        <!-- Enlaces -->
         <nav class="hidden md:flex gap-6 text-sm font-semibold text-gray-500">
           <button id="tab_dashboard" class="text-red-500 border-b-2 border-red-500 pb-1" onclick="switchTab('dashboard')">Dashboard</button>
           <button id="tab_docs" class="hover:text-gray-900 pb-1 transition-colors" onclick="switchTab('docs')">Documentación Técnica</button>
@@ -56,7 +58,7 @@
           <div class="space-y-6">
             <div>
               <label class="block text-xs font-semibold text-gray-700 mb-2">Corredor Ferroviario</label>
-              <select id="selector_ruta" class="w-full bg-gray-50 border border-gray-200 text-gray-800 text-xs font-bold rounded-md p-2.5 outline-none"></select>
+              <select id="selector_ruta" class="w-full bg-gray-50 border border-gray-200 text-gray-800 text-xs font-bold rounded-md p-2.5 outline-none focus:ring-1 focus:ring-red-400"></select>
             </div>
 
             <div>
@@ -77,7 +79,7 @@
           </div>
         </section>
 
-        <!-- Tarjeta Recomendación (Como en tu foto) -->
+        <!-- Tarjeta Recomendación -->
         <section>
           <h2 class="text-[10px] font-bold text-red-500 uppercase tracking-widest mb-3">Recomendación del Modelo</h2>
           
@@ -105,7 +107,18 @@
       <!-- ÁREA PRINCIPAL DERECHA -->
       <main class="flex-1 p-6 sm:p-8 bg-gray-50/30 flex flex-col gap-6 min-w-0">
         
-        <!-- LOS 4 CUADRITOS DE TU FOTO -->
+        <!-- Banner Gobernanza -->
+        <div id="banner_gobernanza" class="hidden rounded-xl border border-red-200 bg-red-50 p-4 shadow-sm">
+          <div class="flex items-start gap-3">
+            <div class="text-xl mt-0.5">🛑</div>
+            <div class="flex-1">
+              <h3 class="text-sm font-bold text-red-900">VETO POR LÍMITE REGULADO</h3>
+              <p id="desc_gobernanza" class="text-xs mt-1 text-red-800"></p>
+            </div>
+          </div>
+        </div>
+
+        <!-- LOS 4 CUADRITOS -->
         <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
           <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex flex-col justify-center">
             <div class="text-[9px] font-bold uppercase tracking-wider text-gray-400">Tarifa Base (Día actual)</div>
@@ -128,7 +141,7 @@
           </div>
         </div>
 
-        <!-- GRÁFICOS (Diseño idéntico a la foto con Leyenda) -->
+        <!-- GRÁFICOS -->
         <div class="grid grid-cols-1 xl:grid-cols-2 gap-6 flex-1">
           
           <!-- Heatmap -->
@@ -139,7 +152,7 @@
             </div>
             <div id="grafico_heatmap" class="w-full flex-1 min-h-0"></div>
             
-            <!-- Leyenda Inferior como en la foto -->
+            <!-- Leyenda Inferior -->
             <div class="flex flex-wrap items-center justify-center gap-6 mt-2 pt-3 border-t border-gray-50 shrink-0">
               <div class="flex items-center gap-2">
                 <div class="w-3.5 h-3.5 bg-[#fbcfe8] rounded-sm"></div>
@@ -175,15 +188,15 @@
       </main>
     </div>
 
-    <!-- PESTAÑA: DOCUMENTACIÓN TÉCNICA (Oculta por defecto) -->
+    <!-- PESTAÑA: DOCUMENTACIÓN TÉCNICA -->
     <div id="vista_docs" class="hidden flex-1 p-8 bg-white text-gray-700 min-h-[600px]">
       <h2 class="text-2xl font-bold text-gray-900 mb-6">Documentación Técnica del Entorno</h2>
       <div class="prose max-w-3xl text-sm">
-        <p class="mb-4">Este dashboard interactúa con el objeto JSON <code class="bg-gray-100 px-1 rounded">CEREBRO_IA</code> exportado desde un pipeline de datos de PySpark.</p>
-        <ul class="list-disc pl-5 space-y-2">
+        <p class="mb-4">Este dashboard interactúa con el objeto JSON <code class="bg-gray-100 px-1 rounded font-mono text-red-500">CEREBRO_IA</code> exportado desde un pipeline de datos de PySpark.</p>
+        <ul class="list-disc pl-5 space-y-2 mt-4">
           <li><strong>Modelo:</strong> Agente de Aprendizaje por Refuerzo (Random Forest Regressor)</li>
           <li><strong>Espacio de Estados:</strong> Continuo normalizado [0, 1] representativo de Días al evento y Plazas remanentes.</li>
-          <li><strong>Espacio de Acciones:</strong> Discreto (0 al 8) correspondiente a multiplicadores desde 0.8x hasta 1.20x.</li>
+          <li><strong>Espacio de Acciones:</strong> Discreto (0 al 8) correspondiente a multiplicadores desde 0.80x hasta 1.20x.</li>
           <li><strong>Gobernanza:</strong> Regla de negocio en el frontend (main.js) que intercepta cualquier tarifa que supere el Techo Histórico de la ruta.</li>
         </ul>
       </div>
