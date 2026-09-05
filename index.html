@@ -9,23 +9,32 @@
   <!-- Plotly.js -->
   <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
   <style>
-    .renfe-purple { background-color: #5c2483; }
-    .renfe-purple-text { color: #5c2483; }
-    .renfe-border { border-color: #5c2483; }
+    .renfe-purple { background-color: #702082; }
+    .renfe-purple-text { color: #702082; }
+    .renfe-border { border-color: #702082; }
   </style>
 </head>
 <body class="bg-slate-100 text-slate-800 font-sans min-h-screen">
 
-  <!-- Header -->
-  <header class="renfe-purple text-white shadow-md">
-    <div class="max-w-7xl mx-auto px-6 py-4 flex flex-col sm:flex-row justify-between items-center gap-2">
-      <div>
-        <h1 class="text-2xl font-bold tracking-tight">RENFE Dynamic Pricing & Governance Engine</h1>
-        <p class="text-xs text-purple-200">Motor de Revenue Management mediante Aprendizaje por Refuerzo y Control Regulatorio</p>
+  <!-- Header con el color corporativo oficial de Renfe (#702082) -->
+  <header class="renfe-purple text-white shadow-lg">
+    <div class="max-w-7xl mx-auto px-6 py-5 flex flex-col sm:flex-row justify-between items-center gap-4">
+      <div class="flex items-center gap-3">
+        <div class="bg-white/10 p-2.5 rounded-xl border border-white/20">
+          <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+          </svg>
+        </div>
+        <div>
+          <h1 class="text-xl sm:text-2xl font-extrabold tracking-tight">RENFE Dynamic Pricing Engine</h1>
+          <p class="text-xs text-purple-200 font-medium">Sistema Inteligente de Revenue Management y Gobernanza Comercial</p>
+        </div>
       </div>
-      <div class="flex items-center gap-2 text-xs bg-purple-900/50 px-3 py-1.5 rounded-full border border-purple-400/30">
-        <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
-        <span id="status_cerebro">Cerebro IA Conectado</span>
+      <div class="flex items-center gap-3">
+        <div class="flex items-center gap-2 text-xs bg-purple-950/40 px-3.5 py-2 rounded-xl border border-purple-400/30 shadow-inner">
+          <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span id="status_cerebro" class="font-semibold tracking-wide">Cerebro IA Conectado</span>
+        </div>
       </div>
     </div>
   </header>
@@ -33,7 +42,7 @@
   <main class="max-w-7xl mx-auto px-6 py-6 space-y-6">
 
     <!-- Panel de Alerta de Gobernanza Comercial -->
-    <div id="banner_gobernanza" class="hidden rounded-xl border p-4 shadow-sm transition-all duration-300">
+    <div id="banner_gobernanza" class="hidden rounded-2xl border p-4 shadow-sm transition-all duration-300">
       <div class="flex items-start gap-3">
         <div id="icono_gobernanza" class="text-2xl">⚠️</div>
         <div class="flex-1">
@@ -57,7 +66,7 @@
           <label for="selector_ruta" class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-2">
             Corredor Ferroviario
           </label>
-          <select id="selector_ruta" class="w-full bg-slate-50 border border-slate-300 text-slate-900 text-sm rounded-xl p-3 focus:ring-2 focus:ring-purple-600 focus:outline-none font-medium">
+          <select id="selector_ruta" class="w-full bg-slate-50 border border-slate-300 text-slate-900 text-sm rounded-xl p-3 focus:ring-2 focus:ring-[#702082] focus:outline-none font-medium">
             <!-- Rellenado dinámicamente por main.js -->
           </select>
         </div>
@@ -70,7 +79,7 @@
             </label>
             <span class="text-sm font-bold renfe-purple-text"><span id="txt_dias">15</span> días</span>
           </div>
-          <input type="range" id="slider_dias" min="0" max="30" value="15" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-purple-800">
+          <input type="range" id="slider_dias" min="0" max="30" value="15" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-[#702082]">
           <div class="flex justify-between text-[10px] text-slate-400 mt-1">
             <span>0 (Salida hoy)</span>
             <span>30 días antes</span>
@@ -85,7 +94,7 @@
             </label>
             <span class="text-sm font-bold renfe-purple-text"><span id="txt_asientos">50</span> plazas</span>
           </div>
-          <input type="range" id="slider_asientos" min="0" max="100" value="50" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-purple-800">
+          <input type="range" id="slider_asientos" min="0" max="100" value="50" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-[#702082]">
           <div class="flex justify-between text-[10px] text-slate-400 mt-1">
             <span>0 (Tren Lleno)</span>
             <span>100 (Vacío)</span>
