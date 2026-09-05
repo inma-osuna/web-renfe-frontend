@@ -10,7 +10,7 @@ const ACCIONES_INFO = {
   8: { mult: 1.20, label: "Recargo premium de escasez absoluta. Maximización de ingresos.", badge: "+20%" }
 };
 
-// VINCULACIÓN EXACTA CON LOS IDS DEL HTML ARREGLADOS
+// VINCULACIÓN CON EL HTML
 const D = {
   selectorRuta: document.getElementById("selector_ruta"),
   sliderDias: document.getElementById("slider_dias"),
@@ -24,35 +24,40 @@ const D = {
   sbAccion: document.getElementById("sb_accion"),
   sbDesc: document.getElementById("sb_desc"),
 
-  // Cuadritos (KPIs Superiores)
+  // Cuadritos
   kpiBase: document.getElementById("kpi_base"),
   kpiTecho: document.getElementById("kpi_techo"),
   kpiVarTexto: document.getElementById("kpi_var_texto"),
   kpiFinal: document.getElementById("kpi_final"),
 
-  // Pestañas de Navegación
-  tabDash: document.getElementById("tab_dashboard"),
-  tabDocs: document.getElementById("tab_docs"),
-  vistaDash: document.getElementById("vista_dashboard"),
-  vistaDocs: document.getElementById("vista_docs")
+  // Gobernanza
+  bannerGob: document.getElementById("banner_gobernanza"),
+  titGob: document.getElementById("titulo_gobernanza"),
+  descGob: document.getElementById("desc_gobernanza")
 };
 
-// FUNCIÓN PARA CAMBIAR ENTRE PESTAÑAS (DASHBOARD Y DOCUMENTACIÓN)
+// FUNCIÓN PARA CAMBIAR ENTRE PESTAÑAS (EXPUESTA GLOBALMENTE)
 window.switchTab = function(tab) {
+  const vistaDash = document.getElementById('vista_dashboard');
+  const vistaDocs = document.getElementById('vista_docs');
+  const tabDash = document.getElementById('tab_dashboard');
+  const tabDocs = document.getElementById('tab_docs');
+
   if(tab === 'dashboard') {
-    D.vistaDash.classList.remove('hidden');
-    D.vistaDash.classList.add('flex');
-    D.vistaDocs.classList.add('hidden');
-    D.tabDash.className = "text-red-500 border-b-2 border-red-500 pb-1";
-    D.tabDocs.className = "text-gray-500 hover:text-gray-900 pb-1 transition-colors";
+    vistaDash.classList.remove('hidden');
+    vistaDash.classList.add('flex');
+    vistaDocs.classList.add('hidden');
+    tabDash.className = "text-red-500 border-b-2 border-red-500 pb-1";
+    tabDocs.className = "text-gray-500 hover:text-gray-900 pb-1 transition-colors";
+    // Redibujar gráficos para evitar bugs visuales al cambiar de pestaña
     Plotly.Plots.resize('grafico_heatmap');
     Plotly.Plots.resize('grafico_curva');
   } else {
-    D.vistaDash.classList.add('hidden');
-    D.vistaDash.classList.remove('flex');
-    D.vistaDocs.classList.remove('hidden');
-    D.tabDash.className = "text-gray-500 hover:text-gray-900 pb-1 transition-colors";
-    D.tabDocs.className = "text-red-500 border-b-2 border-red-500 pb-1";
+    vistaDash.classList.add('hidden');
+    vistaDash.classList.remove('flex');
+    vistaDocs.classList.remove('hidden');
+    tabDash.className = "text-gray-500 hover:text-gray-900 pb-1 transition-colors";
+    tabDocs.className = "text-red-500 border-b-2 border-red-500 pb-1";
   }
 };
 
@@ -84,8 +89,6 @@ function update(cambioRuta) {
 
   const accion = data.politica[`${dias}_${asientos}`] ?? 4;
   const info = ACCIONES_INFO[accion];
-  
-  // Extraemos el precio del JSON (usamos String para garantizar lectura segura de las claves)
   const precioBase = data.precios_base[String(dias)] || 60;
   const tarifaMax = data.tarifa_maxima || 250;
 
@@ -112,7 +115,7 @@ function update(cambioRuta) {
     isNegative ? "text-red-500 bg-pink-50" : "text-orange-600 bg-orange-50"
   }`;
 
-  // 2. Actualizar Cuadritos Superiores (KPIs)
+  // 2. Actualizar Cuadritos Superiores
   D.kpiBase.textContent = precioBase.toFixed(2);
   D.kpiTecho.textContent = tarifaMax.toFixed(2);
   D.kpiFinal.textContent = precioFinal.toFixed(2);
@@ -126,6 +129,14 @@ function update(cambioRuta) {
     D.kpiVarTexto.innerHTML = `<span class="${variacion > 0 ? 'text-orange-500' : variacion < 0 ? 'text-emerald-500' : 'text-gray-500'}">
       ${variacion > 0 ? '+' : ''}${variacion.toFixed(1)}%
     </span>`;
+  }
+
+  // Alarma
+  if (veto) {
+    D.bannerGob.classList.remove("hidden");
+    D.descGob.innerHTML = `La IA determinó un precio óptimo de <b>${precioCrudo.toFixed(2)}€</b> (Base ${precioBase.toFixed(2)}€ x ${info.mult.toFixed(2)}), superando el techo legal de <b>${tarifaMax.toFixed(2)}€</b>.`;
+  } else {
+    D.bannerGob.classList.add("hidden");
   }
 
   renderPlotly(data, dias, asientos, cambioRuta);
@@ -144,16 +155,16 @@ function renderPlotly(data, diasActual, asientosActual, refrescarTodo) {
       zValues.push(fila);
     }
     
-    // HEATMAP SEGMENTADO (Rosa, Rojo, Naranja)
+    // HEATMAP
     Plotly.react('grafico_heatmap', [{
       z: zValues, 
       x: Array.from({length: 31}, (_, i) => i), 
       y: Array.from({length: 101}, (_, i) => i).reverse(),
       type: 'heatmap', 
       colorscale: [
-        [0.0, '#fbcfe8'], [0.33, '#fbcfe8'], // 0, 1, 2 = Rosa
-        [0.33, '#ef4444'], [0.66, '#ef4444'], // 3, 4, 5 = Rojo
-        [0.66, '#ea580c'], [1.0, '#ea580c']   // 6, 7, 8 = Naranja
+        [0.0, '#fbcfe8'], [0.33, '#fbcfe8'], // Rosa
+        [0.33, '#ef4444'], [0.66, '#ef4444'], // Rojo
+        [0.66, '#ea580c'], [1.0, '#ea580c']   // Naranja
       ], 
       zmin: 0, zmax: 8,
       showscale: false

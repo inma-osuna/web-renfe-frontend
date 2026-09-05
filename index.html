@@ -4,8 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Renfe RM | Dynamic Pricing</title>
-  <!-- AQUÍ ESTÁ EL LOGO DE LA PESTAÑA DEL NAVEGADOR -->
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ef4444' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'><path d='M3 17l6-6 4 4 8-8'/><path d='M17 7h4v4'/></svg>" type="image/svg+xml">
+  
+  <!-- Enlace a tu propio archivo favicon.svg -->
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
 </head>
@@ -27,7 +29,7 @@
             <p class="text-[10px] font-bold text-red-500 tracking-wider">DYNAMIC PRICING</p>
           </div>
         </div>
-        <!-- Enlaces -->
+        <!-- Enlaces a las pestañas -->
         <nav class="hidden md:flex gap-6 text-sm font-semibold text-gray-500">
           <button id="tab_dashboard" class="text-red-500 border-b-2 border-red-500 pb-1" onclick="switchTab('dashboard')">Dashboard</button>
           <button id="tab_docs" class="hover:text-gray-900 pb-1 transition-colors" onclick="switchTab('docs')">Documentación Técnica</button>
@@ -46,7 +48,7 @@
       </div>
     </header>
 
-    <!-- PESTAÑA: DASHBOARD -->
+    <!-- PESTAÑA 1: DASHBOARD -->
     <div id="vista_dashboard" class="flex flex-col lg:flex-row flex-1 bg-white">
       
       <!-- SIDEBAR IZQUIERDO -->
@@ -188,7 +190,7 @@
       </main>
     </div>
 
-    <!-- PESTAÑA: DOCUMENTACIÓN TÉCNICA -->
+    <!-- PESTAÑA 2: DOCUMENTACIÓN TÉCNICA -->
     <div id="vista_docs" class="hidden flex-1 p-8 bg-white text-gray-700 min-h-[600px]">
       <h2 class="text-2xl font-bold text-gray-900 mb-6">Documentación Técnica del Entorno</h2>
       <div class="prose max-w-3xl text-sm">
