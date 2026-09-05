@@ -189,23 +189,18 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 function update(cambioRuta) {
-  const ruta = D.selectorRuta.value;
-  const dias = parseInt(D.sliderDias.value);
-  const asientos = parseInt(D.sliderAsientos.value);
-  const data = CEREBRO_IA[ruta];
-
-  D.txtDias.textContent = dias;
-  D.txtAsientos.textContent = asientos;
-
   const accion = data.politica[`${dias}_${asientos}`] ?? 4;
   const info = ACCIONES_INFO[lang][accion];
   const precioBase = data.precios_base[String(dias)] || 60;
-  const tarifaMax = data.tarifa_maxima || 250;
+  
+  // CAMBIO CLAVE: El techo legal estricto ahora es la propia Tarifa Base del día
+  const tarifaMax = precioBase; 
 
   const precioCrudo = precioBase * info.mult;
   let precioFinal = precioCrudo;
   let veto = false;
 
+  // Si la IA intenta subir por encima del precio base (ej: multiplicador > 1.0), se capa a la base
   if (precioCrudo > tarifaMax) {
     precioFinal = tarifaMax;
     veto = true;
@@ -232,8 +227,8 @@ function update(cambioRuta) {
   if (veto) {
     D.kpiVarTexto.innerHTML = `<span class="text-red-600 text-sm font-bold bg-red-50 px-2 py-1 rounded">${i18n[lang].text_capado}</span>`;
     D.descGob.innerHTML = lang === 'es' 
-      ? `La IA determinó un precio óptimo de <b>${precioCrudo.toFixed(2)}€</b>, superando el techo legal de <b>${tarifaMax.toFixed(2)}€</b>.`
-      : `AI calculated optimal price of <b>${precioCrudo.toFixed(2)}€</b>, exceeding the legal ceiling of <b>${tarifaMax.toFixed(2)}€</b>.`;
+      ? `La IA intentó aplicar un recargo, superando el límite estricto de la Tarifa Base de <b>${tarifaMax.toFixed(2)}€</b>.`
+      : `AI attempted a surcharge, exceeding the strict Base Fare limit of <b>${tarifaMax.toFixed(2)}€</b>.`;
     D.bannerGob.classList.remove("hidden");
   } else {
     D.kpiVarTexto.innerHTML = `<span class="${variacion > 0 ? 'text-orange-500' : variacion < 0 ? 'text-emerald-500' : 'text-gray-500'}">
