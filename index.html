@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Renfe RM | Dynamic Pricing</title>
   
-  <!-- Logo en la pestaña del buscador -->
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   
   <script src="https://cdn.tailwindcss.com"></script>
@@ -18,8 +17,7 @@
     <!-- NAVBAR -->
     <header class="flex flex-wrap justify-between items-center px-8 py-4 border-b border-gray-100 bg-white shrink-0">
       <div class="flex items-center gap-10">
-        
-        <!-- AQUÍ CARGAMOS TU LOGO REAL DENTRO DE LA PÁGINA -->
+        <!-- Logo -->
         <div class="flex items-center gap-2">
           <img src="favicon.svg" alt="Logo RM" class="w-7 h-7">
           <div class="leading-tight">
@@ -27,7 +25,6 @@
             <p class="text-[10px] font-bold text-red-500 tracking-wider">DYNAMIC PRICING</p>
           </div>
         </div>
-        
         <!-- Enlaces a las pestañas -->
         <nav class="hidden md:flex gap-6 text-sm font-semibold text-gray-500">
           <button id="tab_dashboard" class="text-red-500 border-b-2 border-red-500 pb-1" onclick="switchTab('dashboard')">Dashboard</button>
@@ -35,13 +32,13 @@
         </nav>
       </div>
 
-      <!-- Botones derecha -->
+      <!-- Botones derecha: IDIOMA Y EXPORTAR -->
       <div class="flex items-center gap-3">
         <div class="flex border border-gray-200 rounded-md text-xs font-semibold overflow-hidden">
-          <button class="px-3 py-1.5 bg-gray-100 text-gray-800">ES</button>
-          <button class="px-3 py-1.5 text-gray-400 hover:bg-gray-50">EN</button>
+          <button id="btn_es" onclick="setLang('es')" class="px-3 py-1.5 bg-gray-100 text-gray-800 transition-colors">ES</button>
+          <button id="btn_en" onclick="setLang('en')" class="px-3 py-1.5 text-gray-400 hover:bg-gray-50 transition-colors">EN</button>
         </div>
-        <button class="px-4 py-1.5 border border-gray-200 rounded-md text-xs font-semibold text-gray-600 hover:bg-gray-50 transition-colors">
+        <button id="btn_exportar" onclick="exportarReporte()" class="px-4 py-1.5 border border-gray-200 rounded-md text-xs font-semibold text-gray-600 hover:bg-gray-50 transition-colors">
           Exportar Reporte
         </button>
       </div>
@@ -54,26 +51,26 @@
       <aside class="w-full lg:w-[320px] border-r border-gray-100 p-8 flex flex-col gap-8 shrink-0 bg-white">
         
         <section>
-          <h2 class="text-[10px] font-bold text-red-500 uppercase tracking-widest mb-5">Parámetros del Entorno</h2>
+          <h2 id="tit_params" class="text-[10px] font-bold text-red-500 uppercase tracking-widest mb-5">Parámetros del Entorno</h2>
           
           <div class="space-y-6">
             <div>
-              <label class="block text-xs font-semibold text-gray-700 mb-2">Corredor Ferroviario</label>
+              <label id="lbl_ruta" class="block text-xs font-semibold text-gray-700 mb-2">Corredor Ferroviario</label>
               <select id="selector_ruta" class="w-full bg-gray-50 border border-gray-200 text-gray-800 text-xs font-bold rounded-md p-2.5 outline-none focus:ring-1 focus:ring-red-400"></select>
             </div>
 
             <div>
               <div class="flex justify-between items-center mb-2">
-                <label class="text-xs font-semibold text-gray-700">Días para la salida</label>
-                <span class="text-xs font-bold text-red-500 bg-red-50 px-2 py-0.5 rounded-md"><span id="txt_dias">15</span> d</span>
+                <label id="lbl_dias" class="text-xs font-semibold text-gray-700">Días para la salida</label>
+                <span class="text-xs font-bold text-red-500 bg-red-50 px-2 py-0.5 rounded-md"><span id="txt_dias">15</span> <span id="lbl_d">d</span></span>
               </div>
               <input type="range" id="slider_dias" min="0" max="30" value="15" class="w-full h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-red-500">
             </div>
 
             <div>
               <div class="flex justify-between items-center mb-2">
-                <label class="text-xs font-semibold text-gray-700">Inventario</label>
-                <span class="text-xs font-bold text-red-500 bg-red-50 px-2 py-0.5 rounded-md"><span id="txt_asientos">50</span> pl</span>
+                <label id="lbl_plazas" class="text-xs font-semibold text-gray-700">Inventario</label>
+                <span class="text-xs font-bold text-red-500 bg-red-50 px-2 py-0.5 rounded-md"><span id="txt_asientos">50</span> <span id="lbl_pl">pl</span></span>
               </div>
               <input type="range" id="slider_asientos" min="0" max="100" value="50" class="w-full h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-red-500">
             </div>
@@ -82,18 +79,18 @@
 
         <!-- Tarjeta Recomendación -->
         <section>
-          <h2 class="text-[10px] font-bold text-red-500 uppercase tracking-widest mb-3">Recomendación del Modelo</h2>
+          <h2 id="tit_recom" class="text-[10px] font-bold text-red-500 uppercase tracking-widest mb-3">Recomendación del Modelo</h2>
           
           <div class="bg-white rounded-2xl border border-gray-100 p-5 shadow-[0_4px_20px_rgba(0,0,0,0.04)] relative">
             <div class="flex justify-between items-start">
-              <span class="text-xs font-semibold text-gray-500">Multiplicador de Precio</span>
+              <span id="lbl_mult" class="text-xs font-semibold text-gray-500">Multiplicador de Precio</span>
               <span id="sb_pct" class="text-xs font-bold text-red-500 bg-pink-50 px-2 py-0.5 rounded-full">-10%</span>
             </div>
             
             <div class="text-4xl font-black text-gray-900 mt-2 mb-4"><span id="sb_multiplicador">0.9</span>x</div>
             
             <div class="flex items-center gap-2 mb-4">
-              <span class="text-xs font-semibold text-gray-500">Acción Discreta:</span>
+              <span id="lbl_accion" class="text-xs font-semibold text-gray-500">Acción Discreta:</span>
               <span id="sb_accion" class="bg-red-500 text-white text-xs font-bold w-5 h-5 flex items-center justify-center rounded">3</span>
             </div>
 
@@ -113,7 +110,7 @@
           <div class="flex items-start gap-3">
             <div class="text-xl mt-0.5">🛑</div>
             <div class="flex-1">
-              <h3 class="text-sm font-bold text-red-900">VETO POR LÍMITE REGULADO</h3>
+              <h3 id="titulo_gobernanza" class="text-sm font-bold text-red-900">VETO POR LÍMITE REGULADO</h3>
               <p id="desc_gobernanza" class="text-xs mt-1 text-red-800"></p>
             </div>
           </div>
@@ -122,22 +119,22 @@
         <!-- LOS 4 CUADRITOS -->
         <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
           <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex flex-col justify-center">
-            <div class="text-[9px] font-bold uppercase tracking-wider text-gray-400">Tarifa Base (Día actual)</div>
+            <div id="kpi_tit_base" class="text-[9px] font-bold uppercase tracking-wider text-gray-400">Tarifa Base (Día actual)</div>
             <div class="text-2xl font-black text-gray-800 mt-1"><span id="kpi_base">--</span>€</div>
           </div>
           
           <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex flex-col justify-center">
-            <div class="text-[9px] font-bold uppercase tracking-wider text-gray-400">Techo Legal</div>
+            <div id="kpi_tit_techo" class="text-[9px] font-bold uppercase tracking-wider text-gray-400">Techo Legal</div>
             <div class="text-2xl font-black text-gray-800 mt-1"><span id="kpi_techo">--</span>€</div>
           </div>
           
           <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex flex-col justify-center">
-            <div class="text-[9px] font-bold uppercase tracking-wider text-gray-400">Variación Aplicada</div>
+            <div id="kpi_tit_var" class="text-[9px] font-bold uppercase tracking-wider text-gray-400">Variación Aplicada</div>
             <div class="text-lg font-bold mt-1" id="kpi_var_texto">--</div>
           </div>
           
           <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex flex-col justify-center border-l-4 border-l-red-500 relative overflow-hidden">
-            <div class="text-[9px] font-bold uppercase tracking-wider text-red-500">Precio Final Cliente</div>
+            <div id="kpi_tit_final" class="text-[9px] font-bold uppercase tracking-wider text-red-500">Precio Final Cliente</div>
             <div class="text-3xl font-black text-red-600 mt-1"><span id="kpi_final">--</span>€</div>
           </div>
         </div>
@@ -148,7 +145,7 @@
           <!-- Heatmap -->
           <div class="bg-white border border-gray-100 rounded-xl p-5 flex flex-col shadow-sm h-[400px] overflow-hidden">
             <div class="flex justify-between items-center mb-2 shrink-0">
-              <h3 class="text-sm font-bold text-gray-900">Mapa de Política: Random Forest</h3>
+              <h3 id="tit_heatmap" class="text-sm font-bold text-gray-900">Mapa de Política: Random Forest</h3>
               <span class="text-[9px] font-bold text-red-500 bg-pink-50 px-2.5 py-1 rounded tracking-wider border border-pink-100">LIVE DATA</span>
             </div>
             <div id="grafico_heatmap" class="w-full flex-1 min-h-0"></div>
@@ -158,19 +155,19 @@
               <div class="flex items-center gap-2">
                 <div class="w-3.5 h-3.5 bg-[#fbcfe8] rounded-sm"></div>
                 <div class="text-[9px] text-gray-500 leading-tight">
-                  <strong class="text-gray-800 block">0-2 (0.8x - 0.9x)</strong> Descuentos
+                  <strong class="text-gray-800 block">0-2 (0.8x - 0.9x)</strong> <span id="leg_1">Descuentos</span>
                 </div>
               </div>
               <div class="flex items-center gap-2">
                 <div class="w-3.5 h-3.5 bg-[#ef4444] rounded-sm"></div>
                 <div class="text-[9px] text-gray-500 leading-tight">
-                  <strong class="text-gray-800 block">3-5 (0.9x - 1.1x)</strong> Neutro
+                  <strong class="text-gray-800 block">3-5 (0.9x - 1.1x)</strong> <span id="leg_2">Neutro</span>
                 </div>
               </div>
               <div class="flex items-center gap-2">
                 <div class="w-3.5 h-3.5 bg-[#ea580c] rounded-sm"></div>
                 <div class="text-[9px] text-gray-500 leading-tight">
-                  <strong class="text-gray-800 block">6-8 (1.1x - 1.2x)</strong> Yield alcista
+                  <strong class="text-gray-800 block">6-8 (1.1x - 1.2x)</strong> <span id="leg_3">Yield alcista</span>
                 </div>
               </div>
             </div>
@@ -179,7 +176,7 @@
           <!-- Curva -->
           <div class="bg-white border border-gray-100 rounded-xl p-5 flex flex-col shadow-sm h-[400px] overflow-hidden">
             <div class="flex justify-between items-center mb-2 shrink-0">
-              <h3 class="text-sm font-bold text-gray-900">Proyección de Tarifa Base</h3>
+              <h3 id="tit_curva" class="text-sm font-bold text-gray-900">Proyección de Tarifa Base</h3>
             </div>
             <div id="grafico_curva" class="w-full flex-1 min-h-0"></div>
           </div>
@@ -190,16 +187,47 @@
     </div>
 
     <!-- PESTAÑA 2: DOCUMENTACIÓN TÉCNICA -->
-    <div id="vista_docs" class="hidden flex-1 p-8 bg-white text-gray-700 min-h-[600px]">
-      <h2 class="text-2xl font-bold text-gray-900 mb-6">Documentación Técnica del Entorno</h2>
-      <div class="prose max-w-3xl text-sm">
-        <p class="mb-4">Este dashboard interactúa con el objeto JSON <code class="bg-gray-100 px-1 rounded font-mono text-red-500">CEREBRO_IA</code> exportado desde un pipeline de datos de PySpark.</p>
-        <ul class="list-disc pl-5 space-y-2 mt-4">
-          <li><strong>Modelo:</strong> Agente de Aprendizaje por Refuerzo (Random Forest Regressor)</li>
-          <li><strong>Espacio de Estados:</strong> Continuo normalizado [0, 1] representativo de Días al evento y Plazas remanentes.</li>
-          <li><strong>Espacio de Acciones:</strong> Discreto (0 al 8) correspondiente a multiplicadores desde 0.80x hasta 1.20x.</li>
-          <li><strong>Gobernanza:</strong> Regla de negocio en el frontend (main.js) que intercepta cualquier tarifa que supere el Techo Histórico de la ruta.</li>
-        </ul>
+    <div id="vista_docs" class="hidden w-full p-6 sm:p-10 bg-gray-50/30">
+      <div class="max-w-6xl mx-auto w-full">
+        <div class="mb-8">
+          <h2 id="docs_h2" class="text-2xl font-extrabold text-gray-900">Arquitectura del Motor de Precios</h2>
+          <p id="docs_p" class="text-sm text-gray-500 mt-2">Especificaciones técnicas del despliegue del modelo predictivo y reglas de negocio. Este dashboard interactúa con el objeto JSON <code class="font-mono text-red-500 bg-red-50 px-1.5 py-0.5 rounded">CEREBRO_IA</code> exportado en tiempo real.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="bg-white rounded-2xl p-6 border border-gray-100 shadow-[0_4px_20px_rgba(0,0,0,0.03)] relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-1.5 h-full bg-red-500"></div>
+            <h3 id="docs_t1" class="font-bold text-gray-900 mb-3 flex items-center gap-2 text-sm">
+              <span class="bg-red-50 text-red-500 p-1.5 rounded-lg text-lg">⚙️</span>
+              Pipeline de Datos y Big Data
+            </h3>
+            <p id="docs_d1" class="text-xs text-gray-600 leading-relaxed">El entrenamiento del agente de aprendizaje por refuerzo y el procesamiento masivo de tarifas históricas se ha ejecutado utilizando un entorno distribuido en <strong>PySpark</strong>.</p>
+          </div>
+          <div class="bg-white rounded-2xl p-6 border border-gray-100 shadow-[0_4px_20px_rgba(0,0,0,0.03)] relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-1.5 h-full bg-orange-500"></div>
+            <h3 id="docs_t2" class="font-bold text-gray-900 mb-3 flex items-center gap-2 text-sm">
+              <span class="bg-orange-50 text-orange-500 p-1.5 rounded-lg text-lg">🧠</span>
+              Modelo de Machine Learning
+            </h3>
+            <p id="docs_d2" class="text-xs text-gray-600 leading-relaxed">El núcleo emplea un <strong>Random Forest Regressor</strong> para aproximar los Q-Values. El <em>Espacio de Estados</em> es un plano continuo normalizado [0, 1] que evalúa Lead Time y capacidad.</p>
+          </div>
+          <div class="bg-white rounded-2xl p-6 border border-gray-100 shadow-[0_4px_20px_rgba(0,0,0,0.03)] relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-1.5 h-full bg-pink-500"></div>
+            <h3 id="docs_t3" class="font-bold text-gray-900 mb-3 flex items-center gap-2 text-sm">
+              <span class="bg-pink-50 text-pink-500 p-1.5 rounded-lg text-lg">📊</span>
+              Espacio de Acciones Discretas
+            </h3>
+            <p id="docs_d3" class="text-xs text-gray-600 leading-relaxed">El agente selecciona sobre 9 acciones que varían el precio. El espectro abarca desde descuentos del <strong>0.80x (-20%)</strong> hasta recargos premium del <strong>1.20x (+20%)</strong>.</p>
+          </div>
+          <div class="bg-white rounded-2xl p-6 border border-gray-100 shadow-[0_4px_20px_rgba(0,0,0,0.03)] relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-1.5 h-full bg-emerald-500"></div>
+            <h3 id="docs_t4" class="font-bold text-gray-900 mb-3 flex items-center gap-2 text-sm">
+              <span class="bg-emerald-50 text-emerald-500 p-1.5 rounded-lg text-lg">⚖️</span>
+              Gobernanza y Límite Legal
+            </h3>
+            <p id="docs_d4" class="text-xs text-gray-600 leading-relaxed">Reglas de negocio estrictas. Cualquier salida del algoritmo que sugiera una tarifa superior al <strong>Techo Histórico Regulado</strong> de la ruta es automáticamente truncada al límite.</p>
+          </div>
+        </div>
       </div>
     </div>
 
